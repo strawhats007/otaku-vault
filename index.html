@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OtakuVault - Premium Anime Figures & Collectibles</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1a1a1a',
+                        accent: '#d8532e',
+                        'accent-dark': '#c53b2b',
+                        'bg-light': '#f5f5f5',
+                        'card-bg': '#ffffff',
+                        'text-muted': '#666666',
+                        'border-light': '#e0e0e0',
+                        sale: '#e53935',
+                    },
+                    fontFamily: {
+                        'heading': ['Poppins', 'sans-serif'],
+                        'body': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f5f5f5; }
+        .hero-bg { background: #1a1a1a; }
+        .faded-text {
+            font-size: clamp(100px, 15vw, 200px);
+            color: rgba(255,255,255,0.03);
+            font-weight: 900;
+            letter-spacing: -5px;
+            user-select: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .stat-animate { animation: countUp 0.6s ease-out forwards; }
+        .product-card:hover { border-color: #d8532e; transform: translateY(-4px); box-shadow: 0 10px 30px rgba(216,83,46,0.15); }
+        .pill-btn.active { background-color: #d8532e !important; color: white !important; font-weight: 600 !important; }
+        .filter-option:hover { background: #f5f5f5; }
+        ::-webkit-scrollbar { height: 8px; }
+        ::-webkit-scrollbar-track { background: #f5f5f5; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #d8532e; }
+
+        /* Custom dropdown styles */
+        select {
+            border-radius: 12px !important;
+            outline: none;
+        }
+        select option {
+            border-radius: 12px !important;
+            padding: 8px;
+        }
+        select option:checked,
+        select option:hover,
+        select option:focus,
+        select option:active {
+            background-color: #d8532e !important;
+            color: white !important;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="font-body">
+
+    <!-- Navbar -->
+    <nav id="mainNavbar" class="fixed top-0 left-0 right-0 bg-white z-50 border-b border-gray-100 shadow-sm transition-transform duration-300 ease-in-out">
+        <div class="max-w-[1600px] mx-auto px-8 md:px-16 h-[70px] flex items-center justify-between relative">
+            <!-- Left: Logo -->
+            <a href="#" class="flex items-center gap-2 flex-shrink-0">
+                <span class="text-primary font-heading font-bold text-2xl tracking-tight">OTAKU</span>
+                <span class="text-accent font-heading font-bold text-2xl tracking-tight">VAULT</span>
+            </a>
+
+            <!-- Center: Navigation Links -->
+            <div class="hidden lg:flex items-center gap-8 justify-center absolute left-1/2 transform -translate-x-1/2">
+                <a href="#" class="text-primary hover:text-accent transition-colors font-medium">Home</a>
+                <a href="#" class="text-primary hover:text-accent transition-colors font-medium">Shop</a>
+                <a href="#" class="text-primary hover:text-accent transition-colors font-medium">Series</a>
+                <a href="#" class="text-primary hover:text-accent transition-colors font-medium">New Arrivals</a>
+                <a href="#" class="text-primary hover:text-accent transition-colors font-medium">About</a>
+            </div>
+
+            <!-- Right: Icons (Search, Account, Wishlist, Cart) -->
+            <div class="flex items-center gap-3">
+                <!-- Search Bar -->
+                <div class="hidden md:flex items-center bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200 rounded-full px-4 py-1.5 w-60">
+                    <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input type="text" placeholder="Search figures..." class="bg-transparent text-primary text-xs w-full outline-none placeholder-gray-400">
+                </div>
+
+                <!-- Account Icon -->
+                <button class="text-primary/80 hover:text-accent transition-colors p-2 cursor-pointer" title="Account">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                </button>
+
+                <!-- Wishlist Icon -->
+                <button class="text-primary/80 hover:text-accent transition-colors p-2 cursor-pointer" title="Wishlist">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                </button>
+
+                <!-- Cart Button -->
+                <a href="cart.html" class="flex items-center gap-2 bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-full font-semibold transition-all hover:scale-105 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                    <span class="text-xs">Cart</span>
+                    <span id="cartBadge" class="bg-white text-accent text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none">0</span>
+                </a>
+
+                <!-- Mobile Menu Button -->
+                <button class="lg:hidden text-primary p-2 cursor-pointer" id="menuBtn">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div class="lg:hidden hidden bg-white border-t border-gray-100 shadow-lg" id="mobileMenu">
+            <div class="px-4 py-4 space-y-3">
+                <a href="#" class="block text-primary hover:text-accent font-medium py-2">Home</a>
+                <a href="#" class="block text-primary hover:text-accent font-medium py-2">Shop</a>
+                <a href="#" class="block text-primary hover:text-accent font-medium py-2">Series</a>
+                <a href="#" class="block text-primary hover:text-accent font-medium py-2">New Arrivals</a>
+                <a href="#" class="block text-primary hover:text-accent font-medium py-2">About</a>
+                <div class="pt-2">
+                    <input type="text" placeholder="Search figures..." class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-primary outline-none placeholder-gray-400">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section (Full-width Image Slider) -->
+    <section class="relative w-full h-[calc(100vh-70px)] mt-[70px] overflow-hidden bg-primary">
+        <!-- Slides Wrapper -->
+        <div id="hero-slider" class="relative w-full h-full">
+            <!-- Slide 1 -->
+            <div class="slide absolute inset-0 w-full h-full opacity-100 transition-opacity duration-1000 ease-in-out z-10">
+                <img src="https://picsum.photos/id/1/1920/1080" alt="Slide 1" class="w-full h-full object-cover">
+            </div>
+            <!-- Slide 2 -->
+            <div class="slide absolute inset-0 w-full h-full opacity-0 transition-opacity duration-1000 ease-in-out z-10">
+                <img src="https://picsum.photos/id/20/1920/1080" alt="Slide 2" class="w-full h-full object-cover">
+            </div>
+            <!-- Slide 3 -->
+            <div class="slide absolute inset-0 w-full h-full opacity-0 transition-opacity duration-1000 ease-in-out z-10">
+                <img src="https://picsum.photos/id/40/1920/1080" alt="Slide 3" class="w-full h-full object-cover">
+            </div>
+            <!-- Slide 4 -->
+            <div class="slide absolute inset-0 w-full h-full opacity-0 transition-opacity duration-1000 ease-in-out z-10">
+                <img src="https://picsum.photos/id/60/1920/1080" alt="Slide 4" class="w-full h-full object-cover">
+            </div>
+            <!-- Slide 5 -->
+            <div class="slide absolute inset-0 w-full h-full opacity-0 transition-opacity duration-1000 ease-in-out z-10">
+                <img src="https://picsum.photos/id/80/1920/1080" alt="Slide 5" class="w-full h-full object-cover">
+            </div>
+        </div>
+
+        <!-- Dot Indicators -->
+        <div class="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-3 z-20">
+            <button class="slider-dot w-3.5 h-3.5 rounded-full bg-accent transition-all cursor-pointer" onclick="goToSlide(0)"></button>
+            <button class="slider-dot w-3.5 h-3.5 rounded-full bg-white/40 hover:bg-white transition-all cursor-pointer" onclick="goToSlide(1)"></button>
+            <button class="slider-dot w-3.5 h-3.5 rounded-full bg-white/40 hover:bg-white transition-all cursor-pointer" onclick="goToSlide(2)"></button>
+            <button class="slider-dot w-3.5 h-3.5 rounded-full bg-white/40 hover:bg-white transition-all cursor-pointer" onclick="goToSlide(3)"></button>
+            <button class="slider-dot w-3.5 h-3.5 rounded-full bg-white/40 hover:bg-white transition-all cursor-pointer" onclick="goToSlide(4)"></button>
+        </div>
+    </section>
+
+    <!-- Series Filter Strip -->
+    <section class="bg-white py-4 border-b border-gray-200">
+        <div class="max-w-[1600px] mx-auto px-8 md:px-16">
+            <div class="flex gap-3 overflow-x-auto scrollbar-hide py-2">
+                <button class="pill-btn active whitespace-nowrap px-6 py-2 rounded-full bg-gray-100 text-gray-700 font-medium text-sm transition-all hover:bg-gray-200 hover:scale-105">All Series</button>
+                <button class="pill-btn whitespace-nowrap px-6 py-2 rounded-full bg-gray-100 text-gray-700 font-medium text-sm transition-all hover:bg-gray-200 hover:scale-105">One Piece</button>
+                <button class="pill-btn whitespace-nowrap px-6 py-2 rounded-full bg-gray-100 text-gray-700 font-medium text-sm transition-all hover:bg-gray-200 hover:scale-105">Naruto</button>
+                <button class="pill-btn whitespace-nowrap px-6 py-2 rounded-full bg-gray-100 text-gray-700 font-medium text-sm transition-all hover:bg-gray-200 hover:scale-105">Demon Slayer</button>
+                <button class="pill-btn whitespace-nowrap px-6 py-2 rounded-full bg-gray-100 text-gray-700 font-medium text-sm transition-all hover:bg-gray-200 hover:scale-105">Dragon Ball Z</button>
+                <button class="pill-btn whitespace-nowrap px-6 py-2 rounded-full bg-gray-100 text-gray-700 font-medium text-sm transition-all hover:bg-gray-200 hover:scale-105">Jujutsu Kaisen</button>
+                <button class="pill-btn whitespace-nowrap px-6 py-2 rounded-full bg-gray-100 text-gray-700 font-medium text-sm transition-all hover:bg-gray-200 hover:scale-105">Attack on Titan</button>
+                <button class="pill-btn whitespace-nowrap px-6 py-2 rounded-full bg-gray-100 text-gray-700 font-medium text-sm transition-all hover:bg-gray-200 hover:scale-105">My Hero Academia</button>
+                <button class="pill-btn whitespace-nowrap px-6 py-2 rounded-full bg-gray-100 text-gray-700 font-medium text-sm transition-all hover:bg-gray-200 hover:scale-105">Black Clover</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <section class="bg-bg-light py-12">
+        <div class="max-w-[1600px] mx-auto px-8 md:px-16">
+            <div class="flex gap-8 items-start">
+                <!-- Left Sidebar -->
+                <aside class="hidden lg:block w-48 flex-shrink-0" style="position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow: hidden; align-self: flex-start;">
+                    <div class="bg-white rounded-2xl p-6 shadow-sm">
+                        <!-- Category Filter -->
+                        <div class="mb-6">
+                            <h3 class="font-heading font-bold text-primary text-lg mb-4">Category</h3>
+                            <div class="space-y-2">
+                                <label class="filter-option flex items-center justify-between p-2 rounded-lg cursor-pointer">
+                                    <span class="text-sm text-gray-700">All Figures</span>
+                                    <span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">48</span>
+                                </label>
+                                <label class="filter-option flex items-center justify-between p-2 rounded-lg cursor-pointer">
+                                    <span class="text-sm text-gray-700">Action Figures</span>
+                                    <span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">15</span>
+                                </label>
+                                <label class="filter-option flex items-center justify-between p-2 rounded-lg cursor-pointer">
+                                    <span class="text-sm text-gray-700">Nendoroids</span>
+                                    <span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">12</span>
+                                </label>
+                                <label class="filter-option flex items-center justify-between p-2 rounded-lg cursor-pointer">
+                                    <span class="text-sm text-gray-700">Figma</span>
+                                    <span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">8</span>
+                                </label>
+                                <label class="filter-option flex items-center justify-between p-2 rounded-lg cursor-pointer">
+                                    <span class="text-sm text-gray-700">Statues/PVC</span>
+                                    <span class="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">13</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Price Range -->
+                        <div class="mb-6">
+                            <h3 class="font-heading font-bold text-primary text-lg mb-4">Price Range</h3>
+                            <div class="space-y-3">
+                                <input type="range" min="500" max="10000" value="5000" class="w-full accent-accent">
+                                <div class="flex justify-between text-sm text-gray-500">
+                                    <span>৳500</span>
+                                    <span>৳10,000</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <input type="number" placeholder="Min" value="500" class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2">
+                                    <input type="number" placeholder="Max" value="10000" class="w-full text-sm border border-gray-200 rounded-lg px-3 py-2">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Scale -->
+                        <div class="mb-6">
+                            <h3 class="font-heading font-bold text-primary text-lg mb-4">Scale</h3>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" class="w-4 h-4 accent-accent">
+                                    <span class="text-sm text-gray-700">1/4 Scale</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" class="w-4 h-4 accent-accent">
+                                    <span class="text-sm text-gray-700">1/7 Scale</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" class="w-4 h-4 accent-accent">
+                                    <span class="text-sm text-gray-700">1/8 Scale</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" class="w-4 h-4 accent-accent">
+                                    <span class="text-sm text-gray-700">Chibi/SD</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Availability -->
+                        <div class="mb-6">
+                            <h3 class="font-heading font-bold text-primary text-lg mb-4">Availability</h3>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" checked class="w-4 h-4 accent-accent">
+                                    <span class="text-sm text-gray-700">In Stock</span>
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" class="w-4 h-4 accent-accent">
+                                    <span class="text-sm text-gray-700">Pre-order</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <button class="w-full bg-accent hover:bg-accent-dark text-white py-3 rounded-xl font-semibold transition-all">
+                            Apply Filters
+                        </button>
+                    </div>
+                </aside>
+
+                <!-- Product Grid -->
+                <div class="flex-1">
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="font-heading font-bold text-2xl text-primary">All Products</h2>
+                        <div class="flex items-center gap-4">
+                            <span class="text-sm text-gray-500">Sort by:</span>
+                            <div id="sortDropdownWrapper" class="relative group inline-block text-left w-48">
+                                <button type="button" id="sortDropdownBtn" class="w-full bg-white text-gray-700 group-hover:bg-accent group-hover:text-white border border-gray-200 rounded-[12px] px-4 py-2 text-sm flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent cursor-pointer transition-all duration-300">
+                                    <span id="selectedSortOption">Popular</span>
+                                    <svg class="w-4 h-4 ml-2 text-gray-500 group-hover:text-white transition-all duration-300" id="sortDropdownArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div id="sortDropdownMenu" class="absolute right-0 top-full pt-2 w-full z-50 transform origin-top scale-95 opacity-0 invisible transition-all duration-200 ease-out pointer-events-none">
+                                    <div class="bg-white border border-gray-100 rounded-[12px] shadow-lg overflow-hidden">
+                                        <div class="p-1.5 space-y-0.5">
+                                            <div class="sort-option px-4 py-2 text-sm text-gray-700 cursor-pointer rounded-[8px] transition-all duration-200 ease-in-out hover:bg-accent hover:text-white" data-value="Popular">Popular</div>
+                                            <div class="sort-option px-4 py-2 text-sm text-gray-700 cursor-pointer rounded-[8px] transition-all duration-200 ease-in-out hover:bg-accent hover:text-white" data-value="Newest">Newest</div>
+                                            <div class="sort-option px-4 py-2 text-sm text-gray-700 cursor-pointer rounded-[8px] transition-all duration-200 ease-in-out hover:bg-accent hover:text-white" data-value="Price: Low to High">Price: Low to High</div>
+                                            <div class="sort-option px-4 py-2 text-sm text-gray-700 cursor-pointer rounded-[8px] transition-all duration-200 ease-in-out hover:bg-accent hover:text-white" data-value="Price: High to Low">Price: High to Low</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        <!-- Products dynamically loaded from Supabase or Fallback array -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Load More Button -->
+            <div class="text-center mt-10">
+                <button class="bg-white hover:bg-gray-50 text-primary border-2 border-gray-200 px-10 py-4 rounded-full font-semibold transition-all hover:border-accent hover:text-accent">
+                    Load More Products
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mid-Page Banner -->
+    <section class="bg-primary py-16">
+        <div class="max-w-[1600px] mx-auto px-8 md:px-16">
+            <div class="bg-gradient-to-r from-accent/20 to-transparent rounded-3xl p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-6 border border-accent/30">
+                <div class="text-center md:text-left">
+                    <span class="bg-accent text-white text-xs font-bold px-4 py-1 rounded-full mb-4 inline-block">PRE-ORDER NOW</span>
+                    <h3 class="font-heading font-bold text-white text-2xl md:text-3xl mb-2">Naruto - Hokage 6th Figure</h3>
+                    <p class="text-gray-400 mb-2">Exclusive limited edition release from the legendary series</p>
+                    <p class="text-accent font-semibold">Expected: July 2024 • ৳5,999</p>
+                </div>
+                <button class="bg-accent hover:bg-accent-dark text-white px-10 py-4 rounded-full font-bold transition-all hover:scale-105 whitespace-nowrap">
+                    Pre-Order Now
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us Section -->
+    <section class="bg-bg-light py-16">
+        <div class="max-w-[1600px] mx-auto px-8 md:px-16">
+            <h2 class="font-heading font-bold text-3xl text-primary text-center mb-4">Why Choose Us</h2>
+            <p class="text-gray-500 text-center mb-12 max-w-2xl mx-auto">We provide the best experience for anime collectors across Bangladesh</p>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Feature 1 -->
+                <div class="bg-white rounded-2xl p-8 text-center shadow-sm hover:shadow-lg transition-all group">
+                    <div class="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-accent/20 transition-all">
+                        <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-heading font-bold text-primary text-lg mb-2">100% Authentic</h3>
+                    <p class="text-gray-500 text-sm">All figures are genuine licensed products from Japan</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="bg-white rounded-2xl p-8 text-center shadow-sm hover:shadow-lg transition-all group">
+                    <div class="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-accent/20 transition-all">
+                        <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-heading font-bold text-primary text-lg mb-2">BD-Wide Delivery</h3>
+                    <p class="text-gray-500 text-sm">Fast shipping across all 64 districts of Bangladesh</p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="bg-white rounded-2xl p-8 text-center shadow-sm hover:shadow-lg transition-all group">
+                    <div class="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-accent/20 transition-all">
+                        <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-heading font-bold text-primary text-lg mb-2">Easy Payment</h3>
+                    <p class="text-gray-500 text-sm">bKash, Nagad, Cards & Cash on Delivery available</p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="bg-white rounded-2xl p-8 text-center shadow-sm hover:shadow-lg transition-all group">
+                    <div class="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-accent/20 transition-all">
+                        <svg class="w-8 h-8 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                    </div>
+                    <h3 class="font-heading font-bold text-primary text-lg mb-2">7-Day Returns</h3>
+                    <p class="text-gray-500 text-sm">Hassle-free return policy if you're not satisfied</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-primary pt-16 pb-8">
+        <div class="max-w-[1600px] mx-auto px-8 md:px-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+                <!-- Brand Column -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="text-white font-heading font-bold text-2xl">OTAKU</span>
+                        <span class="text-accent font-heading font-bold text-2xl">VAULT</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Your ultimate destination for authentic anime figures and collectibles in Bangladesh. Quality products, competitive prices, excellent service.</p>
+                    <div class="flex gap-3">
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-accent transition-all">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-accent transition-all">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 6.333 0 6.741 0 12c0 5.259.014 5.668.072 6.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white hover:bg-accent transition-all">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Shop Links -->
+                <div>
+                    <h4 class="font-heading font-bold text-white text-lg mb-4">Shop</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">All Figures</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">New Arrivals</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">Best Sellers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">Pre-Orders</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">Sale Items</a></li>
+                    </ul>
+                </div>
+
+                <!-- Series Links -->
+                <div>
+                    <h4 class="font-heading font-bold text-white text-lg mb-4">Series</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">One Piece</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">Naruto</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">Demon Slayer</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">Dragon Ball Z</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">More Series</a></li>
+                    </ul>
+                </div>
+
+                <!-- Support Links -->
+                <div>
+                    <h4 class="font-heading font-bold text-white text-lg mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">Shipping Info</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">Return Policy</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">Track Order</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">FAQ</a></li>
+                        <li><a href="admin.html" class="text-gray-400 hover:text-accent transition-colors text-sm">Admin Dashboard</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="border-t border-white/10 pt-8 text-center">
+                <p class="text-gray-500 text-sm">© 2024 OtakuVault. All rights reserved. Made with ❤️ for anime collectors.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // Global Error Debugging Handler (renders visual feedback on exceptions)
+        window.addEventListener('error', function(e) {
+            const errDiv = document.createElement('div');
+            errDiv.style.position = 'fixed';
+            errDiv.style.top = '10px';
+            errDiv.style.left = '10px';
+            errDiv.style.right = '10px';
+            errDiv.style.backgroundColor = 'rgba(255,0,0,0.95)';
+            errDiv.style.color = 'white';
+            errDiv.style.padding = '15px';
+            errDiv.style.zIndex = '99999';
+            errDiv.style.borderRadius = '10px';
+            errDiv.style.fontFamily = 'monospace';
+            errDiv.style.whiteSpace = 'pre-wrap';
+            errDiv.textContent = 'Global Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno;
+            document.body.appendChild(errDiv);
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            const errDiv = document.createElement('div');
+            errDiv.style.position = 'fixed';
+            errDiv.style.top = '10px';
+            errDiv.style.left = '10px';
+            errDiv.style.right = '10px';
+            errDiv.style.backgroundColor = 'rgba(255,0,0,0.95)';
+            errDiv.style.color = 'white';
+            errDiv.style.padding = '15px';
+            errDiv.style.zIndex = '99999';
+            errDiv.style.borderRadius = '10px';
+            errDiv.style.fontFamily = 'monospace';
+            errDiv.style.whiteSpace = 'pre-wrap';
+            errDiv.textContent = 'Unhandled Rejection: ' + (e.reason ? (e.reason.message || e.reason) : 'Unknown Promise Rejection');
+            document.body.appendChild(errDiv);
+        });
+
+        // Hero Image Slider
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.slider-dot');
+        let sliderInterval;
+
+        function showSlide(index) {
+            slides.forEach((slide, i) => {
+                if (i === index) {
+                    slide.classList.remove('opacity-0');
+                    slide.classList.add('opacity-100');
+                } else {
+                    slide.classList.remove('opacity-100');
+                    slide.classList.add('opacity-0');
+                }
+            });
+
+            dots.forEach((dot, i) => {
+                if (i === index) {
+                    dot.classList.add('bg-accent');
+                    dot.classList.remove('bg-white/40');
+                } else {
+                    dot.classList.remove('bg-accent');
+                    dot.classList.add('bg-white/40');
+                }
+            });
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            let next = (currentSlide + 1) % slides.length;
+            showSlide(next);
+        }
+
+        function goToSlide(index) {
+            showSlide(index);
+            resetInterval();
+        }
+
+        function resetInterval() {
+            clearInterval(sliderInterval);
+            sliderInterval = setInterval(nextSlide, 5000);
+        }
+
+        // Start auto slide
+        sliderInterval = setInterval(nextSlide, 5000);
+
+        // Supabase configuration - Replace with your actual credentials
+        const SUPABASE_URL = 'https://lalafwkxgitckodmyjep.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_gcQvPyKoCQ_UxmjmH9gV9Q_BUAsJfpt';
+
+        let supabaseClient = null;
+        if (SUPABASE_URL && SUPABASE_ANON_KEY) {
+            try {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            } catch (e) {
+                console.error("Failed to initialize Supabase client:", e);
+            }
+        }
+
+        // Fallback Products array
+        const fallbackProducts = [
+            {
+                id: 1,
+                name: "Monkey D. Luffy - Gear 5",
+                price: 2899,
+                original_price: 3624,
+                image: "images/luffy_gear5_1779161050741.png",
+                second_image: "https://picsum.photos/id/100/400/300",
+                category: "Figures",
+                series: "One Piece",
+                scale: "1/7",
+                material: "PVC",
+                size: "21cm",
+                stock: 10,
+                badge: "-20%",
+                is_preorder: false
+            },
+            {
+                id: 2,
+                name: "Naruto Uzumaki - Sage Mode",
+                price: 4199,
+                original_price: null,
+                image: "images/naruto_sage_1779161069637.png",
+                second_image: "https://picsum.photos/id/200/400/300",
+                category: "Figures",
+                series: "Naruto",
+                scale: "1/8",
+                material: "PVC",
+                size: "22cm",
+                stock: 5,
+                badge: "NEW",
+                is_preorder: false
+            },
+            {
+                id: 3,
+                name: "Nezuko Kamado - Demon Form",
+                price: 3499,
+                original_price: null,
+                image: "images/nezuko_demon_1779161090026.png",
+                second_image: "https://picsum.photos/id/300/400/300",
+                category: "Figures",
+                series: "Demon Slayer",
+                scale: "1/7",
+                material: "PVC",
+                size: "18cm",
+                stock: 8,
+                badge: "HOT",
+                is_preorder: false
+            },
+            {
+                id: 4,
+                name: "Goku - Ultra Instinct",
+                price: 8999,
+                original_price: null,
+                image: "images/goku_ui_1779161109260.png",
+                second_image: "https://picsum.photos/id/400/400/300",
+                category: "Figures",
+                series: "Dragon Ball Z",
+                scale: "1/6",
+                material: "PVC",
+                size: "30cm",
+                stock: 3,
+                badge: null,
+                is_preorder: false
+            },
+            {
+                id: 5,
+                name: "Gojo Satoru - Blindfolded",
+                price: 4749,
+                original_price: 5587,
+                image: "images/gojo_satoru_1779161136685.png",
+                second_image: "https://picsum.photos/id/500/400/300",
+                category: "Figures",
+                series: "Jujutsu Kaisen",
+                scale: "1/7",
+                material: "PVC/ABS",
+                size: "25cm",
+                stock: 7,
+                badge: "-15%",
+                is_preorder: false
+            },
+            {
+                id: 6,
+                name: "Eren Yeager - Founding Titan",
+                price: 5299,
+                original_price: null,
+                image: "images/eren_yeager_1779161155761.png",
+                second_image: "https://picsum.photos/id/600/400/300",
+                category: "Figures",
+                series: "Attack on Titan",
+                scale: "1/7",
+                material: "PVC",
+                size: "26cm",
+                stock: 4,
+                badge: "NEW",
+                is_preorder: false
+            },
+            {
+                id: 7,
+                name: "Izuku Midoriya - Full Cowl",
+                price: 3199,
+                original_price: null,
+                image: "images/izuku_midoriya_1779161169887.png",
+                second_image: "https://picsum.photos/id/700/400/300",
+                category: "Figures",
+                series: "My Hero Academia",
+                scale: "1/8",
+                material: "PVC/ABS",
+                size: "20cm",
+                stock: 12,
+                badge: null,
+                is_preorder: false
+            },
+            {
+                id: 8,
+                name: "Roronoa Zoro - Wado Ichimonji",
+                price: 1499,
+                original_price: 1999,
+                image: "images/zoro_wado_1779161184154.png",
+                second_image: "https://picsum.photos/id/800/400/300",
+                category: "Accessories",
+                series: "One Piece",
+                scale: "1/1",
+                material: "Wood/Metal",
+                size: "104cm",
+                stock: 2,
+                badge: "-25%",
+                is_preorder: false
+            },
+            {
+                id: 9,
+                name: "Rengoku Kyojuro - Flame Hashira",
+                price: 4899,
+                original_price: null,
+                image: "images/rengoku_flame_1779161199200.png",
+                second_image: "https://picsum.photos/id/900/400/300",
+                category: "Figures",
+                series: "Demon Slayer",
+                scale: "1/8",
+                material: "PVC",
+                size: "22cm",
+                stock: 0,
+                badge: "PRE-ORDER",
+                is_preorder: true
+            }
+        ];
+
+        // Cart State & Functionality
+        let cart = JSON.parse(localStorage.getItem('otaku_vault_cart') || '[]');
+
+        function updateCartBadge() {
+            const badge = document.getElementById('cartBadge');
+            if (badge) {
+                const totalCount = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                badge.textContent = totalCount;
+            }
+        }
+
+        function addToCart(product) {
+            const existingItem = cart.find(item => String(item.id) === String(product.id));
+            if (existingItem) {
+                existingItem.quantity = (existingItem.quantity || 1) + 1;
+            } else {
+                cart.push({ ...product, quantity: 1 });
+            }
+            localStorage.setItem('otaku_vault_cart', JSON.stringify(cart));
+            updateCartBadge();
+        }
+
+        // Initialize cart badge count on load
+        updateCartBadge();
+
+        // Fetch and Render Products Dynamically
+        async function fetchAndRenderProducts() {
+            const grid = document.getElementById('productGrid');
+            if (!grid) return;
+
+            let productsList = fallbackProducts;
+
+            if (supabaseClient) {
+                try {
+                    // Create a promise that rejects after 3 seconds to prevent indefinitely pending network requests
+                    const timeoutPromise = new Promise((_, reject) => 
+                        setTimeout(() => reject(new Error("Request timeout")), 3000)
+                    );
+
+                    // Race the Supabase request against the timeout
+                    const { data, error } = await Promise.race([
+                        supabaseClient.from('products').select('*').order('id', { ascending: true }),
+                        timeoutPromise
+                    ]);
+
+                    if (error) throw error;
+                    if (data && data.length > 0) {
+                        productsList = data;
+                    }
+                } catch (err) {
+                    console.warn("Supabase fetch failed, falling back to local data:", err);
+                }
+            }
+
+            grid.innerHTML = productsList.map(product => {
+                const originalPriceHtml = product.original_price ? `<span class="text-gray-400 line-through text-xs ml-1">৳${product.original_price}</span>` : '';
+                const badgeHtml = product.badge ? `<span class="absolute top-3 left-3 ${product.badge.includes('%') || product.badge.toLowerCase().includes('sale') ? 'bg-sale' : 'bg-accent'} text-white text-xs font-bold px-3 py-1 rounded-full z-20">${product.badge}</span>` : '';
+                
+                return `
+                    <div class="product-card flex flex-col h-[490px] bg-white rounded-3xl p-3 border border-black/5 hover:shadow-lg transition-all duration-300">
+                        <div class="relative overflow-hidden group h-[310px] rounded-2xl">
+                            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover transition-opacity duration-500 ease-in-out group-hover:opacity-0">
+                            <img src="${product.second_image || 'https://picsum.photos/id/100/400/300'}" alt="${product.name} Hover" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100">
+                            ${badgeHtml}
+                            <button class="absolute top-3 right-3 z-30 bg-white/80 hover:bg-white text-accent p-2 rounded-full shadow-md transition-all hover:scale-110 cursor-pointer" onclick="toggleWishlist(this, event)">
+                                <svg class="w-5 h-5 heart-outline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                                </svg>
+                                <svg class="w-5 h-5 heart-solid hidden" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="p-3 flex flex-col justify-between flex-1">
+                            <div>
+                                <h3 class="font-bold text-primary text-sm truncate leading-tight" title="${product.name}">${product.name}</h3>
+                                <span class="text-accent font-bold text-base">৳${product.price}</span>
+                                ${originalPriceHtml}
+                            </div>
+                            <div class="flex items-center justify-between pt-2 border-t border-gray-100">
+                                <span class="text-gray-400 text-xs">${product.series}</span>
+                            </div>
+                            <div class="flex gap-2 mt-2">
+                                <button class="flex-grow bg-gray-100 hover:bg-gray-200 hover:-translate-y-[3px] hover:shadow-md text-primary py-2 rounded-xl font-semibold text-xs transition-all duration-300 add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
+                                <button class="flex-grow bg-accent hover:bg-accent-dark hover:-translate-y-[3px] hover:shadow-md text-white py-2 rounded-xl font-semibold text-xs transition-all duration-300">Buy Now</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Re-bind click event listeners to add-to-cart buttons
+            const cartBtns = grid.querySelectorAll('.add-to-cart-btn');
+            cartBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-product-id');
+                    const product = productsList.find(p => String(p.id) === String(productId));
+                    if (product) {
+                        addToCart(product);
+                    }
+
+                    if (this.classList.contains('bg-green-500')) return;
+
+                    const originalText = this.textContent;
+                    this.textContent = '✓ Added!';
+                    this.classList.remove('bg-gray-100', 'text-primary', 'hover:bg-gray-200');
+                    this.classList.add('bg-green-500', 'text-white', 'hover:bg-green-600');
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                        this.classList.remove('bg-green-500', 'text-white', 'hover:bg-green-600');
+                        this.classList.add('bg-gray-100', 'text-primary', 'hover:bg-gray-200');
+                    }, 2000);
+                });
+            });
+        }
+
+        // Initialize Products
+        fetchAndRenderProducts();
+
+        // Navbar auto-hide/show on scroll
+        let lastScrollY = window.scrollY;
+        const navbar = document.getElementById('mainNavbar');
+
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                // Scrolling down - hide navbar
+                navbar.classList.add('-translate-y-full');
+                if (mobileMenu) mobileMenu.classList.add('hidden'); // Also hide mobile menu on scroll
+            } else {
+                // Scrolling up - show navbar
+                navbar.classList.remove('-translate-y-full');
+            }
+            lastScrollY = currentScrollY;
+        });
+
+        // Wishlist Toggle Functionality
+        function toggleWishlist(btn, event) {
+            event.preventDefault();
+            event.stopPropagation();
+            const outline = btn.querySelector('.heart-outline');
+            const solid = btn.querySelector('.heart-solid');
+            if (outline.classList.contains('hidden')) {
+                outline.classList.remove('hidden');
+                solid.classList.add('hidden');
+            } else {
+                outline.classList.add('hidden');
+                solid.classList.remove('hidden');
+            }
+        }
+
+        // Mobile menu toggle
+        const menuBtn = document.getElementById('menuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Series filter pills
+        const pillBtns = document.querySelectorAll('.pill-btn');
+        pillBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                pillBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Custom Sort by Dropdown Functionality (Hover triggered with smooth animation)
+        const sortDropdownWrapper = document.getElementById('sortDropdownWrapper');
+        const sortDropdownMenu = document.getElementById('sortDropdownMenu');
+        const sortDropdownArrow = document.getElementById('sortDropdownArrow');
+        const selectedSortOption = document.getElementById('selectedSortOption');
+        const sortOptions = document.querySelectorAll('.sort-option');
+
+        if (sortDropdownWrapper && sortDropdownMenu) {
+            function showMenu() {
+                sortDropdownMenu.classList.remove('invisible', 'opacity-0', 'scale-95', 'pointer-events-none');
+                sortDropdownMenu.classList.add('visible', 'opacity-100', 'scale-100');
+                sortDropdownArrow.classList.add('rotate-180');
+            }
+
+            function hideMenu() {
+                sortDropdownMenu.classList.add('invisible', 'opacity-0', 'scale-95', 'pointer-events-none');
+                sortDropdownMenu.classList.remove('visible', 'opacity-100', 'scale-100');
+                sortDropdownArrow.classList.remove('rotate-180');
+            }
+
+            // Open on hover (mouse enters wrapper)
+            sortDropdownWrapper.addEventListener('mouseenter', showMenu);
+
+            // Close on hover leave (mouse leaves wrapper)
+            sortDropdownWrapper.addEventListener('mouseleave', hideMenu);
+
+            // Handle option selection
+            sortOptions.forEach(option => {
+                option.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const value = option.getAttribute('data-value');
+                    selectedSortOption.textContent = value;
+                    
+                    // Hide dropdown immediately on selection
+                    hideMenu();
+                });
+            });
+        }
+    </script>
+</body>
+</html>
