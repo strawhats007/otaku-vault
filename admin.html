@@ -345,15 +345,15 @@
                             <table class="w-full text-left border-collapse">
                                 <thead>
                                     <tr class="border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-wider">
-                                        <th class="pb-3.5 w-10">
+                                        <th class="pb-5 px-4 w-10">
                                             <input type="checkbox" id="selectAllCheckbox" onchange="toggleBulkSelect(this)" class="rounded border-gray-300 text-accent focus:ring-accent w-4 h-4 cursor-pointer">
                                         </th>
-                                        <th class="pb-3.5">Product Info</th>
-                                        <th class="pb-3.5">Price</th>
-                                        <th class="pb-3.5">Stock</th>
-                                        <th class="pb-3.5">Category</th>
-                                        <th class="pb-3.5">Status</th>
-                                        <th class="pb-3.5 text-right">Actions</th>
+                                        <th class="pb-5 px-4">Product Info</th>
+                                        <th class="pb-5 px-4">Price</th>
+                                        <th class="pb-5 px-4">Stock</th>
+                                        <th class="pb-5 px-4">Category</th>
+                                        <th class="pb-5 px-4">Status</th>
+                                        <th class="pb-5 px-4 text-right">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="productsTableBody" class="text-sm font-medium text-primary divide-y divide-gray-50">
@@ -728,20 +728,20 @@
                 const isPreorder = product.is_preorder === true;
                 const stockPercent = Math.min(Math.max((product.stock / 100) * 100, 0), 100);
                 
-                // Set stock bar color based on density
-                let stockBarColor = 'bg-accent';
+                // Set stock bar color based on density: green if high (>10), yellow if medium (3-10), red if low/0 (<=2)
+                let stockBarColor = 'bg-emerald-500';
                 if (product.stock <= 2) {
                     stockBarColor = 'bg-red-500';
-                } else if (product.stock <= 5) {
+                } else if (product.stock <= 10) {
                     stockBarColor = 'bg-amber-500';
                 }
 
                 return `
                     <tr class="hover:bg-gray-50/50 transition-colors">
-                        <td class="py-4.5">
+                        <td class="py-6 px-4">
                             <input type="checkbox" data-product-id="${product.id}" onchange="updateMasterCheckbox()" class="row-checkbox rounded border-gray-300 text-accent focus:ring-accent w-4 h-4 cursor-pointer">
                         </td>
-                        <td class="py-4.5">
+                        <td class="py-6 px-4">
                             <div class="flex items-center gap-3">
                                 <img src="${product.image || 'https://picsum.photos/id/100/400/300'}" alt="${product.name}" class="w-12 h-12 rounded-xl object-cover border border-gray-100 flex-shrink-0" onerror="this.src='https://picsum.photos/id/100/400/300'">
                                 <div class="min-w-0">
@@ -750,28 +750,28 @@
                                 </div>
                             </div>
                         </td>
-                        <td class="py-4.5 text-primary font-bold">৳${product.price}</td>
-                        <td class="py-4.5">
-                            <div class="space-y-1 max-w-[130px]">
+                        <td class="py-6 px-4 text-primary font-bold">৳${product.price}</td>
+                        <td class="py-6 px-4">
+                            <div class="space-y-1 w-full max-w-[150px]">
                                 <span class="text-xs font-bold text-gray-700 block">${product.stock} units</span>
-                                <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
-                                    <div class="${stockBarColor} h-1.5 rounded-full" style="width: ${stockPercent}%"></div>
+                                <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                                    <div class="${stockBarColor} h-2 rounded-full transition-all duration-300" style="width: ${stockPercent}%"></div>
                                 </div>
                             </div>
                         </td>
-                        <td class="py-4.5">
+                        <td class="py-6 px-4">
                             <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-gray-50 border border-gray-100 text-gray-500">
                                 ${product.category || 'Figures'}
                             </span>
                         </td>
-                        <td class="py-4.5">
+                        <td class="py-6 px-4">
                             <label class="relative inline-flex items-center cursor-pointer select-none">
                                 <input type="checkbox" ${isPreorder ? 'checked' : ''} onchange="toggleProductPreorder(${product.id}, this.checked)" class="sr-only peer">
-                                <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
-                                <span class="ml-2 text-xs font-bold text-gray-500 peer-checked:text-accent">${isPreorder ? 'Pre-order' : 'In Stock'}</span>
+                                <div class="w-14 h-7 bg-emerald-500 peer-focus:outline-none rounded-full peer after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-7 peer-checked:bg-accent"></div>
+                                <span class="ml-3 text-xs font-extrabold text-gray-500 peer-checked:text-accent">${isPreorder ? 'Pre-order' : 'In Stock'}</span>
                             </label>
                         </td>
-                        <td class="py-4.5 text-right">
+                        <td class="py-6 px-4 text-right">
                             <div class="flex items-center justify-end gap-2">
                                 <button onclick="openProductModal('edit', ${product.id})" class="p-2 text-gray-400 hover:text-accent hover:bg-accent/5 rounded-xl transition-all cursor-pointer" title="Edit Figure">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
