@@ -77,19 +77,19 @@
 
                 <!-- Navigation List -->
                 <nav class="space-y-1">
-                    <a href="#" class="flex items-center gap-3 bg-accent text-white px-4 py-3.5 rounded-xl font-bold text-sm transition-all select-none">
+                    <a href="#" id="nav-dashboard" onclick="switchTab('dashboard')" class="flex items-center gap-3 bg-accent text-white px-4 py-3.5 rounded-xl font-bold text-sm transition-all select-none">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
                         Dashboard
                     </a>
-                    <a href="#" onclick="showSectionToast('Products list')" class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
+                    <a href="#" id="nav-products" onclick="switchTab('products')" class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
                         Products
                     </a>
-                    <a href="#" onclick="showSectionToast('Orders filter list')" class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
+                    <a href="#" id="nav-orders" onclick="showSectionToast('Orders filter list')" class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
                         Orders
                     </a>
-                    <a href="#" onclick="showSectionToast('Settings panel')" class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
+                    <a href="#" id="nav-settings" onclick="showSectionToast('Settings panel')" class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                         Settings
                     </a>
@@ -131,9 +131,12 @@
             </header>
 
             <!-- Scrollable dashboard content container -->
-            <div class="flex-grow p-10 space-y-8 overflow-y-auto max-h-[calc(100vh-75px)]">
+            <div class="flex-grow p-10 overflow-y-auto max-h-[calc(100vh-75px)]">
 
-                <!-- 4 Stat Cards Row -->
+                <!-- DASHBOARD SECTION -->
+                <div id="sectionDashboard" class="space-y-8 animate-fadeIn">
+
+                    <!-- 4 Stat Cards Row -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                     <!-- Total Orders Card -->
                     <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex items-center justify-between group hover:border-accent/30 transition-all hover:scale-[1.01]">
@@ -299,6 +302,74 @@
                     </div>
 
                 </div>
+
+                </div> <!-- End of #sectionDashboard -->
+
+                <!-- PRODUCTS SECTION -->
+                <div id="sectionProducts" class="hidden space-y-8 animate-fadeIn">
+                    <!-- Products Header Controls -->
+                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+                        <!-- Search and Filter Dropdowns Left Side -->
+                        <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
+                            <!-- Search bar -->
+                            <div class="relative w-full md:w-72">
+                                <input type="text" id="productSearch" oninput="filterProductsClientSide()" placeholder="Search products by name..." class="w-full bg-gray-50 border border-gray-150 rounded-xl px-5 py-3 outline-none focus:border-accent focus:bg-white text-xs font-semibold pl-11 transition-all">
+                                <svg class="w-4 h-4 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            </div>
+                            
+                            <!-- Category Filter Dropdown -->
+                            <select id="filterCategory" onchange="filterProductsClientSide()" class="bg-gray-50 border border-gray-150 rounded-xl px-4 py-3 outline-none focus:border-accent text-xs font-semibold text-gray-600 transition-all cursor-pointer">
+                                <option value="All">All Categories</option>
+                                <option value="Figures">Figures</option>
+                                <option value="Accessories">Accessories</option>
+                            </select>
+                            
+                            <!-- Status Filter Dropdown -->
+                            <select id="filterStatus" onchange="filterProductsClientSide()" class="bg-gray-50 border border-gray-150 rounded-xl px-4 py-3 outline-none focus:border-accent text-xs font-semibold text-gray-600 transition-all cursor-pointer">
+                                <option value="All">All Statuses</option>
+                                <option value="In Stock">In Stock</option>
+                                <option value="Pre-order">Pre-order</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Add New Product Button Right Side -->
+                        <button onclick="openProductModal('add')" class="bg-accent hover:bg-accent-dark text-white px-6 py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-accent/20 cursor-pointer text-xs flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                            Add Product
+                        </button>
+                    </div>
+
+                    <!-- Product Table Card -->
+                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-6">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-wider">
+                                        <th class="pb-3.5 w-10">
+                                            <input type="checkbox" id="selectAllCheckbox" onchange="toggleBulkSelect(this)" class="rounded border-gray-300 text-accent focus:ring-accent w-4 h-4 cursor-pointer">
+                                        </th>
+                                        <th class="pb-3.5">Product Info</th>
+                                        <th class="pb-3.5">Price</th>
+                                        <th class="pb-3.5">Stock</th>
+                                        <th class="pb-3.5">Category</th>
+                                        <th class="pb-3.5">Status</th>
+                                        <th class="pb-3.5 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productsTableBody" class="text-sm font-medium text-primary divide-y divide-gray-50">
+                                    <tr>
+                                        <td colspan="7" class="py-12 text-center text-gray-400 font-semibold">
+                                            <div class="flex flex-col items-center gap-2">
+                                                <svg class="w-6 h-6 animate-spin text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                                Loading product database...
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> <!-- End of #sectionProducts -->
 
             </div>
         </main>
@@ -544,6 +615,470 @@
             });
         }
 
+        }
+
+        // PRODUCTS TAB FUNCTIONALITY
+        let allProducts = [];
+
+        // Tab Switching logic
+        function switchTab(tabName) {
+            const sections = {
+                dashboard: document.getElementById('sectionDashboard'),
+                products: document.getElementById('sectionProducts')
+            };
+
+            const navLinks = {
+                dashboard: document.getElementById('nav-dashboard'),
+                products: document.getElementById('nav-products')
+            };
+
+            // Toggle visibility of sections
+            Object.keys(sections).forEach(key => {
+                if (sections[key]) {
+                    if (key === tabName) {
+                        sections[key].classList.remove('hidden');
+                    } else {
+                        sections[key].classList.add('hidden');
+                    }
+                }
+            });
+
+            // Toggle active/inactive styles of nav links
+            Object.keys(navLinks).forEach(key => {
+                if (navLinks[key]) {
+                    if (key === tabName) {
+                        navLinks[key].className = "flex items-center gap-3 bg-accent text-white px-4 py-3.5 rounded-xl font-bold text-sm transition-all select-none";
+                    } else {
+                        navLinks[key].className = "flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none";
+                    }
+                }
+            });
+
+            // Trigger specific load logic
+            if (tabName === 'products') {
+                fetchProductsData();
+            } else if (tabName === 'dashboard') {
+                if (typeof fetchOrdersData === 'function') {
+                    fetchOrdersData();
+                }
+            }
+        }
+
+        // Fetch products from database
+        async function fetchProductsData() {
+            const tableBody = document.getElementById('productsTableBody');
+            if (tableBody) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="py-12 text-center text-gray-400 font-semibold">
+                            <div class="flex flex-col items-center gap-2">
+                                <svg class="w-6 h-6 animate-spin text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                Loading product database...
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            try {
+                if (!supabaseClient) {
+                    throw new Error("Supabase client is not initialized.");
+                }
+                const { data, error } = await supabaseClient
+                    .from('products')
+                    .select('*')
+                    .order('id', { ascending: true });
+
+                if (error) throw error;
+                allProducts = data || [];
+                renderProductsTable(allProducts);
+            } catch (err) {
+                console.error("Failed to load products:", err);
+                if (tableBody) {
+                    tableBody.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="py-12 text-center text-red-500 font-semibold">
+                                Error loading products: ${err.message || err}. Please try again.
+                            </td>
+                        </tr>
+                    `;
+                }
+                showNotificationToast("Failed to fetch products", false);
+            }
+        }
+
+        // Render dynamic table rows
+        function renderProductsTable(productsList) {
+            const tableBody = document.getElementById('productsTableBody');
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            if (selectAllCheckbox) selectAllCheckbox.checked = false;
+
+            if (!tableBody) return;
+
+            if (!productsList || productsList.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="py-12 text-center text-gray-400 font-semibold">
+                            No products found matching filters.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = productsList.map(product => {
+                const isPreorder = product.is_preorder === true;
+                const stockPercent = Math.min(Math.max((product.stock / 100) * 100, 0), 100);
+                
+                // Set stock bar color based on density
+                let stockBarColor = 'bg-accent';
+                if (product.stock <= 2) {
+                    stockBarColor = 'bg-red-500';
+                } else if (product.stock <= 5) {
+                    stockBarColor = 'bg-amber-500';
+                }
+
+                return `
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="py-4.5">
+                            <input type="checkbox" data-product-id="${product.id}" onchange="updateMasterCheckbox()" class="row-checkbox rounded border-gray-300 text-accent focus:ring-accent w-4 h-4 cursor-pointer">
+                        </td>
+                        <td class="py-4.5">
+                            <div class="flex items-center gap-3">
+                                <img src="${product.image || 'https://picsum.photos/id/100/400/300'}" alt="${product.name}" class="w-12 h-12 rounded-xl object-cover border border-gray-100 flex-shrink-0" onerror="this.src='https://picsum.photos/id/100/400/300'">
+                                <div class="min-w-0">
+                                    <h4 class="font-bold text-primary truncate max-w-[200px]" title="${product.name}">${product.name}</h4>
+                                    <span class="text-[10px] text-gray-400 font-semibold block">#ID: ${product.id}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-4.5 text-primary font-bold">৳${product.price}</td>
+                        <td class="py-4.5">
+                            <div class="space-y-1 max-w-[130px]">
+                                <span class="text-xs font-bold text-gray-700 block">${product.stock} units</span>
+                                <div class="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
+                                    <div class="${stockBarColor} h-1.5 rounded-full" style="width: ${stockPercent}%"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-4.5">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-gray-50 border border-gray-100 text-gray-500">
+                                ${product.category || 'Figures'}
+                            </span>
+                        </td>
+                        <td class="py-4.5">
+                            <label class="relative inline-flex items-center cursor-pointer select-none">
+                                <input type="checkbox" ${isPreorder ? 'checked' : ''} onchange="toggleProductPreorder(${product.id}, this.checked)" class="sr-only peer">
+                                <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
+                                <span class="ml-2 text-xs font-bold text-gray-500 peer-checked:text-accent">${isPreorder ? 'Pre-order' : 'In Stock'}</span>
+                            </label>
+                        </td>
+                        <td class="py-4.5 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <button onclick="openProductModal('edit', ${product.id})" class="p-2 text-gray-400 hover:text-accent hover:bg-accent/5 rounded-xl transition-all cursor-pointer" title="Edit Figure">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                </button>
+                                <button onclick="confirmDeleteProduct(${product.id}, '${escapeHtml(product.name)}')" class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-500/5 rounded-xl transition-all cursor-pointer" title="Delete Figure">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Helper to escape HTML to prevent breaking attributes
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Client-side filtering logic
+        function filterProductsClientSide() {
+            const searchQuery = document.getElementById('productSearch').value.toLowerCase().trim();
+            const selectedCategory = document.getElementById('filterCategory').value;
+            const selectedStatus = document.getElementById('filterStatus').value;
+
+            const filtered = allProducts.filter(product => {
+                const matchesSearch = product.name.toLowerCase().includes(searchQuery);
+                const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
+                
+                let matchesStatus = true;
+                if (selectedStatus === 'In Stock') {
+                    matchesStatus = product.is_preorder === false || !product.is_preorder;
+                } else if (selectedStatus === 'Pre-order') {
+                    matchesStatus = product.is_preorder === true;
+                }
+
+                return matchesSearch && matchesCategory && matchesStatus;
+            });
+
+            renderProductsTable(filtered);
+        }
+
+        // Master checkbox for bulk select
+        function toggleBulkSelect(master) {
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            checkboxes.forEach(chk => {
+                chk.checked = master.checked;
+            });
+        }
+
+        function updateMasterCheckbox() {
+            const master = document.getElementById('selectAllCheckbox');
+            const checkboxes = document.querySelectorAll('.row-checkbox');
+            if (!master || checkboxes.length === 0) return;
+
+            const checkedCount = Array.from(checkboxes).filter(chk => chk.checked).length;
+            master.checked = checkedCount === checkboxes.length;
+            master.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+        }
+
+        // Quick toggle product status (is_preorder)
+        async function toggleProductPreorder(id, isChecked) {
+            try {
+                if (!supabaseClient) throw new Error("Supabase is not initialized.");
+                
+                // Update locally first to make it responsive
+                const prod = allProducts.find(p => p.id === id);
+                if (prod) prod.is_preorder = isChecked;
+
+                const { error } = await supabaseClient
+                    .from('products')
+                    .update({ is_preorder: isChecked })
+                    .eq('id', id);
+
+                if (error) throw error;
+                showNotificationToast(`Status updated to ${isChecked ? 'Pre-order' : 'In Stock'}`);
+                
+                // Refresh filters to make sure table displays correct styling
+                filterProductsClientSide();
+            } catch (err) {
+                console.error("Failed to toggle status:", err);
+                showNotificationToast(`Failed to update status: ${err.message || err}`, false);
+                fetchProductsData(); // rollback
+            }
+        }
+
+        // Modal triggers
+        function openProductModal(mode, productId = null) {
+            const modal = document.getElementById('productModal');
+            const container = document.getElementById('productModalContainer');
+            const title = document.getElementById('modalTitle');
+            const subtitle = document.getElementById('modalSubtitle');
+            
+            if (!modal || !container) return;
+
+            // Reset Form Fields
+            document.getElementById('modalProductId').value = '';
+            document.getElementById('modalName').value = '';
+            document.getElementById('modalPrice').value = '';
+            document.getElementById('modalCategory').value = 'Figures';
+            document.getElementById('modalSeries').value = 'One Piece';
+            document.getElementById('modalStock').value = '';
+            document.getElementById('modalStatus').value = 'In Stock';
+            document.getElementById('modalImageUrl').value = '';
+            document.getElementById('modalDescription').value = '';
+
+            if (mode === 'add') {
+                title.textContent = 'Add New Product';
+                subtitle.textContent = 'Fill in the fields below to add a new figure to the shop.';
+            } else if (mode === 'edit' && productId) {
+                title.textContent = 'Edit Product';
+                subtitle.textContent = `Modify details for product #ID ${productId}.`;
+
+                const product = allProducts.find(p => p.id === productId);
+                if (product) {
+                    document.getElementById('modalProductId').value = product.id;
+                    document.getElementById('modalName').value = product.name || '';
+                    document.getElementById('modalPrice').value = product.price || '';
+                    document.getElementById('modalCategory').value = product.category || 'Figures';
+                    document.getElementById('modalSeries').value = product.series || 'One Piece';
+                    document.getElementById('modalStock').value = product.stock !== undefined ? product.stock : '';
+                    document.getElementById('modalStatus').value = product.is_preorder ? 'Pre-order' : 'In Stock';
+                    document.getElementById('modalImageUrl').value = product.image || '';
+                    document.getElementById('modalDescription').value = '';
+                }
+            }
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                container.classList.remove('scale-95', 'opacity-0');
+                container.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeProductModal() {
+            const modal = document.getElementById('productModal');
+            const container = document.getElementById('productModalContainer');
+            if (!modal || !container) return;
+
+            container.classList.remove('scale-100', 'opacity-100');
+            container.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Save (Insert / Update) Product Form handler
+        async function saveProduct(event) {
+            event.preventDefault();
+            
+            const saveBtn = document.getElementById('saveProductBtn');
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = `<svg class="w-4 h-4 animate-spin inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Saving...`;
+            }
+
+            const id = document.getElementById('modalProductId').value;
+            const name = document.getElementById('modalName').value;
+            const price = Number(document.getElementById('modalPrice').value);
+            const category = document.getElementById('modalCategory').value;
+            const series = document.getElementById('modalSeries').value;
+            const stock = Number(document.getElementById('modalStock').value);
+            const status = document.getElementById('modalStatus').value;
+            const image_url = document.getElementById('modalImageUrl').value;
+            
+            const isPreorder = status === 'Pre-order';
+
+            const payload = {
+                name: name,
+                price: price,
+                stock: stock,
+                category: category,
+                series: series,
+                image: image_url,
+                is_preorder: isPreorder,
+                second_image: image_url
+            };
+
+            try {
+                if (!supabaseClient) throw new Error("Supabase is not initialized.");
+
+                if (id) {
+                    // UPDATE (PATCH)
+                    const { error } = await supabaseClient
+                        .from('products')
+                        .update(payload)
+                        .eq('id', id);
+
+                    if (error) throw error;
+                    showNotificationToast("Product updated successfully!");
+                } else {
+                    // INSERT (POST)
+                    const { error } = await supabaseClient
+                        .from('products')
+                        .insert([payload]);
+
+                    if (error) throw error;
+                    showNotificationToast("Product added successfully!");
+                }
+
+                closeProductModal();
+                fetchProductsData(); // Refresh table
+            } catch (err) {
+                console.error("Error saving product:", err);
+                showNotificationToast(`Failed to save product: ${err.message || err}`, false);
+            } finally {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Save Product';
+                }
+            }
+        }
+
+        // Delete Confirm Dialog triggers
+        function confirmDeleteProduct(id, name) {
+            const modal = document.getElementById('deleteConfirmModal');
+            const container = document.getElementById('deleteConfirmModalContainer');
+            const nameEl = document.getElementById('deleteProductName');
+            const idEl = document.getElementById('deleteProductId');
+
+            if (!modal || !container || !nameEl || !idEl) return;
+
+            idEl.value = id;
+            nameEl.textContent = name;
+
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                container.classList.remove('scale-95', 'opacity-0');
+                container.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeDeleteConfirmModal() {
+            const modal = document.getElementById('deleteConfirmModal');
+            const container = document.getElementById('deleteConfirmModalContainer');
+            if (!modal || !container) return;
+
+            container.classList.remove('scale-100', 'opacity-100');
+            container.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        async function deleteProductExecute() {
+            const id = document.getElementById('deleteProductId').value;
+            if (!id) return;
+
+            try {
+                if (!supabaseClient) throw new Error("Supabase is not initialized.");
+
+                const { error } = await supabaseClient
+                    .from('products')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+                
+                showNotificationToast("Product deleted successfully!");
+                closeDeleteConfirmModal();
+                fetchProductsData(); // Refresh table
+            } catch (err) {
+                console.error("Error deleting product:", err);
+                showNotificationToast(`Failed to delete product: ${err.message || err}`, false);
+            }
+        }
+
+        // Custom notification toast helper
+        function showNotificationToast(message, isSuccess = true) {
+            const container = document.getElementById('toastContainer') || createToastContainer();
+            const toast = document.createElement('div');
+            toast.className = `flex items-center gap-3 px-5 py-3.5 bg-white border border-gray-150 shadow-xl rounded-2xl transition-all duration-300 transform translate-y-10 opacity-0 max-w-sm w-full border-l-4 ${isSuccess ? 'border-l-accent' : 'border-l-red-500'}`;
+            toast.innerHTML = `
+                ${isSuccess ? `
+                <svg class="w-5 h-5 text-accent flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                ` : `
+                <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+                `}
+                <span class="text-sm font-semibold text-primary">${message}</span>
+            `;
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-10', 'opacity-0');
+                toast.classList.add('translate-y-0', 'opacity-100');
+            }, 10);
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-10', 'opacity-0');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
         // Show generic toast inside admin panel sections
         function showSectionToast(sectionName) {
             const container = document.getElementById('toastContainer') || createToastContainer();
@@ -579,5 +1114,129 @@
             return container;
         }
     </script>
+
+    <!-- ADD / EDIT PRODUCT MODAL -->
+    <div id="productModal" class="fixed inset-0 bg-primary/60 backdrop-blur-sm z-[9999] hidden flex items-center justify-center transition-all duration-300">
+        <div class="bg-white border border-gray-100 rounded-3xl p-8 max-w-2xl w-full shadow-2xl space-y-6 mx-4 relative overflow-y-auto max-h-[90vh] scale-95 opacity-0 transition-all duration-300" id="productModalContainer">
+            <!-- Close Button -->
+            <button onclick="closeProductModal()" class="absolute top-6 right-6 text-gray-400 hover:text-primary transition-colors cursor-pointer">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+            
+            <div class="space-y-1">
+                <h3 id="modalTitle" class="text-2xl font-heading font-extrabold text-primary">Add New Product</h3>
+                <p id="modalSubtitle" class="text-xs text-gray-400">Fill in the fields below to add a new figure to the shop.</p>
+            </div>
+            
+            <form onsubmit="saveProduct(event)" class="space-y-5">
+                <input type="hidden" id="modalProductId">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Name -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Product Name</label>
+                        <input type="text" id="modalName" required placeholder="e.g. Naruto Sage Mode" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all">
+                    </div>
+                    
+                    <!-- Price -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Price (৳)</label>
+                        <input type="number" id="modalPrice" required min="0" placeholder="e.g. 3500" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Category -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Category</label>
+                        <select id="modalCategory" required class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all bg-white cursor-pointer">
+                            <option value="Figures">Figures</option>
+                            <option value="Accessories">Accessories</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Series -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Series</label>
+                        <select id="modalSeries" required class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all bg-white cursor-pointer">
+                            <option value="One Piece">One Piece</option>
+                            <option value="Naruto">Naruto</option>
+                            <option value="Demon Slayer">Demon Slayer</option>
+                            <option value="Dragon Ball Z">Dragon Ball Z</option>
+                            <option value="Jujutsu Kaisen">Jujutsu Kaisen</option>
+                            <option value="Attack on Titan">Attack on Titan</option>
+                            <option value="My Hero Academia">My Hero Academia</option>
+                            <option value="Black Clover">Black Clover</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Stock -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Stock Quantity</label>
+                        <input type="number" id="modalStock" required min="0" placeholder="e.g. 10" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all">
+                    </div>
+                    
+                    <!-- Status (In Stock vs Pre-order) -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Status</label>
+                        <select id="modalStatus" required class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all bg-white cursor-pointer">
+                            <option value="In Stock">In Stock</option>
+                            <option value="Pre-order">Pre-order</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Image URL -->
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Image URL</label>
+                    <input type="text" id="modalImageUrl" required placeholder="e.g. images/naruto_sage.png or https://picsum.photos/id/200/400/300" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all">
+                </div>
+
+                <!-- Description -->
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Description (Optional)</label>
+                    <textarea id="modalDescription" rows="3" placeholder="Describe the figure features, size, and details..." class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all resize-none"></textarea>
+                </div>
+
+                <!-- Modal Actions -->
+                <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-50">
+                    <button type="button" onclick="closeProductModal()" class="px-6 py-3 border border-gray-200 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-50 transition-all cursor-pointer">
+                        Cancel
+                    </button>
+                    <button type="submit" id="saveProductBtn" class="bg-accent hover:bg-accent-dark text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-accent/20 cursor-pointer text-xs">
+                        Save Product
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div id="deleteConfirmModal" class="fixed inset-0 bg-primary/60 backdrop-blur-sm z-[9999] hidden flex items-center justify-center transition-all duration-300">
+        <div class="bg-white border border-gray-100 rounded-3xl p-8 max-w-md w-full shadow-2xl space-y-6 mx-4 relative scale-95 opacity-0 transition-all duration-300" id="deleteConfirmModalContainer">
+            <div class="text-center space-y-4">
+                <div class="w-16 h-16 bg-red-50 border border-red-100 rounded-full flex items-center justify-center text-red-500 mx-auto">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-xl font-heading font-bold text-primary">Delete Product?</h3>
+                    <p class="text-xs text-gray-400">Are you sure you want to delete <span id="deleteProductName" class="font-bold text-primary text-sm"></span>? This action cannot be undone and will remove the item from the database.</p>
+                </div>
+            </div>
+            
+            <input type="hidden" id="deleteProductId">
+            
+            <div class="flex items-center justify-center gap-3">
+                <button onclick="closeDeleteConfirmModal()" class="w-full py-3.5 border border-gray-200 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-50 transition-all cursor-pointer">
+                    Cancel
+                </button>
+                <button onclick="deleteProductExecute()" class="w-full bg-red-500 hover:bg-red-600 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-red-500/20 cursor-pointer text-xs">
+                    Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
