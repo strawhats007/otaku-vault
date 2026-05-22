@@ -801,8 +801,9 @@
             }
 
             tableBody.innerHTML = productsList.map(product => {
-                let statusToggleClass = product.is_preorder ? 'bg-accent' : 'bg-emerald-500';
-                let statusTranslateClass = product.is_preorder ? 'translate-x-7' : 'translate-x-1';
+                const isPreorder = product.is_preorder ?? false;
+                let statusToggleClass = isPreorder ? 'bg-accent' : 'bg-emerald-500';
+                let statusTranslateClass = isPreorder ? 'translate-x-7' : 'translate-x-1';
                 
                 let stockPct = Math.min(100, Math.max(0, (product.stock / 100) * 100));
                 let stockBarColor = 'bg-emerald-500';
