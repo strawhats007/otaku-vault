@@ -752,6 +752,32 @@
         // Initialize cart badge count on load
         updateCartBadge();
 
+        // Transform local fallback image paths dynamically to premium public URLs
+        function getProductImageUrl(imgUrl) {
+            if (!imgUrl) return 'https://picsum.photos/id/100/400/300';
+            if (imgUrl.startsWith('images/')) {
+                const mappings = {
+                    'luffy_gear5': 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500&auto=format&fit=crop&q=80',
+                    'naruto_sage': 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=80',
+                    'nezuko_demon': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500&auto=format&fit=crop&q=80',
+                    'goku_ui': 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=500&auto=format&fit=crop&q=80',
+                    'gojo_satoru': 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=500&auto=format&fit=crop&q=80',
+                    'eren_yeager': 'https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?w=500&auto=format&fit=crop&q=80',
+                    'izuku_midoriya': 'https://images.unsplash.com/photo-1563089145-599997674d42?w=500&auto=format&fit=crop&q=80',
+                    'zoro_wado': 'https://images.unsplash.com/photo-1618336753974-aae8e04506aa?w=500&auto=format&fit=crop&q=80',
+                    'rengoku_flame': 'https://images.unsplash.com/photo-1613376023733-0a73315d9b06?w=500&auto=format&fit=crop&q=80'
+                };
+                
+                for (const [key, val] of Object.entries(mappings)) {
+                    if (imgUrl.includes(key)) {
+                        return val;
+                    }
+                }
+                return 'https://picsum.photos/id/100/400/300';
+            }
+            return imgUrl;
+        }
+
         // Fetch and Render Products Dynamically
         async function fetchAndRenderProducts() {
             const grid = document.getElementById('productGrid');
@@ -788,7 +814,7 @@
                 return `
                     <div class="product-card flex flex-col h-[490px] bg-white rounded-3xl p-3 border border-black/5 hover:shadow-lg transition-all duration-300">
                         <div class="relative overflow-hidden group h-[310px] rounded-2xl">
-                            <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover transition-opacity duration-500 ease-in-out group-hover:opacity-0">
+                            <img src="${getProductImageUrl(product.image)}" alt="${product.name}" class="w-full h-full object-cover transition-opacity duration-500 ease-in-out group-hover:opacity-0">
                             <img src="${product.second_image || 'https://picsum.photos/id/100/400/300'}" alt="${product.name} Hover" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100">
                             ${badgeHtml}
                             <button class="absolute top-3 right-3 z-30 bg-white/80 hover:bg-white text-accent p-2 rounded-full shadow-md transition-all hover:scale-110 cursor-pointer" onclick="toggleWishlist(this, event)">

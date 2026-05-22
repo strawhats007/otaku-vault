@@ -755,6 +755,32 @@
             }
         }
 
+        // Transform local fallback image paths dynamically to premium public URLs
+        function getProductImageUrl(imgUrl) {
+            if (!imgUrl) return 'https://picsum.photos/id/100/400/300';
+            if (imgUrl.startsWith('images/')) {
+                const mappings = {
+                    'luffy_gear5': 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500&auto=format&fit=crop&q=80',
+                    'naruto_sage': 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=80',
+                    'nezuko_demon': 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500&auto=format&fit=crop&q=80',
+                    'goku_ui': 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=500&auto=format&fit=crop&q=80',
+                    'gojo_satoru': 'https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=500&auto=format&fit=crop&q=80',
+                    'eren_yeager': 'https://images.unsplash.com/photo-1560169897-fc0cdbdfa4d5?w=500&auto=format&fit=crop&q=80',
+                    'izuku_midoriya': 'https://images.unsplash.com/photo-1563089145-599997674d42?w=500&auto=format&fit=crop&q=80',
+                    'zoro_wado': 'https://images.unsplash.com/photo-1618336753974-aae8e04506aa?w=500&auto=format&fit=crop&q=80',
+                    'rengoku_flame': 'https://images.unsplash.com/photo-1613376023733-0a73315d9b06?w=500&auto=format&fit=crop&q=80'
+                };
+                
+                for (const [key, val] of Object.entries(mappings)) {
+                    if (imgUrl.includes(key)) {
+                        return val;
+                    }
+                }
+                return 'https://picsum.photos/id/100/400/300';
+            }
+            return imgUrl;
+        }
+
         // Render dynamic table rows
         function renderProductsTable(productsList) {
             const tableBody = document.getElementById('productsTableBody');
@@ -775,10 +801,10 @@
             }
 
             tableBody.innerHTML = productsList.map(product => {
-                const isPreorder = product.is_preorder === true;
-                const stockPercent = Math.min(Math.max((product.stock / 100) * 100, 0), 100);
+                let statusToggleClass = product.is_preorder ? 'bg-accent' : 'bg-emerald-500';
+                let statusTranslateClass = product.is_preorder ? 'translate-x-7' : 'translate-x-1';
                 
-                // Set stock bar color based on density: green if high (>10), yellow if medium (3-10), red if low/0 (<=2)
+                let stockPct = Math.min(100, Math.max(0, (product.stock / 100) * 100));
                 let stockBarColor = 'bg-emerald-500';
                 if (product.stock <= 2) {
                     stockBarColor = 'bg-red-500';
@@ -793,7 +819,7 @@
                         </td>
                         <td class="py-6 px-4">
                             <div class="flex items-center gap-3">
-                                <img src="${product.image || 'https://picsum.photos/id/100/400/300'}" alt="${product.name}" class="w-12 h-12 rounded-xl object-cover border border-gray-100 flex-shrink-0" onerror="this.src='https://picsum.photos/id/100/400/300'">
+                                <img src="${getProductImageUrl(product.image)}" alt="${product.name}" class="w-12 h-12 rounded-xl object-cover border border-gray-100 flex-shrink-0" onerror="this.src='https://picsum.photos/id/100/400/300'">
                                 <div class="min-w-0">
                                     <h4 class="font-bold text-primary truncate max-w-[200px]" title="${product.name}">${product.name}</h4>
                                     <span class="text-[10px] text-gray-400 font-semibold block">#ID: ${product.id}</span>
@@ -805,7 +831,7 @@
                             <div class="space-y-1 w-full max-w-[150px]">
                                 <span class="text-xs font-bold text-gray-700 block">${product.stock} units</span>
                                 <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                                    <div class="${stockBarColor} h-2 rounded-full transition-all duration-300" style="width: ${stockPercent}%"></div>
+                                    <div class="${stockBarColor} h-2 rounded-full transition-all duration-300" style="width: ${stockPct}%"></div>
                                 </div>
                             </div>
                         </td>
