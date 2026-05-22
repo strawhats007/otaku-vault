@@ -992,6 +992,11 @@
 
                 const product = allProducts.find(p => p.id === productId);
                 if (product) {
+                    console.log(`[Edit Modal Open] ID: ${product.id}, Name: ${product.name}`);
+                    console.log(`- Loaded Main Image URL from DB: ${product.image}`);
+                    console.log(`- Loaded Hover Image URL from DB: ${product.hover_image_url}`);
+                    console.log(`- Loaded second_image (compatibility): ${product.second_image}`);
+
                     document.getElementById('modalProductId').value = product.id;
                     document.getElementById('modalName').value = product.name || '';
                     document.getElementById('modalPrice').value = product.price || '';
@@ -1088,8 +1093,15 @@
 
                 const publicUrl = publicUrlData.publicUrl;
                 
+                console.log(`[Upload success] Uploaded ${type} image.`);
+                console.log(`- Received Public URL: ${publicUrl}`);
+                console.log(`- Setting hidden input: #${hiddenInputId}`);
+
                 // Set value in hidden input and show preview
                 document.getElementById(hiddenInputId).value = publicUrl;
+                
+                console.log(`- Verified hidden input value:`, document.getElementById(hiddenInputId).value);
+
                 if (previewImg && noPreview) {
                     previewImg.src = publicUrl;
                     previewImg.classList.remove('hidden');
@@ -1140,6 +1152,13 @@
                 second_image: hover_image_url || image_url,
                 hover_image_url: hover_image_url || null
             };
+
+            console.log("[saveProduct] Prepared DB Payload:");
+            console.log("- ID:", id || "(new product)");
+            console.log("- Name:", name);
+            console.log("- Main Image Input:", image_url);
+            console.log("- Hover Image Input:", hover_image_url);
+            console.log("- Full Payload Object:", JSON.stringify(payload, null, 2));
 
             try {
                 if (!supabaseClient) throw new Error("Supabase is not initialized.");
