@@ -1230,22 +1230,67 @@
             const id = document.getElementById('deleteProductId').value;
             if (!id) return;
 
+            const deleteBtn = document.querySelector('#deleteConfirmModal button.bg-red-500');
+            if (deleteBtn) {
+                deleteBtn.disabled = true;
+                deleteBtn.innerHTML = `<svg class="w-4 h-4 animate-spin inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg> Deleting...`;
+            }
+
             try {
                 if (!supabaseClient) throw new Error("Supabase is not initialized.");
 
+                // 1. Find product to locate related storage images
+                const product = allProducts.find(p => p.id == id);
+                if (product) {
+                    const pathsToDelete = [];
+                    const getStoragePathFromUrl = (url) => {
+                        if (!url) return null;
+                        const prefix = "/storage/v1/object/public/products/";
+                        const index = url.indexOf(prefix);
+                        return index !== -1 ? url.substring(index + prefix.length) : null;
+                    };
+
+                    const mainPath = getStoragePathFromUrl(product.image);
+                    const hoverPath = getStoragePathFromUrl(product.hover_image_url || product.second_image);
+
+                    if (mainPath) pathsToDelete.push(mainPath);
+                    if (hoverPath && hoverPath !== mainPath) pathsToDelete.push(hoverPath);
+
+                    if (pathsToDelete.length > 0) {
+                        console.log("[Delete] Deleting related storage assets:", pathsToDelete);
+                        try {
+                            const { error: storageErr } = await supabaseClient.storage
+                                .from('products')
+                                .remove(pathsToDelete);
+                            if (storageErr) {
+                                console.warn("Storage deletion warning (proceeding):", storageErr);
+                            }
+                        } catch (storageException) {
+                            console.warn("Storage assets remove exception:", storageException);
+                        }
+                    }
+                }
+
+                // 2. Perform the DB deletion
                 const { error } = await supabaseClient
                     .from('products')
                     .delete()
                     .eq('id', id);
 
                 if (error) throw error;
-                
+
+                // 3. Success feedback only after confirmation
                 showNotificationToast("Product deleted successfully!");
                 closeDeleteConfirmModal();
-                fetchProductsData(); // Refresh table
+                await fetchProductsData(); // Refresh table
             } catch (err) {
                 console.error("Error deleting product:", err);
                 showNotificationToast(`Failed to delete product: ${err.message || err}`, false);
+            } finally {
+                if (deleteBtn) {
+                    deleteBtn.disabled = false;
+                    deleteBtn.textContent = 'Yes, Delete';
+                }
             }
         }
 
