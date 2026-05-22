@@ -394,25 +394,73 @@
         if (sessionStorage.getItem('otaku_admin_authenticated') === 'true') {
             document.getElementById('loginOverlay').classList.add('hidden');
             document.getElementById('dashboardContent').classList.remove('hidden');
-            silentSupabaseAuthLogin();
-            initializeDashboard();
+            (async () => {
+                await ensureSupabaseAuth();
+                initializeDashboard();
+            })();
+        }
+
+        async function ensureSupabaseAuth() {
+            try {
+                if (!supabaseClient) throw new Error("Supabase is not initialized.");
+                
+                // Get active session
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                
+                console.log("[ensureSupabaseAuth] Checking auth session...");
+                
+                if (session) {
+                    console.log("[ensureSupabaseAuth] ACTIVE Session established:", session);
+                    console.log("[ensureSupabaseAuth] User:", session.user);
+                    console.log("[ensureSupabaseAuth] Role:", session.user.role);
+                    console.log("[ensureSupabaseAuth] Headers:", supabaseClient.headers);
+                    return true;
+                }
+                
+                console.log("[ensureSupabaseAuth] No active session. Executing silent sign-in...");
+                const data = await silentSupabaseAuthLogin();
+                
+                if (data && data.session) {
+                    console.log("[ensureSupabaseAuth] Session established successfully via silent login!");
+                    console.log("- session:", data.session);
+                    console.log("- user:", data.user);
+                    console.log("- role:", data.user.role);
+                    console.log("- request headers:", supabaseClient.headers);
+                    return true;
+                }
+                
+                // Fetch session once more to verify auto-signup triggers
+                const { data: { session: finalCheck } } = await supabaseClient.auth.getSession();
+                if (finalCheck) {
+                    console.log("[ensureSupabaseAuth] Verified final auth session:", finalCheck);
+                    console.log("- user:", finalCheck.user);
+                    console.log("- role:", finalCheck.user.role);
+                    console.log("- request headers:", supabaseClient.headers);
+                    return true;
+                }
+
+                throw new Error("Unable to establish an authenticated session. uid and role are NULL.");
+            } catch (err) {
+                console.error("[ensureSupabaseAuth] Auth failed:", err);
+                showNotificationToast(`Authentication error: ${err.message || err}`, false);
+                return false;
+            }
         }
 
         async function silentSupabaseAuthLogin() {
             try {
-                if (!supabaseClient) return;
+                if (!supabaseClient) return null;
 
                 const email = 'admin@otakuvault.com';
                 const password = 'admin123';
 
-                // Try to sign in first
+                console.log("[silentSupabaseAuthLogin] Background sign-in...");
                 const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
 
                 if (error) {
-                    // If user does not exist, try to sign up
                     if (error.message.includes('Invalid login credentials') || error.status === 400 || error.message.includes('User not found')) {
                         console.log("Admin auth user not found. Automatically registering admin account...");
                         const { error: signUpError } = await supabaseClient.auth.signUp({
@@ -422,26 +470,31 @@
                         
                         if (signUpError) {
                             console.error("Failed to automatically register admin auth account:", signUpError);
+                            return null;
                         } else {
-                            console.log("Admin auth user registered successfully!");
-                            // Try sign in again after sign up
-                            await supabaseClient.auth.signInWithPassword({
+                            console.log("Admin auth user registered successfully! Re-signing in...");
+                            const { data: retryData, error: retryErr } = await supabaseClient.auth.signInWithPassword({
                                 email: email,
                                 password: password
                             });
+                            if (retryErr) throw retryErr;
+                            return retryData;
                         }
                     } else {
                         console.error("Supabase sign in failed:", error);
+                        return null;
                     }
                 } else {
-                    console.log("Supabase Auth successful: admin authenticated.");
+                    console.log("Supabase Auth successful: admin session established.");
+                    return data;
                 }
             } catch (err) {
                 console.error("Failed to perform silent Supabase Auth login:", err);
+                return null;
             }
         }
 
-        function handleLogin(e) {
+        async function handleLogin(e) {
             e.preventDefault();
             const passwordInput = document.getElementById('adminPassword').value.trim();
             const errorLabel = document.getElementById('loginError');
@@ -450,12 +503,12 @@
                 errorLabel.classList.add('hidden');
                 sessionStorage.setItem('otaku_admin_authenticated', 'true');
                 
-                // Trigger silent login to Supabase Auth to enable RLS authorization
-                silentSupabaseAuthLogin();
-                
                 // Hide overlay and show content
                 document.getElementById('loginOverlay').classList.add('hidden');
                 document.getElementById('dashboardContent').classList.remove('hidden');
+
+                // Trigger authenticated loading flow
+                await ensureSupabaseAuth();
                 initializeDashboard();
             } else {
                 errorLabel.classList.remove('hidden');
@@ -732,6 +785,12 @@
                 if (!supabaseClient) {
                     throw new Error("Supabase client is not initialized.");
                 }
+
+                // Enforce authentication gate before fetching database rows
+                const isAuthenticated = await ensureSupabaseAuth();
+                if (!isAuthenticated) {
+                    throw new Error("Authentication failed. Request blocked.");
+                }
                 const { data, error } = await supabaseClient
                     .from('products')
                     .select('*')
@@ -918,6 +977,12 @@
         async function toggleProductPreorder(id, isChecked) {
             try {
                 if (!supabaseClient) throw new Error("Supabase is not initialized.");
+
+                // Enforce authenticated gate before executing database writes
+                const isAuthenticated = await ensureSupabaseAuth();
+                if (!isAuthenticated) {
+                    throw new Error("Operation blocked: Unauthenticated session.");
+                }
                 
                 // Update locally first to make it responsive
                 const prod = allProducts.find(p => p.id === id);
@@ -1122,6 +1187,13 @@
         // Save (Insert / Update) Product Form handler
         async function saveProduct(event) {
             event.preventDefault();
+
+            // Enforce authenticated gate before executing database writes
+            const isAuthenticated = await ensureSupabaseAuth();
+            if (!isAuthenticated) {
+                showNotificationToast("Operation blocked: Unauthenticated session.", false);
+                return;
+            }
             
             const saveBtn = document.getElementById('saveProductBtn');
             if (saveBtn) {
@@ -1245,6 +1317,13 @@
         async function deleteProductExecute() {
             const id = document.getElementById('deleteProductId').value;
             if (!id) return;
+
+            // Enforce authenticated gate before executing database writes
+            const isAuthenticated = await ensureSupabaseAuth();
+            if (!isAuthenticated) {
+                showNotificationToast("Operation blocked: Unauthenticated session.", false);
+                return;
+            }
 
             const deleteBtn = document.querySelector('#deleteConfirmModal button.bg-red-500');
             if (deleteBtn) {
