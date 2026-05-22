@@ -20,9 +20,23 @@ CREATE TABLE IF NOT EXISTS public.products (
 -- 2. Enable Row Level Security (RLS)
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 
--- 3. Create a policy to allow anyone to read products (Anonymous Read Access)
+-- 3. Create policies for product read and write access
+-- Allow anyone (public/anon) to read products
 CREATE POLICY "Allow public read access" ON public.products
     FOR SELECT USING (true);
+
+-- Allow authenticated admins to CREATE products
+CREATE POLICY "Allow admin insert" ON public.products
+    FOR INSERT TO authenticated WITH CHECK (true);
+
+-- Allow authenticated admins to UPDATE products
+CREATE POLICY "Allow admin update" ON public.products
+    FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
+
+-- Allow authenticated admins to DELETE products
+CREATE POLICY "Allow admin delete" ON public.products
+    FOR DELETE TO authenticated USING (true);
+
 
 -- 4. Seed the products table with sample anime figures
 INSERT INTO public.products (name, price, original_price, image, second_image, category, series, scale, material, size, stock, badge, is_preorder)

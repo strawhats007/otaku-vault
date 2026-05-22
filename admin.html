@@ -394,7 +394,51 @@
         if (sessionStorage.getItem('otaku_admin_authenticated') === 'true') {
             document.getElementById('loginOverlay').classList.add('hidden');
             document.getElementById('dashboardContent').classList.remove('hidden');
+            silentSupabaseAuthLogin();
             initializeDashboard();
+        }
+
+        async function silentSupabaseAuthLogin() {
+            try {
+                if (!supabaseClient) return;
+
+                const email = 'admin@otakuvault.com';
+                const password = 'admin123';
+
+                // Try to sign in first
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) {
+                    // If user does not exist, try to sign up
+                    if (error.message.includes('Invalid login credentials') || error.status === 400 || error.message.includes('User not found')) {
+                        console.log("Admin auth user not found. Automatically registering admin account...");
+                        const { error: signUpError } = await supabaseClient.auth.signUp({
+                            email: email,
+                            password: password
+                        });
+                        
+                        if (signUpError) {
+                            console.error("Failed to automatically register admin auth account:", signUpError);
+                        } else {
+                            console.log("Admin auth user registered successfully!");
+                            // Try sign in again after sign up
+                            await supabaseClient.auth.signInWithPassword({
+                                email: email,
+                                password: password
+                            });
+                        }
+                    } else {
+                        console.error("Supabase sign in failed:", error);
+                    }
+                } else {
+                    console.log("Supabase Auth successful: admin authenticated.");
+                }
+            } catch (err) {
+                console.error("Failed to perform silent Supabase Auth login:", err);
+            }
         }
 
         function handleLogin(e) {
@@ -405,6 +449,9 @@
             if (passwordInput === 'admin123') {
                 errorLabel.classList.add('hidden');
                 sessionStorage.setItem('otaku_admin_authenticated', 'true');
+                
+                // Trigger silent login to Supabase Auth to enable RLS authorization
+                silentSupabaseAuthLogin();
                 
                 // Hide overlay and show content
                 document.getElementById('loginOverlay').classList.add('hidden');
@@ -418,6 +465,9 @@
 
         function handleLogout() {
             sessionStorage.removeItem('otaku_admin_authenticated');
+            if (supabaseClient && supabaseClient.auth) {
+                supabaseClient.auth.signOut().catch(e => console.error("Error signing out from Supabase Auth:", e));
+            }
             document.getElementById('loginOverlay').classList.remove('hidden');
             document.getElementById('dashboardContent').classList.add('hidden');
             document.getElementById('adminPassword').value = '';
@@ -883,6 +933,17 @@
             document.getElementById('modalImageUrl').value = '';
             document.getElementById('modalDescription').value = '';
 
+            const previewImg = document.getElementById('imagePreviewThumbnail');
+            const noPreview = document.getElementById('noPreviewText');
+            const uploadLabelText = document.getElementById('uploadLabelText');
+            
+            if (previewImg && noPreview && uploadLabelText) {
+                previewImg.src = '';
+                previewImg.classList.add('hidden');
+                noPreview.classList.remove('hidden');
+                uploadLabelText.textContent = "Click or Drag Image to Upload";
+            }
+
             if (mode === 'add') {
                 title.textContent = 'Add New Product';
                 subtitle.textContent = 'Fill in the fields below to add a new figure to the shop.';
@@ -901,6 +962,13 @@
                     document.getElementById('modalStatus').value = product.is_preorder ? 'Pre-order' : 'In Stock';
                     document.getElementById('modalImageUrl').value = product.image || '';
                     document.getElementById('modalDescription').value = '';
+
+                    if (product.image && previewImg && noPreview) {
+                        previewImg.src = product.image;
+                        previewImg.classList.remove('hidden');
+                        noPreview.classList.add('hidden');
+                        uploadLabelText.textContent = "Change Product Image";
+                    }
                 }
             }
 
@@ -921,6 +989,61 @@
             setTimeout(() => {
                 modal.classList.add('hidden');
             }, 300);
+        }
+
+        // Upload Product Image to Supabase Storage Bucket
+        async function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const uploadLabelText = document.getElementById('uploadLabelText');
+            const previewImg = document.getElementById('imagePreviewThumbnail');
+            const noPreview = document.getElementById('noPreviewText');
+            
+            if (uploadLabelText) uploadLabelText.textContent = "Uploading image...";
+
+            try {
+                if (!supabaseClient) throw new Error("Supabase is not initialized.");
+
+                // Use a unique name for the uploaded file in the bucket
+                const fileExt = file.name.split('.').pop();
+                const fileName = `product_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+                const filePath = `products/${fileName}`;
+
+                // Upload to the 'products' bucket
+                const { data, error } = await supabaseClient.storage
+                    .from('products')
+                    .upload(filePath, file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+
+                if (error) {
+                    throw error;
+                }
+
+                // Get Public URL
+                const { data: publicUrlData } = supabaseClient.storage
+                    .from('products')
+                    .getPublicUrl(filePath);
+
+                const publicUrl = publicUrlData.publicUrl;
+                
+                // Set value in hidden input and show preview
+                document.getElementById('modalImageUrl').value = publicUrl;
+                if (previewImg && noPreview) {
+                    previewImg.src = publicUrl;
+                    previewImg.classList.remove('hidden');
+                    noPreview.classList.add('hidden');
+                }
+
+                if (uploadLabelText) uploadLabelText.textContent = "Image uploaded successfully!";
+                showNotificationToast("Image uploaded successfully!");
+            } catch (err) {
+                console.error("Image upload failed:", err);
+                if (uploadLabelText) uploadLabelText.textContent = "Upload failed. Click to retry.";
+                showNotificationToast(`Upload failed: ${err.message || err}`, false);
+            }
         }
 
         // Save (Insert / Update) Product Form handler
@@ -1186,10 +1309,24 @@
                     </div>
                 </div>
 
-                <!-- Image URL -->
+                <!-- Product Image Upload / Public URL Flow -->
                 <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Image URL</label>
-                    <input type="text" id="modalImageUrl" required placeholder="e.g. images/naruto_sage.png or https://picsum.photos/id/200/400/300" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all">
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Product Image</label>
+                    <div class="flex gap-4 items-center">
+                        <div class="flex-grow">
+                            <label for="imageUploadInput" class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer hover:border-accent transition-all bg-gray-50/50">
+                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span class="text-xs font-semibold text-gray-500 mt-1" id="uploadLabelText">Click or Drag Image to Upload</span>
+                                <input type="file" id="imageUploadInput" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                            </label>
+                        </div>
+                        <!-- Preview Thumbnail -->
+                        <div class="w-20 h-20 rounded-xl border border-gray-150 overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center">
+                            <img id="imagePreviewThumbnail" src="" class="w-full h-full object-cover hidden">
+                            <span id="noPreviewText" class="text-[10px] text-gray-400 font-bold text-center p-1">No Image</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="modalImageUrl" required>
                 </div>
 
                 <!-- Description -->
