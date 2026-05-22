@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS public.products (
     original_price NUMERIC,
     image TEXT NOT NULL,
     second_image TEXT,
+    hover_image_url TEXT,
     category TEXT,
     series TEXT,
     scale TEXT,

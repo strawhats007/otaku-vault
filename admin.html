@@ -958,6 +958,7 @@
             document.getElementById('modalStock').value = '';
             document.getElementById('modalStatus').value = 'In Stock';
             document.getElementById('modalImageUrl').value = '';
+            document.getElementById('modalHoverImageUrl').value = '';
             document.getElementById('modalDescription').value = '';
 
             const previewImg = document.getElementById('imagePreviewThumbnail');
@@ -969,6 +970,17 @@
                 previewImg.classList.add('hidden');
                 noPreview.classList.remove('hidden');
                 uploadLabelText.textContent = "Click or Drag Image to Upload";
+            }
+
+            const hoverPreviewImg = document.getElementById('hoverImagePreviewThumbnail');
+            const noHoverPreview = document.getElementById('noHoverPreviewText');
+            const hoverUploadLabelText = document.getElementById('hoverUploadLabelText');
+
+            if (hoverPreviewImg && noHoverPreview && hoverUploadLabelText) {
+                hoverPreviewImg.src = '';
+                hoverPreviewImg.classList.add('hidden');
+                noHoverPreview.classList.remove('hidden');
+                hoverUploadLabelText.textContent = "Click or Drag Hover Image to Upload";
             }
 
             if (mode === 'add') {
@@ -988,6 +1000,9 @@
                     document.getElementById('modalStock').value = product.stock !== undefined ? product.stock : '';
                     document.getElementById('modalStatus').value = product.is_preorder ? 'Pre-order' : 'In Stock';
                     document.getElementById('modalImageUrl').value = product.image || '';
+                    
+                    const hoverImgUrl = product.hover_image_url || product.second_image || '';
+                    document.getElementById('modalHoverImageUrl').value = hoverImgUrl;
                     document.getElementById('modalDescription').value = '';
 
                     if (product.image && previewImg && noPreview) {
@@ -995,6 +1010,13 @@
                         previewImg.classList.remove('hidden');
                         noPreview.classList.add('hidden');
                         uploadLabelText.textContent = "Change Product Image";
+                    }
+
+                    if (hoverImgUrl && hoverPreviewImg && noHoverPreview) {
+                        hoverPreviewImg.src = hoverImgUrl;
+                        hoverPreviewImg.classList.remove('hidden');
+                        noHoverPreview.classList.add('hidden');
+                        hoverUploadLabelText.textContent = "Change Hover Image";
                     }
                 }
             }
@@ -1019,13 +1041,23 @@
         }
 
         // Upload Product Image to Supabase Storage Bucket
-        async function handleImageUpload(event) {
+        async function handleImageUpload(event, type = 'main') {
             const file = event.target.files[0];
             if (!file) return;
 
-            const uploadLabelText = document.getElementById('uploadLabelText');
-            const previewImg = document.getElementById('imagePreviewThumbnail');
-            const noPreview = document.getElementById('noPreviewText');
+            let uploadLabelText, previewImg, noPreview, hiddenInputId;
+
+            if (type === 'main') {
+                uploadLabelText = document.getElementById('uploadLabelText');
+                previewImg = document.getElementById('imagePreviewThumbnail');
+                noPreview = document.getElementById('noPreviewText');
+                hiddenInputId = 'modalImageUrl';
+            } else {
+                uploadLabelText = document.getElementById('hoverUploadLabelText');
+                previewImg = document.getElementById('hoverImagePreviewThumbnail');
+                noPreview = document.getElementById('noHoverPreviewText');
+                hiddenInputId = 'modalHoverImageUrl';
+            }
             
             if (uploadLabelText) uploadLabelText.textContent = "Uploading image...";
 
@@ -1034,7 +1066,7 @@
 
                 // Use a unique name for the uploaded file in the bucket
                 const fileExt = file.name.split('.').pop();
-                const fileName = `product_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+                const fileName = `product_${type}_${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
                 const filePath = `products/${fileName}`;
 
                 // Upload to the 'products' bucket
@@ -1057,7 +1089,7 @@
                 const publicUrl = publicUrlData.publicUrl;
                 
                 // Set value in hidden input and show preview
-                document.getElementById('modalImageUrl').value = publicUrl;
+                document.getElementById(hiddenInputId).value = publicUrl;
                 if (previewImg && noPreview) {
                     previewImg.src = publicUrl;
                     previewImg.classList.remove('hidden');
@@ -1068,7 +1100,9 @@
                 showNotificationToast("Image uploaded successfully!");
             } catch (err) {
                 console.error("Image upload failed:", err);
-                if (uploadLabelText) uploadLabelText.textContent = "Upload failed. Click to retry.";
+                if (uploadLabelText) {
+                    uploadLabelText.textContent = type === 'main' ? "Upload failed. Click to retry." : "Upload failed. Click to retry.";
+                }
                 showNotificationToast(`Upload failed: ${err.message || err}`, false);
             }
         }
@@ -1091,6 +1125,7 @@
             const stock = Number(document.getElementById('modalStock').value);
             const status = document.getElementById('modalStatus').value;
             const image_url = document.getElementById('modalImageUrl').value;
+            const hover_image_url = document.getElementById('modalHoverImageUrl').value;
             
             const isPreorder = status === 'Pre-order';
 
@@ -1102,7 +1137,8 @@
                 series: series,
                 image: image_url,
                 is_preorder: isPreorder,
-                second_image: image_url
+                second_image: hover_image_url || image_url,
+                hover_image_url: hover_image_url || null
             };
 
             try {
@@ -1344,7 +1380,7 @@
                             <label for="imageUploadInput" class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer hover:border-accent transition-all bg-gray-50/50">
                                 <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                                 <span class="text-xs font-semibold text-gray-500 mt-1" id="uploadLabelText">Click or Drag Image to Upload</span>
-                                <input type="file" id="imageUploadInput" accept="image/*" class="hidden" onchange="handleImageUpload(event)">
+                                <input type="file" id="imageUploadInput" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'main')">
                             </label>
                         </div>
                         <!-- Preview Thumbnail -->
@@ -1354,6 +1390,26 @@
                         </div>
                     </div>
                     <input type="hidden" id="modalImageUrl" required>
+                </div>
+
+                <!-- Product Hover Image Upload -->
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Hover Image (Optional)</label>
+                    <div class="flex gap-4 items-center">
+                        <div class="flex-grow">
+                            <label for="hoverImageUploadInput" class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer hover:border-accent transition-all bg-gray-50/50">
+                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span class="text-xs font-semibold text-gray-500 mt-1" id="hoverUploadLabelText">Click or Drag Hover Image to Upload</span>
+                                <input type="file" id="hoverImageUploadInput" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'hover')">
+                            </label>
+                        </div>
+                        <!-- Preview Thumbnail -->
+                        <div class="w-20 h-20 rounded-xl border border-gray-150 overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center">
+                            <img id="hoverImagePreviewThumbnail" src="" class="w-full h-full object-cover hidden">
+                            <span id="noHoverPreviewText" class="text-[10px] text-gray-400 font-bold text-center p-1">No Image</span>
+                        </div>
+                    </div>
+                    <input type="hidden" id="modalHoverImageUrl">
                 </div>
 
                 <!-- Description -->

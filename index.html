@@ -811,11 +811,14 @@
                 const originalPriceHtml = product.original_price ? `<span class="text-gray-400 line-through text-xs ml-1">৳${product.original_price}</span>` : '';
                 const badgeHtml = product.badge ? `<span class="absolute top-3 left-3 ${product.badge.includes('%') || product.badge.toLowerCase().includes('sale') ? 'bg-sale' : 'bg-accent'} text-white text-xs font-bold px-3 py-1 rounded-full z-20">${product.badge}</span>` : '';
                 
+                const defaultImg = getProductImageUrl(product.image);
+                const hoverImg = getProductImageUrl(product.hover_image_url || product.second_image || product.image);
+
                 return `
                     <div class="product-card flex flex-col h-[490px] bg-white rounded-3xl p-3 border border-black/5 hover:shadow-lg transition-all duration-300">
                         <div class="relative overflow-hidden group h-[310px] rounded-2xl">
-                            <img src="${getProductImageUrl(product.image)}" alt="${product.name}" class="w-full h-full object-cover transition-opacity duration-500 ease-in-out group-hover:opacity-0">
-                            <img src="${product.second_image || 'https://picsum.photos/id/100/400/300'}" alt="${product.name} Hover" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100">
+                            <img src="${defaultImg}" alt="${product.name}" class="w-full h-full object-cover transition-opacity duration-500 ease-in-out group-hover:opacity-0">
+                            <img src="${hoverImg}" alt="${product.name} Hover" class="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-500 ease-in-out group-hover:opacity-100">
                             ${badgeHtml}
                             <button class="absolute top-3 right-3 z-30 bg-white/80 hover:bg-white text-accent p-2 rounded-full shadow-md transition-all hover:scale-110 cursor-pointer" onclick="toggleWishlist(this, event)">
                                 <svg class="w-5 h-5 heart-outline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
