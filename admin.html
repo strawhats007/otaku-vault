@@ -3370,7 +3370,7 @@
         let orders = mockOrders; // Define global orders array
         let currentOrderActiveTab = 'All';
         let orderCurrentPage = 1;
-        const ordersPerPage = 5;
+        const ordersPerPage = 20;
         let selectedMockOrderId = null;
 
         function renderOrders() {
@@ -3499,16 +3499,16 @@
 
                 return `
                     <tr onclick="openOrderPanel('${order.id}')" class="hover:bg-gray-50/50 cursor-pointer transition-colors group border-b border-gray-50">
-                        <td class="py-4.5 px-4 font-bold text-primary group-hover:text-accent transition-colors">${order.id}</td>
-                        <td class="py-4.5 px-4 font-semibold text-primary">${order.customerName}</td>
-                        <td class="py-4.5 px-4 text-gray-500">${order.date}</td>
-                        <td class="py-4.5 px-4 font-bold text-primary">৳${grandTotal.toLocaleString()}</td>
-                        <td class="py-4.5 px-4">
+                        <td class="py-2 px-4 font-bold text-primary group-hover:text-accent transition-colors">${order.id}</td>
+                        <td class="py-2 px-4 font-semibold text-primary">${order.customerName}</td>
+                        <td class="py-2 px-4 text-gray-500">${order.date}</td>
+                        <td class="py-2 px-4 font-bold text-primary">৳${grandTotal.toLocaleString()}</td>
+                        <td class="py-2 px-4">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${badgeClass}">
                                 ${order.status}
                             </span>
                         </td>
-                        <td class="py-4.5 px-4 text-right" onclick="event.stopPropagation()">
+                        <td class="py-2 px-4 text-right" onclick="event.stopPropagation()">
                             <button onclick="openOrderPanel('${order.id}')" class="bg-gray-50 border border-gray-150 hover:border-accent hover:bg-accent hover:text-white px-3 py-1.5 rounded-xl font-bold text-xs text-primary transition-all select-none">
                                 View Details
                             </button>
