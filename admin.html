@@ -1175,25 +1175,44 @@
                         <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Configure store information, delivery, and credentials</p>
                     </div>
 
-                    <!-- 3 Cards Layout -->
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Left Column (Store Info & Delivery Settings) -->
-                        <div class="space-y-8">
-                            <!-- 1. Store Information Card -->
-                            <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-6">
-                                <div class="flex items-center gap-3 pb-4 border-b border-gray-50">
-                                    <div class="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-accent">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-lg font-heading font-bold text-primary">Store Information</h3>
-                                        <p class="text-xs text-gray-400 font-semibold">General metadata for your e-commerce shop</p>
-                                    </div>
+                    <!-- Two-Column Dashboard Layout -->
+                    <div class="bg-white border border-gray-100 rounded-3xl p-4 md:p-6 shadow-sm flex flex-col md:flex-row gap-8 min-h-[500px]">
+                        <!-- Left Column: Vertical Sub-Navigation Tabs (~220px) -->
+                        <div class="w-full md:w-[220px] flex-shrink-0 border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 md:pr-6 space-y-1 flex flex-row md:flex-col overflow-x-auto md:overflow-x-visible">
+                            <!-- Store Info Tab -->
+                            <button onclick="switchSettingsSubTab('store-info')" id="settingsSubTab-store-info" class="settings-sub-tab flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all select-none w-full text-left border-l-4 border-accent text-accent bg-orange-50/50">
+                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                </svg>
+                                <span>Store Info</span>
+                            </button>
+                            <!-- Delivery Tab -->
+                            <button onclick="switchSettingsSubTab('delivery')" id="settingsSubTab-delivery" class="settings-sub-tab flex items-center gap-3 px-4 py-3.5 rounded-xl font-semibold text-xs uppercase tracking-wider text-gray-400 hover:text-primary hover:bg-gray-50 transition-all select-none w-full text-left border-l-4 border-transparent">
+                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10M21 16V10a1 1 0 00-1-1h-6v8m0 0h2" />
+                                </svg>
+                                <span>Delivery</span>
+                            </button>
+                            <!-- Security Tab -->
+                            <button onclick="switchSettingsSubTab('security')" id="settingsSubTab-security" class="settings-sub-tab flex items-center gap-3 px-4 py-3.5 rounded-xl font-semibold text-xs uppercase tracking-wider text-gray-400 hover:text-primary hover:bg-gray-50 transition-all select-none w-full text-left border-l-4 border-transparent">
+                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                                <span>Security</span>
+                            </button>
+                        </div>
+
+                        <!-- Right Column: Content Area -->
+                        <div class="flex-grow">
+                            <!-- 1. Store Information Pane -->
+                            <div id="settingsPane-store-info" class="settings-pane space-y-6 animate-fadeIn">
+                                <div class="pb-4 border-b border-gray-50">
+                                    <h3 class="text-xl font-heading font-extrabold text-primary">Store Information</h3>
+                                    <p class="text-xs text-gray-400 font-semibold mt-1">General metadata and contact information for your online shop</p>
                                 </div>
 
-                                <div class="space-y-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div class="space-y-1.5">
                                         <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingStoreName">Store Name</label>
                                         <input type="text" id="settingStoreName" placeholder="Otaku Vault" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all" value="Otaku Vault">
@@ -1202,14 +1221,14 @@
                                         <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingStoreEmail">Store Email</label>
                                         <input type="email" id="settingStoreEmail" placeholder="support@otakuvault.com" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all" value="support@otakuvault.com">
                                     </div>
-                                    <div class="space-y-1.5">
+                                    <div class="space-y-1.5 md:col-span-2">
                                         <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingStoreAddress">Store Address</label>
-                                        <textarea id="settingStoreAddress" placeholder="Banani, Dhaka, Bangladesh" rows="3" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all resize-none">Banani, Dhaka, Bangladesh</textarea>
+                                        <textarea id="settingStoreAddress" placeholder="Banani, Dhaka, Bangladesh" rows="4" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all resize-none">Banani, Dhaka, Bangladesh</textarea>
                                     </div>
                                 </div>
 
                                 <div class="pt-4 border-t border-gray-50 flex justify-end">
-                                    <button onclick="saveStoreInformation()" class="bg-[#d8532e] hover:bg-[#c53b2b] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all duration-300 flex items-center gap-2 select-none hover:shadow">
+                                    <button onclick="saveStoreInformation()" class="bg-[#d8532e] hover:bg-[#c53b2b] text-white px-6 py-3.5 rounded-xl font-bold text-sm shadow-sm transition-all duration-300 flex items-center gap-2 select-none hover:shadow">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                                         </svg>
@@ -1218,22 +1237,14 @@
                                 </div>
                             </div>
 
-                            <!-- 2. Delivery Settings Card -->
-                            <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-6">
-                                <div class="flex items-center gap-3 pb-4 border-b border-gray-50">
-                                    <div class="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-accent">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10M21 16V10a1 1 0 00-1-1h-6v8m0 0h2" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-lg font-heading font-bold text-primary">Delivery Settings</h3>
-                                        <p class="text-xs text-gray-400 font-semibold">Configure shipping costs and free shipping thresholds</p>
-                                    </div>
+                            <!-- 2. Delivery Pane -->
+                            <div id="settingsPane-delivery" class="settings-pane hidden space-y-6 animate-fadeIn">
+                                <div class="pb-4 border-b border-gray-50">
+                                    <h3 class="text-xl font-heading font-extrabold text-primary">Delivery Settings</h3>
+                                    <p class="text-xs text-gray-400 font-semibold mt-1">Configure shipping costs and free delivery thresholds</p>
                                 </div>
 
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div class="space-y-1.5">
                                         <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingDeliveryDhaka">Dhaka Delivery Fee (BDT)</label>
                                         <input type="number" id="settingDeliveryDhaka" placeholder="60" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all" value="60">
@@ -1243,45 +1254,34 @@
                                         <input type="number" id="settingDeliveryOutside" placeholder="120" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all" value="120">
                                     </div>
                                     <div class="space-y-1.5 md:col-span-2">
-                                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingFreeThreshold">Free Delivery Threshold (BDT)</label>
+                                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingFreeThreshold">Free Delivery Minimum Order (BDT)</label>
                                         <input type="number" id="settingFreeThreshold" placeholder="3000" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all" value="3000">
                                     </div>
                                 </div>
 
                                 <div class="pt-4 border-t border-gray-50 flex justify-end">
-                                    <button onclick="saveDeliverySettings()" class="bg-[#d8532e] hover:bg-[#c53b2b] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all duration-300 flex items-center gap-2 select-none hover:shadow">
+                                    <button onclick="saveDeliverySettings()" class="bg-[#d8532e] hover:bg-[#c53b2b] text-white px-6 py-3.5 rounded-xl font-bold text-sm shadow-sm transition-all duration-300 flex items-center gap-2 select-none hover:shadow">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                                         </svg>
-                                        Save Settings
+                                        Save Changes
                                     </button>
                                 </div>
                             </div>
-                        </div>
 
-                        <!-- Right Column (Password Change Card) -->
-                        <div>
-                            <!-- 3. Password Change Card -->
-                            <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-6">
-                                <div class="flex items-center gap-3 pb-4 border-b border-gray-50">
-                                    <div class="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-accent">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h3 class="text-lg font-heading font-bold text-primary">Change Password</h3>
-                                        <p class="text-xs text-gray-400 font-semibold">Update your administrator portal access credentials</p>
-                                    </div>
+                            <!-- 3. Security Pane -->
+                            <div id="settingsPane-security" class="settings-pane hidden space-y-6 animate-fadeIn">
+                                <div class="pb-4 border-b border-gray-50">
+                                    <h3 class="text-xl font-heading font-extrabold text-primary">Security Settings</h3>
+                                    <p class="text-xs text-gray-400 font-semibold mt-1">Manage portal password and authentication credentials</p>
                                 </div>
 
-                                <div class="space-y-4">
+                                <div class="space-y-4 max-w-lg">
                                     <div class="space-y-1.5 relative">
                                         <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingCurrentPassword">Current Password</label>
                                         <div class="relative">
                                             <input type="password" id="settingCurrentPassword" placeholder="••••••••" class="password-input w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all">
                                             <button type="button" onclick="toggleSettingsPassword('settingCurrentPassword', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-accent transition-all cursor-pointer">
-                                                <!-- Eye icon -->
                                                 <svg class="w-5 h-5 eye-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -1318,7 +1318,7 @@
                                 </div>
 
                                 <div class="pt-4 border-t border-gray-50 flex justify-end">
-                                    <button onclick="savePasswordSettings()" class="bg-[#d8532e] hover:bg-[#c53b2b] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all duration-300 flex items-center gap-2 select-none hover:shadow">
+                                    <button onclick="savePasswordSettings()" class="bg-[#d8532e] hover:bg-[#c53b2b] text-white px-6 py-3.5 rounded-xl font-bold text-sm shadow-sm transition-all duration-300 flex items-center gap-2 select-none hover:shadow">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                         </svg>
@@ -2737,6 +2737,28 @@
         }
 
         // ==================== SETTINGS FUNCTIONS ====================
+        function switchSettingsSubTab(subTabId) {
+            // Hide all sub-tab content panes
+            const panes = document.querySelectorAll('.settings-pane');
+            panes.forEach(pane => pane.classList.add('hidden'));
+
+            // Show current active sub-tab content pane
+            const activePane = document.getElementById(`settingsPane-${subTabId}`);
+            if (activePane) activePane.classList.remove('hidden');
+
+            // Set inactive classes for all sub-tab buttons
+            const buttons = document.querySelectorAll('.settings-sub-tab');
+            buttons.forEach(btn => {
+                btn.className = "settings-sub-tab flex items-center gap-3 px-4 py-3.5 rounded-xl font-semibold text-xs uppercase tracking-wider text-gray-400 hover:text-primary hover:bg-gray-50 transition-all select-none w-full text-left border-l-4 border-transparent";
+            });
+
+            // Set active classes for the clicked sub-tab button
+            const activeBtn = document.getElementById(`settingsSubTab-${subTabId}`);
+            if (activeBtn) {
+                activeBtn.className = "settings-sub-tab flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all select-none w-full text-left border-l-4 border-accent text-accent bg-orange-50/50";
+            }
+        }
+
         function toggleSettingsPassword(inputId, btn) {
             const input = document.getElementById(inputId);
             if (!input) return;
