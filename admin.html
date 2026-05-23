@@ -1085,7 +1085,7 @@
                                         <th class="pb-4 px-4 text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="ordersTableBody" class="text-sm font-medium text-primary divide-y divide-gray-50">
+                                <tbody id="ordersTabTableBody" class="text-sm font-medium text-primary divide-y divide-gray-50">
                                     <!-- Loaded dynamically via script -->
                                 </tbody>
                             </table>
@@ -3367,14 +3367,19 @@
         ];
 
         let mockOrders = [...initialMockOrders];
+        let orders = mockOrders; // Define global orders array
         let currentOrderActiveTab = 'All';
         let orderCurrentPage = 1;
         const ordersPerPage = 5;
         let selectedMockOrderId = null;
 
+        function renderOrders() {
+            filterOrders();
+        }
+
         function initOrdersTab() {
             recalculateOrderStats();
-            filterOrders();
+            renderOrders();
         }
 
         function recalculateOrderStats() {
@@ -3460,7 +3465,7 @@
         }
 
         function renderOrdersTableRows(paginatedList) {
-            const tbody = document.getElementById('ordersTableBody');
+            const tbody = document.getElementById('ordersTabTableBody');
             if (!tbody) return;
 
             if (paginatedList.length === 0) {
@@ -3653,6 +3658,7 @@
 
             // Update in mock array
             mockOrders = mockOrders.map(o => o.id === selectedMockOrderId ? { ...o, status: newStatus } : o);
+            orders = mockOrders; // Keep orders array fully in sync
 
             // Instant table row/counters update (optimistic UI)
             recalculateOrderStats();
