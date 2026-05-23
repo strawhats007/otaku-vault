@@ -1055,51 +1055,137 @@
             });
         }
 
-        // Custom Category Filter
-        function filterProductsByCategory(category) {
+        // Centralized Filter and Sorting States
+        window.activeCategory = 'all';
+        window.activeSeries = 'all';
+        window.activeBadge = 'all';
+        window.currentSearchQuery = '';
+        window.activeSortValue = 'Popular';
+
+        function applyAllFiltersAndSort() {
             const allProducts = window.allProducts || fallbackProducts;
             const heading = document.querySelector('.flex-grow h2.font-heading, .flex-1 h2.font-heading');
             
-            let filtered;
-            const catLower = category.trim().toLowerCase();
-            
-            if (catLower === 'all' || catLower === 'all figures') {
-                filtered = allProducts;
-                if (heading) heading.textContent = 'All Products';
-            } else if (catLower === 'action figures') {
-                filtered = allProducts.filter(p => {
-                    const name = p.name.toLowerCase();
-                    const cat = (p.category || '').toLowerCase();
-                    return cat.includes('action') || name.includes('gear 5') || name.includes('sage mode') || name.includes('instinct') || name.includes('zoro') || name.includes('kamado');
-                });
-                if (heading) heading.textContent = 'Action Figures';
-            } else if (catLower === 'nendoroids') {
-                filtered = allProducts.filter(p => {
-                    const name = p.name.toLowerCase();
-                    const cat = (p.category || '').toLowerCase();
-                    return cat.includes('nendoroid') || name.includes('demon form') || name.includes('nezuko') || name.includes('kamado');
-                });
-                if (heading) heading.textContent = 'Nendoroids';
-            } else if (catLower === 'figma') {
-                filtered = allProducts.filter(p => {
-                    const name = p.name.toLowerCase();
-                    const cat = (p.category || '').toLowerCase();
-                    return cat.includes('figma') || name.includes('goku') || name.includes('naruto');
-                });
-                if (heading) heading.textContent = 'Figma';
-            } else if (catLower === 'statues/pvc') {
-                filtered = allProducts.filter(p => {
-                    const name = p.name.toLowerCase();
-                    const cat = (p.category || '').toLowerCase();
-                    return cat.includes('statue') || cat.includes('pvc') || p.material === 'PVC' || name.includes('gear 5');
-                });
-                if (heading) heading.textContent = 'Statues/PVC';
-            } else {
-                filtered = allProducts.filter(p => (p.category || '').toLowerCase() === catLower);
-                if (heading) heading.textContent = category;
+            let filtered = [...allProducts];
+
+            // 1. Category Filter
+            if (window.activeCategory && window.activeCategory !== 'all' && window.activeCategory !== 'all figures') {
+                const catLower = window.activeCategory.toLowerCase();
+                if (catLower === 'action figures') {
+                    filtered = filtered.filter(p => {
+                        const name = p.name.toLowerCase();
+                        const cat = (p.category || '').toLowerCase();
+                        return cat.includes('action') || name.includes('gear 5') || name.includes('sage mode') || name.includes('instinct') || name.includes('zoro') || name.includes('kamado');
+                    });
+                    if (heading) heading.textContent = 'Action Figures';
+                } else if (catLower === 'nendoroids') {
+                    filtered = filtered.filter(p => {
+                        const name = p.name.toLowerCase();
+                        const cat = (p.category || '').toLowerCase();
+                        return cat.includes('nendoroid') || name.includes('demon form') || name.includes('nezuko') || name.includes('kamado');
+                    });
+                    if (heading) heading.textContent = 'Nendoroids';
+                } else if (catLower === 'figma') {
+                    filtered = filtered.filter(p => {
+                        const name = p.name.toLowerCase();
+                        const cat = (p.category || '').toLowerCase();
+                        return cat.includes('figma') || name.includes('goku') || name.includes('naruto');
+                    });
+                    if (heading) heading.textContent = 'Figma';
+                } else if (catLower === 'statues/pvc') {
+                    filtered = filtered.filter(p => {
+                        const name = p.name.toLowerCase();
+                        const cat = (p.category || '').toLowerCase();
+                        return cat.includes('statue') || cat.includes('pvc') || p.material === 'PVC' || name.includes('gear 5');
+                    });
+                    if (heading) heading.textContent = 'Statues/PVC';
+                } else {
+                    filtered = filtered.filter(p => (p.category || '').toLowerCase() === catLower);
+                    if (heading) heading.textContent = window.activeCategory;
+                }
             }
-            
+
+            // 2. Series Filter
+            if (window.activeSeries && window.activeSeries !== 'all' && window.activeSeries !== 'all series') {
+                const seriesLower = window.activeSeries.toLowerCase();
+                filtered = filtered.filter(p => (p.series || '').toLowerCase() === seriesLower);
+                if (heading) heading.textContent = window.activeSeries;
+            }
+
+            // 3. Badge Filter
+            if (window.activeBadge && window.activeBadge !== 'all') {
+                const tagLower = window.activeBadge.toLowerCase();
+                if (tagLower === 'new') {
+                    filtered = filtered.filter(p => (p.badge || '').toUpperCase() === 'NEW');
+                    if (heading) heading.textContent = 'New Arrivals';
+                } else if (tagLower === 'hot') {
+                    filtered = filtered.filter(p => (p.badge || '').toUpperCase() === 'HOT');
+                    if (heading) heading.textContent = 'Hot Trending';
+                } else if (tagLower === 'upcoming') {
+                    filtered = filtered.filter(p => (p.badge || '').toUpperCase() === 'UPCOMING');
+                    if (heading) heading.textContent = 'Upcoming Releases';
+                } else if (tagLower === 'discount') {
+                    const todayStr = new Date().toISOString().split('T')[0];
+                    filtered = filtered.filter(p => {
+                        const isDiscountBadge = p.badge === 'DISCOUNT' || (p.badge && p.badge.startsWith('-') && p.badge.endsWith('%'));
+                        const hasActiveDiscount = isDiscountBadge && p.discount_percent > 0 && 
+                            (!p.discount_expiry || p.discount_expiry >= todayStr);
+                        return hasActiveDiscount || (p.discount_percent > 0) || (p.original_price > p.price);
+                    });
+                    if (heading) heading.textContent = 'Special Offers & Discounts';
+                }
+            }
+
+            // 4. Search Filter
+            if (window.currentSearchQuery) {
+                const cleanQuery = window.currentSearchQuery.trim().toLowerCase();
+                filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(cleanQuery));
+                if (heading) heading.textContent = `Search Results for "${window.currentSearchQuery}"`;
+            }
+
+            // If no active filter heading, default to 'All Products'
+            if ((!window.activeCategory || window.activeCategory === 'all' || window.activeCategory === 'all figures') && 
+                (!window.activeSeries || window.activeSeries === 'all' || window.activeSeries === 'all series') && 
+                window.activeBadge === 'all' && 
+                !window.currentSearchQuery) {
+                if (heading) heading.textContent = 'All Products';
+            }
+
+            // 5. Sorting
+            if (window.activeSortValue) {
+                if (window.activeSortValue === 'Popular') {
+                    // "Popular" to "Hot" — show products with HOT badge first
+                    filtered.sort((a, b) => {
+                        const aHot = (a.badge || '').toUpperCase() === 'HOT' ? 1 : 0;
+                        const bHot = (b.badge || '').toUpperCase() === 'HOT' ? 1 : 0;
+                        return bHot - aHot;
+                    });
+                } else if (window.activeSortValue === 'Newest') {
+                    // "Newest" → sort products by newest first
+                    filtered.sort((a, b) => {
+                        const aTime = a.created_at ? new Date(a.created_at).getTime() : 0;
+                        const bTime = b.created_at ? new Date(b.created_at).getTime() : 0;
+                        if (bTime !== aTime) return bTime - aTime;
+                        return b.id - a.id;
+                    });
+                } else if (window.activeSortValue === 'Price: Low to High') {
+                    // "Price: Low to High" → sort products by price ascending
+                    filtered.sort((a, b) => (a.price || 0) - (b.price || 0));
+                } else if (window.activeSortValue === 'Price: High to Low') {
+                    // "Price: High to Low" → sort products by price descending
+                    filtered.sort((a, b) => (b.price || 0) - (a.price || 0));
+                }
+            }
+
             renderProducts(filtered);
+        }
+
+        // Custom Category Filter
+        function filterProductsByCategory(category) {
+            window.activeCategory = category;
+            window.activeSeries = 'all';
+            window.activeBadge = 'all';
+            applyAllFiltersAndSort();
 
             // Smooth scroll down to the product section container
             const productSection = document.getElementById('shopProductSection');
@@ -1114,23 +1200,13 @@
 
         // Custom Series Filter
         function filterProductsBySeries(seriesName) {
-            const allProducts = window.allProducts || fallbackProducts;
-            const heading = document.querySelector('.flex-grow h2.font-heading, .flex-1 h2.font-heading');
-            
-            let filtered;
-            const seriesLower = seriesName.trim().toLowerCase();
-            
-            if (seriesLower === 'all' || seriesLower === 'all series') {
-                filtered = allProducts;
-                if (heading) heading.textContent = 'All Products';
-            } else {
-                filtered = allProducts.filter(p => (p.series || '').toLowerCase() === seriesLower);
-                if (heading) heading.textContent = seriesName;
-            }
-            
-            renderProducts(filtered);
+            window.activeCategory = 'all';
+            window.activeSeries = seriesName;
+            window.activeBadge = 'all';
+            applyAllFiltersAndSort();
 
             // Update series pill active state visually if it exists
+            const seriesLower = seriesName.trim().toLowerCase();
             const pillBtns = document.querySelectorAll('.pill-btn');
             pillBtns.forEach(btn => {
                 const btnText = btn.textContent.trim().toLowerCase();
@@ -1153,36 +1229,10 @@
 
         // Custom Badge/Tag Filter
         function filterProductsByBadge(tag) {
-            const allProducts = window.allProducts || fallbackProducts;
-            const heading = document.querySelector('.flex-grow h2.font-heading, .flex-1 h2.font-heading');
-            
-            let filtered;
-            const tagLower = tag.trim().toLowerCase();
-            
-            if (tagLower === 'new') {
-                filtered = allProducts.filter(p => (p.badge || '').toUpperCase() === 'NEW');
-                if (heading) heading.textContent = 'New Arrivals';
-            } else if (tagLower === 'hot') {
-                filtered = allProducts.filter(p => (p.badge || '').toUpperCase() === 'HOT');
-                if (heading) heading.textContent = 'Hot Trending';
-            } else if (tagLower === 'upcoming') {
-                filtered = allProducts.filter(p => (p.badge || '').toUpperCase() === 'UPCOMING');
-                if (heading) heading.textContent = 'Upcoming Releases';
-            } else if (tagLower === 'discount') {
-                const todayStr = new Date().toISOString().split('T')[0];
-                filtered = allProducts.filter(p => {
-                    const isDiscountBadge = p.badge === 'DISCOUNT' || (p.badge && p.badge.startsWith('-') && p.badge.endsWith('%'));
-                    const hasActiveDiscount = isDiscountBadge && p.discount_percent > 0 && 
-                        (!p.discount_expiry || p.discount_expiry >= todayStr);
-                    return hasActiveDiscount || (p.discount_percent > 0) || (p.original_price > p.price);
-                });
-                if (heading) heading.textContent = 'Special Offers & Discounts';
-            } else {
-                filtered = allProducts;
-                if (heading) heading.textContent = 'All Products';
-            }
-            
-            renderProducts(filtered);
+            window.activeCategory = 'all';
+            window.activeSeries = 'all';
+            window.activeBadge = tag;
+            applyAllFiltersAndSort();
 
             // Smooth scroll down to the product section container
             const productSection = document.getElementById('shopProductSection');
@@ -1196,24 +1246,9 @@
         window.filterProductsByBadge = filterProductsByBadge;
 
         // Custom Search Filter
-        window.currentSearchQuery = '';
         function filterProductsBySearch(query) {
             window.currentSearchQuery = query;
-            const allProducts = window.allProducts || fallbackProducts;
-            const heading = document.querySelector('.flex-grow h2.font-heading, .flex-1 h2.font-heading');
-            
-            let filtered;
-            const cleanQuery = (query || '').trim().toLowerCase();
-            
-            if (cleanQuery) {
-                filtered = allProducts.filter(p => (p.name || '').toLowerCase().includes(cleanQuery));
-                if (heading) heading.textContent = `Search Results for "${query}"`;
-            } else {
-                filtered = allProducts;
-                if (heading) heading.textContent = 'All Products';
-            }
-            
-            renderProducts(filtered);
+            applyAllFiltersAndSort();
 
             // Smooth scroll down to the product section container
             const productSection = document.getElementById('shopProductSection');
@@ -1251,7 +1286,7 @@
             }
 
             window.allProducts = productsList;
-            renderProducts(productsList);
+            applyAllFiltersAndSort();
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -1388,6 +1423,12 @@
                         e.stopPropagation();
                         const value = option.getAttribute('data-value');
                         if (selectedSortOption) selectedSortOption.textContent = value;
+                        
+                        // Apply sorting instantly
+                        window.activeSortValue = value;
+                        if (typeof window.applyAllFiltersAndSort === 'function') {
+                            window.applyAllFiltersAndSort();
+                        }
                         
                         // Hide dropdown immediately on selection
                         hideMenu();
