@@ -3480,13 +3480,15 @@
             const textEl = document.getElementById('selectedStatusText');
             if (textEl) textEl.textContent = text;
             
-            // Highlight selected option in status panel
+            // Highlight selected option in status panel with 100% precision
             const options = document.querySelectorAll('.status-option');
             options.forEach(opt => {
                 if (opt.getAttribute('data-value') === val) {
-                    opt.className = "status-option px-3.5 py-2 text-xs font-semibold bg-accent text-white rounded-lg transition-all cursor-pointer";
+                    opt.classList.add('bg-accent', 'text-white', 'font-semibold');
+                    opt.classList.remove('text-primary', 'font-medium');
                 } else {
-                    opt.className = "status-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#d8532e] hover:text-white rounded-lg transition-all cursor-pointer";
+                    opt.classList.remove('bg-accent', 'text-white', 'font-semibold');
+                    opt.classList.add('text-primary', 'font-medium');
                 }
             });
 
@@ -3505,13 +3507,15 @@
             const textEl = document.getElementById('selectedSortText');
             if (textEl) textEl.textContent = text;
             
-            // Highlight selected option in sort panel
+            // Highlight selected option in sort panel with 100% precision
             const options = document.querySelectorAll('.sort-option');
             options.forEach(opt => {
                 if (opt.getAttribute('data-value') === val) {
-                    opt.className = "sort-option px-3.5 py-2 text-xs font-semibold bg-accent text-white rounded-lg transition-all cursor-pointer";
+                    opt.classList.add('bg-accent', 'text-white', 'font-semibold');
+                    opt.classList.remove('text-primary', 'font-medium');
                 } else {
-                    opt.className = "sort-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#d8532e] hover:text-white rounded-lg transition-all cursor-pointer";
+                    opt.classList.remove('bg-accent', 'text-white', 'font-semibold');
+                    opt.classList.add('text-primary', 'font-medium');
                 }
             });
 
