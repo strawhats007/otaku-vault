@@ -90,12 +90,12 @@
             transition: all 0.3s ease;
         }
 
-        .custom-dropdown-wrapper:hover .custom-select-trigger {
+        .custom-dropdown-wrapper.is-open .custom-select-trigger {
             border-color: #e85d04 !important;
             box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.1);
         }
 
-        .custom-dropdown-wrapper:hover .custom-select-trigger svg {
+        .custom-dropdown-wrapper.is-open .custom-select-trigger svg {
             transform: rotate(180deg);
         }
 
@@ -103,12 +103,12 @@
             opacity: 0;
             transform: translateY(-8px) scale(0.95);
             pointer-events: none;
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            transition: all 0.3s ease;
             border-radius: 12px !important;
             border-color: #f1f3f5;
         }
 
-        .custom-dropdown-wrapper:hover .custom-select-options {
+        .custom-dropdown-wrapper.is-open .custom-select-options {
             opacity: 1;
             transform: translateY(0) scale(1);
             pointer-events: auto;
@@ -117,7 +117,7 @@
         .custom-dropdown-wrapper .custom-option {
             border-radius: 12px !important;
             border-left: none !important;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            transition: background-color 0.25s ease, color 0.25s ease;
         }
 
         .custom-dropdown-wrapper .custom-option:hover {
@@ -1848,6 +1848,23 @@
                         // Dispatch native select change event so any listeners (like toggleDiscountFields) are fired!
                         nativeSelect.dispatchEvent(new Event('change'));
                     });
+                });
+
+                // Hover (mouseenter/mouseleave) with delay
+                let closeTimeout = null;
+
+                wrapper.addEventListener('mouseenter', () => {
+                    if (closeTimeout) {
+                        clearTimeout(closeTimeout);
+                        closeTimeout = null;
+                    }
+                    wrapper.classList.add('is-open');
+                });
+
+                wrapper.addEventListener('mouseleave', () => {
+                    closeTimeout = setTimeout(() => {
+                        wrapper.classList.remove('is-open');
+                    }, 200); // 200ms delay before closing
                 });
             });
         }
