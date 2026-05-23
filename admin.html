@@ -2655,13 +2655,13 @@
                     <td class="py-4 px-4 text-gray-400 font-semibold">${dateStr}</td>
                     <td class="py-4 px-4">
                         <label class="relative inline-flex items-center cursor-pointer select-none">
-                            <input type="checkbox" ${isChecked} onchange="toggleDiscountActive(${d.id}, ${d.active})"
+                            <input type="checkbox" ${isChecked} onchange="toggleDiscountActive('${d.id}', ${d.active})"
                                 class="sr-only peer">
                             <div class="w-9 h-5 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-accent/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
                         </label>
                     </td>
                     <td class="py-4 px-4 text-right">
-                        <button onclick="deleteDiscountCode(${d.id})" class="text-red-500 hover:text-red-700 font-bold text-xs cursor-pointer select-none">Delete</button>
+                        <button onclick="deleteDiscountCode('${d.id}')" class="text-red-500 hover:text-red-700 font-bold text-xs cursor-pointer select-none">Delete</button>
                     </td>
                 `;
                 tableBody.appendChild(tr);
@@ -2706,7 +2706,7 @@
             const newStatus = !currentStatus;
 
             // Optimistic local update
-            const disc = allDiscounts.find(item => item.id === id);
+            const disc = allDiscounts.find(item => String(item.id) === String(id));
             if (disc) disc.active = newStatus;
             renderDiscountsTable();
 
@@ -2746,7 +2746,7 @@
                 }
             }
 
-            allDiscounts = allDiscounts.filter(item => item.id !== id);
+            allDiscounts = allDiscounts.filter(item => String(item.id) !== String(id));
             renderDiscountsTable();
         }
 
