@@ -1487,16 +1487,27 @@
             const categoryOptions = document.querySelectorAll('.shop-category-option');
 
             if (shopDropdownWrapper && shopDropdownMenu) {
+                let closeTimeout = null;
+
                 function showShopMenu() {
+                    if (closeTimeout) {
+                        clearTimeout(closeTimeout);
+                        closeTimeout = null;
+                    }
                     shopDropdownMenu.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
                     shopDropdownMenu.classList.add('opacity-100', 'scale-100');
                     if (shopDropdownArrow) shopDropdownArrow.classList.add('rotate-180');
                 }
 
                 function hideShopMenu() {
-                    shopDropdownMenu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-                    shopDropdownMenu.classList.remove('opacity-100', 'scale-100');
-                    if (shopDropdownArrow) shopDropdownArrow.classList.remove('rotate-180');
+                    if (closeTimeout) {
+                        clearTimeout(closeTimeout);
+                    }
+                    closeTimeout = setTimeout(() => {
+                        shopDropdownMenu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                        shopDropdownMenu.classList.remove('opacity-100', 'scale-100');
+                        if (shopDropdownArrow) shopDropdownArrow.classList.remove('rotate-180');
+                    }, 100);
                 }
 
                 shopDropdownWrapper.addEventListener('mouseenter', showShopMenu);
