@@ -827,6 +827,10 @@
             }
 
             grid.innerHTML = productsList.map(product => {
+                let status = product.status || 'in_stock';
+                if (status === 'In Stock' || status === 'Pre-order') status = 'in_stock';
+                if (status === 'Stock Out') status = 'stock_out';
+
                 const today = new Date();
                 const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
                 
@@ -870,6 +874,22 @@
                 const defaultImg = getProductImageUrl(product.image);
                 const hoverImg = getProductImageUrl(product.hover_image_url || product.second_image || product.image);
 
+                let actionHtml = '';
+                if (status === 'stock_out') {
+                    actionHtml = `
+                        <div class="mt-2 w-full bg-[#9ca3af] text-white py-2.5 rounded-xl font-bold text-xs text-center select-none cursor-default">
+                            Stock Out
+                        </div>
+                    `;
+                } else {
+                    actionHtml = `
+                        <div class="flex gap-2 mt-2">
+                            <button class="flex-grow bg-gray-100 hover:bg-gray-200 hover:-translate-y-[3px] hover:shadow-md text-primary py-2 rounded-xl font-semibold text-xs transition-all duration-300 add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
+                            <button class="flex-grow bg-accent hover:bg-accent-dark hover:-translate-y-[3px] hover:shadow-md text-white py-2 rounded-xl font-semibold text-xs transition-all duration-300 buy-now-btn" data-product-id="${product.id}">Buy Now</button>
+                        </div>
+                    `;
+                }
+
                 return `
                     <div class="product-card flex flex-col h-[490px] bg-white rounded-3xl p-3 border border-black/5 hover:shadow-lg transition-all duration-300">
                         <div class="relative overflow-hidden group h-[310px] rounded-2xl">
@@ -894,10 +914,7 @@
                             <div class="flex items-center justify-between pt-2 border-t border-gray-100">
                                 <span class="text-gray-400 text-xs">${product.series}</span>
                             </div>
-                            <div class="flex gap-2 mt-2">
-                                <button class="flex-grow bg-gray-100 hover:bg-gray-200 hover:-translate-y-[3px] hover:shadow-md text-primary py-2 rounded-xl font-semibold text-xs transition-all duration-300 add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
-                                <button class="flex-grow bg-accent hover:bg-accent-dark hover:-translate-y-[3px] hover:shadow-md text-white py-2 rounded-xl font-semibold text-xs transition-all duration-300 buy-now-btn" data-product-id="${product.id}">Buy Now</button>
-                            </div>
+                            ${actionHtml}
                         </div>
                     </div>
                 `;
