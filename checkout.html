@@ -311,6 +311,20 @@
                             </div>
                         </div>
 
+                        <!-- Coupon Code Section -->
+                        <div class="space-y-3 pb-6 border-b border-gray-100">
+                            <label class="block text-xs font-bold text-primary tracking-wider uppercase">Have a Coupon?</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="couponInput" placeholder="e.g. OTAKU20" 
+                                    class="flex-grow border border-gray-200 rounded-xl px-4 py-2.5 outline-none focus:border-accent text-sm font-semibold uppercase tracking-wider transition-all">
+                                <button type="button" onclick="applyCoupon()" 
+                                    class="bg-primary hover:bg-accent text-white px-5 py-2.5 rounded-xl font-bold transition-all text-sm cursor-pointer whitespace-nowrap">
+                                    Apply
+                                </button>
+                            </div>
+                            <div id="couponMessage" class="hidden text-xs font-semibold"></div>
+                        </div>
+
                         <!-- Grand Total -->
                         <div class="flex justify-between items-center">
                             <span class="font-bold text-gray-500">Grand Total</span>
@@ -413,11 +427,16 @@
                 document.getElementById('discountRow').classList.remove('hidden');
                 document.getElementById('discountLabel').textContent = `${discountPercent}% Coupon Applied`;
                 document.getElementById('summaryDiscount').textContent = '-৳' + discountAmount.toLocaleString();
+                
+                const originalTotal = subtotal + deliveryFee;
+                document.getElementById('summaryTotal').innerHTML = `
+                    <span class="text-sm font-bold text-gray-400 line-through mr-2 align-middle">৳${originalTotal.toLocaleString()}</span>
+                    <span class="align-middle">৳${grandTotal.toLocaleString()}</span>
+                `;
             } else {
                 document.getElementById('discountRow').classList.add('hidden');
+                document.getElementById('summaryTotal').textContent = '৳' + grandTotal.toLocaleString();
             }
-
-            document.getElementById('summaryTotal').textContent = '৳' + grandTotal.toLocaleString();
         }
 
         // Stepper Navigation Functions
@@ -645,6 +664,96 @@
             container.className = 'fixed bottom-6 right-6 z-[9999] flex flex-col gap-3 w-80 pointer-events-none';
             document.body.appendChild(container);
             return container;
+        }
+
+        async function applyCoupon() {
+            const input = document.getElementById('couponInput');
+            const messageDiv = document.getElementById('couponMessage');
+            if (!input || !messageDiv) return;
+
+            const code = input.value.trim().toUpperCase();
+            if (!code) {
+                showCouponMessage('Please enter a coupon code.', 'error');
+                return;
+            }
+
+            if (!supabaseClient) {
+                showCouponMessage('Database connection error.', 'error');
+                return;
+            }
+
+            // Display loading state on button
+            const applyBtn = input.nextElementSibling;
+            const originalText = applyBtn.textContent;
+            applyBtn.textContent = '...';
+            applyBtn.disabled = true;
+
+            try {
+                // Fetch discount code details from Supabase
+                const { data, error } = await supabaseClient
+                    .from('discount_codes')
+                    .select('*')
+                    .eq('code', code)
+                    .single();
+
+                if (error || !data) {
+                    showCouponMessage('Invalid or expired coupon code', 'error');
+                    // Reset saved discount on failure
+                    discountPercent = 0;
+                    localStorage.removeItem('otaku_vault_discount_percent');
+                    calculateSummary();
+                    return;
+                }
+
+                // Check status and expiry
+                const isStatusActive = data.status !== undefined ? (data.status === true) : (data.active === true);
+                const expiryDate = new Date(data.expiry_date);
+                const today = new Date();
+                
+                // Set both dates to start of day for accurate day-level comparison
+                today.setHours(0, 0, 0, 0);
+                expiryDate.setHours(0, 0, 0, 0);
+                const isNotExpired = expiryDate >= today;
+
+                if (!isStatusActive || !isNotExpired) {
+                    showCouponMessage('Invalid or expired coupon code', 'error');
+                    discountPercent = 0;
+                    localStorage.removeItem('otaku_vault_discount_percent');
+                    calculateSummary();
+                    return;
+                }
+
+                // If valid, save discount percentage
+                const pctVal = data.percentage_off !== undefined ? data.percentage_off : data.percentage;
+                discountPercent = parseInt(pctVal) || 0;
+                localStorage.setItem('otaku_vault_discount_percent', discountPercent);
+                
+                showCouponMessage(`Coupon applied successfully! ${discountPercent}% off`, 'success');
+                calculateSummary();
+                showToast(`Applied ${discountPercent}% discount!`, 'success');
+
+            } catch (err) {
+                console.error("Error applying coupon:", err);
+                showCouponMessage('Invalid or expired coupon code', 'error');
+                discountPercent = 0;
+                localStorage.removeItem('otaku_vault_discount_percent');
+                calculateSummary();
+            } finally {
+                applyBtn.textContent = originalText;
+                applyBtn.disabled = false;
+            }
+        }
+
+        function showCouponMessage(text, type) {
+            const messageDiv = document.getElementById('couponMessage');
+            if (!messageDiv) return;
+            messageDiv.textContent = text;
+            messageDiv.classList.remove('hidden', 'text-green-600', 'text-red-500');
+            if (type === 'success') {
+                messageDiv.classList.add('text-green-600');
+            } else {
+                messageDiv.classList.add('text-red-500');
+            }
         }
 
         // Initialize Render & Event Listeners

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +10,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
     <script>
         tailwind.config = {
             theme: {
@@ -32,40 +35,191 @@
         }
     </script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; color: #1a1a1a; }
-        .font-heading { font-family: 'Poppins', sans-serif; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: white;
+            color: #1a1a1a;
+        }
+
+        .font-heading {
+            font-family: 'Poppins', sans-serif;
+        }
+
+        /* Custom dropdown styles */
+        .custom-dropdown-menu {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, visibility 0.3s ease-in-out;
+            visibility: hidden;
+            opacity: 0;
+            transform: scale(0.95) translateY(-8px);
+        }
+        .custom-dropdown-menu.open {
+            visibility: visible;
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+        .custom-option {
+            transition: background-color 0.3s ease, color 0.3s ease, border-left-color 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        .custom-option:hover {
+            background-color: #e85d04 !important;
+            color: #ffffff !important;
+            border-left-color: transparent !important;
+        }
+        .custom-option.selected {
+            background-color: transparent !important;
+            color: #e85d04 !important;
+            font-weight: 700;
+            border-left: 3px solid #e85d04;
+        }
+
+        /* Product Modal inputs border radius overrides */
+        #productModal input,
+        #productModal select,
+        #productModal textarea,
+        #productModal label[for="imageUploadInput"],
+        #productModal label[for="hoverImageUploadInput"],
+        #productModal #imagePreviewThumbnail,
+        #productModal #hoverImagePreviewThumbnail,
+        #productModal .w-20.h-20,
+        #productModal button {
+            border-radius: 12px !important;
+        }
+
+        /* Product Modal custom scrollbar rules */
+        #productModalContainer .overflow-y-auto::-webkit-scrollbar {
+            width: 4px !important;
+        }
+        #productModalContainer .overflow-y-auto::-webkit-scrollbar-track {
+            background: transparent !important;
+        }
+        #productModalContainer .overflow-y-auto::-webkit-scrollbar-thumb {
+            background: #e85d04 !important;
+            border-radius: 4px !important;
+        }
+
+        /* Page Loader Styles */
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-fade-out {
+            opacity: 0 !important;
+            transition: opacity 0.5s ease-in-out !important;
+            pointer-events: none !important;
+        }
+
+        .blur-content {
+            filter: blur(8px);
+            transition: filter 0.5s ease;
+        }
+
+        /* Hide inner table/content loading indicators while pageLoaderOverlay is active */
+        #pageLoaderOverlay ~ * .animate-spin {
+            display: none !important;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #invoiceModal, #invoiceModal * {
+                visibility: visible;
+            }
+            #invoiceModal {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: auto;
+                max-height: none;
+                overflow: visible;
+                box-shadow: none;
+                border: none;
+                margin: 0;
+                padding: 0;
+                background: white;
+                z-index: auto !important;
+            }
+            #invoicePrintContent {
+                overflow: visible;
+                padding: 0;
+                margin: 0;
+                width: 100%;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
     </style>
 </head>
+
 <body class="font-body min-h-screen relative overflow-x-hidden">
 
+    <!-- PAGE LOAD SCREEN OVERLAY -->
+    <div id="pageLoaderOverlay"
+        style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: rgba(0,0,0,0.4);"
+        class="flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="flex flex-col items-center gap-4">
+            <div class="loading-spinner"></div>
+            <span class="text-xs font-bold text-white tracking-widest uppercase">LOADING OTAKU VAULT...</span>
+        </div>
+    </div>
+
     <!-- LOGIN SCREEN OVERLAY -->
-    <div id="loginOverlay" class="fixed inset-0 bg-primary/95 z-[9999] flex items-center justify-center transition-all duration-500">
-        <div class="bg-white border border-gray-100 rounded-3xl p-10 max-w-md w-full shadow-2xl space-y-6 mx-4 text-center">
+    <div id="loginOverlay"
+        class="fixed inset-0 bg-primary/95 z-[9999] hidden flex items-center justify-center transition-all duration-500 blur-content">
+        <div
+            class="bg-[#1e1e1e] border border-gray-800 rounded-3xl p-10 max-w-md w-full shadow-2xl space-y-6 mx-4 text-center">
             <!-- Logo -->
             <div class="flex items-center gap-2 justify-center mb-2">
-                <span class="text-primary font-heading font-bold text-3xl tracking-tight">OTAKU</span>
+                <span class="text-white font-heading font-bold text-3xl tracking-tight">OTAKU</span>
                 <span class="text-accent font-heading font-bold text-3xl tracking-tight">VAULT</span>
             </div>
             <div class="space-y-2">
-                <h2 class="text-xl font-heading font-bold text-primary">Admin Control Center</h2>
-                <p class="text-xs text-gray-400">Please enter the security password to unlock the dashboard.</p>
+                <h2 class="text-lg font-heading font-bold text-white uppercase tracking-wider">Admin Login</h2>
+                <p class="text-xs text-gray-400">Sign in with your administrator credentials.</p>
             </div>
-            <form onsubmit="handleLogin(event)" class="space-y-4">
-                <div class="relative">
-                    <input type="password" id="adminPassword" required placeholder="Enter password" class="w-full border border-gray-200 rounded-xl px-5 py-4 outline-none focus:border-accent text-center font-bold tracking-widest text-sm transition-all">
+            <form onsubmit="handleLogin(event)" class="space-y-4 text-left">
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Email Address</label>
+                    <input type="email" id="adminEmail" required placeholder="admin@otakuvault.com"
+                        class="w-full bg-[#141414] border border-gray-800 rounded-xl px-4 py-3 outline-none focus:border-accent text-white text-sm font-semibold transition-all">
                 </div>
-                <div id="loginError" class="hidden text-xs text-red-500 font-bold">Incorrect password. Please try again.</div>
-                <button type="submit" class="w-full bg-accent hover:bg-accent-dark text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-accent/20 cursor-pointer text-sm">
-                    Access Dashboard
+                <div class="space-y-1.5">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Password</label>
+                    <input type="password" id="adminPassword" required placeholder="••••••••"
+                        class="w-full bg-[#141414] border border-gray-800 rounded-xl px-4 py-3 outline-none focus:border-accent text-white text-sm font-semibold transition-all">
+                </div>
+                <div id="loginError" class="hidden text-xs text-red-400 font-bold bg-red-950/30 border border-red-900/50 py-2.5 rounded-xl text-center">
+                </div>
+                <button type="submit"
+                    class="w-full bg-accent hover:bg-accent-dark text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-accent/20 cursor-pointer text-sm text-center">
+                    Sign In
                 </button>
             </form>
         </div>
     </div>
 
     <!-- MAIN DASHBOARD CONTENT -->
-    <div id="dashboardContent" class="hidden min-h-screen flex">
-        
+    <div id="dashboardContent" class="hidden min-h-screen flex blur-content">
+
         <!-- Left Sidebar Navigation -->
         <aside class="w-64 bg-primary text-white flex-shrink-0 flex flex-col justify-between p-6">
             <div class="space-y-8">
@@ -77,54 +231,112 @@
 
                 <!-- Navigation List -->
                 <nav class="space-y-1">
-                    <a href="#" id="nav-dashboard" onclick="switchTab('dashboard')" class="flex items-center gap-3 bg-accent text-white px-4 py-3.5 rounded-xl font-bold text-sm transition-all select-none">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z"/></svg>
+                    <a href="#" id="nav-dashboard" onclick="switchTab('dashboard')"
+                        class="flex items-center gap-3 bg-accent text-white px-4 py-3.5 rounded-xl font-bold text-sm transition-all select-none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                d="M4 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2H6a2 2 0 01-2-2v-4zM14 16a2 2 0 012-2h2a2 2 0 012 2v4a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4z" />
+                        </svg>
                         Dashboard
                     </a>
-                    <a href="#" id="nav-products" onclick="switchTab('products')" class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    <a href="#" id="nav-products" onclick="switchTab('products')"
+                        class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                        </svg>
                         Products
                     </a>
-                    <a href="#" id="nav-orders" onclick="showSectionToast('Orders filter list')" class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                    <a href="#" id="nav-customers" onclick="switchTab('customers')"
+                        class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                        Customers
+                    </a>
+                    <a href="#" id="nav-discounts" onclick="switchTab('discounts')"
+                        class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5a2 2 0 10-2 2h2zm0 0h4m-4 0H8m-2 4h12a2 2 0 012 2v6a2 2 0 01-2 2H6a2 2 0 01-2-2v-6a2 2 0 012-2z" />
+                        </svg>
+                        Discounts
+                    </a>
+                    <a href="#" id="nav-invoices" onclick="switchTab('invoices')"
+                        class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Invoice
+                    </a>
+                    <a href="#" id="nav-orders" onclick="showSectionToast('Orders filter list')"
+                        class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                        </svg>
                         Orders
                     </a>
-                    <a href="#" id="nav-settings" onclick="showSectionToast('Settings panel')" class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                    <a href="#" id="nav-settings" onclick="showSectionToast('Settings panel')"
+                        class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
                         Settings
                     </a>
                 </nav>
             </div>
 
             <!-- Logout Link -->
-            <a href="#" onclick="handleLogout()" class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            <a href="#" onclick="handleLogout()"
+                class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
                 Logout
             </a>
         </aside>
 
         <!-- Right Side Dashboard Area -->
         <main class="flex-grow flex flex-col min-w-0">
-            
+
             <!-- Topbar Header -->
-            <header class="h-[75px] bg-white border-b border-gray-100 flex items-center justify-between px-10 flex-shrink-0">
+            <header
+                class="h-[75px] bg-white border-b border-gray-100 flex items-center justify-between px-10 flex-shrink-0">
                 <div class="flex items-center gap-2">
                     <h1 class="text-xl font-heading font-extrabold text-primary tracking-tight">Hello, Admin 👋</h1>
                 </div>
-                
+
                 <!-- Search bar in topbar -->
                 <div class="w-96 relative hidden md:block">
-                    <input type="text" id="dashboardSearch" placeholder="Search orders, transactions, figures..." class="w-full bg-gray-50 border border-gray-150 rounded-full px-5 py-2.5 outline-none focus:border-accent focus:bg-white text-xs font-semibold pl-11 transition-all">
-                    <svg class="w-4 h-4 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                    <input type="text" id="dashboardSearch" placeholder="Search orders, transactions, figures..."
+                        class="w-full bg-gray-50 border border-gray-150 rounded-full px-5 py-2.5 outline-none focus:border-accent focus:bg-white text-xs font-semibold pl-11 transition-all">
+                    <svg class="w-4 h-4 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
                 </div>
 
                 <!-- Admin Info / Avatar -->
                 <div class="flex items-center gap-4">
-                    <button class="relative p-2 text-gray-400 hover:text-accent transition-colors" title="Notifications">
-                        <span class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-accent border-2 border-white rounded-full"></span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    <button class="relative p-2 text-gray-400 hover:text-accent transition-colors"
+                        title="Notifications">
+                        <span
+                            class="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-accent border-2 border-white rounded-full"></span>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
                     </button>
-                    <div class="h-10 w-10 rounded-full bg-accent text-white flex items-center justify-center font-bold text-sm tracking-tight border border-accent/20 cursor-pointer shadow-sm">
+                    <div
+                        class="h-10 w-10 rounded-full bg-accent text-white flex items-center justify-center font-bold text-sm tracking-tight border border-accent/20 cursor-pointer shadow-sm">
                         AD
                     </div>
                 </div>
@@ -137,204 +349,337 @@
                 <div id="sectionDashboard" class="space-y-8 animate-fadeIn">
 
                     <!-- 4 Stat Cards Row -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <!-- Total Orders Card -->
-                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex items-center justify-between group hover:border-accent/30 transition-all hover:scale-[1.01]">
-                        <div class="space-y-2">
-                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Orders</span>
-                            <h3 id="statOrders" class="text-3xl font-heading font-extrabold text-primary tracking-tight">0</h3>
-                            <span class="text-[10px] text-green-500 font-bold bg-green-50 px-2 py-0.5 rounded-full">Live Stats</span>
-                        </div>
-                        <div class="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-accent">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                        </div>
-                    </div>
-
-                    <!-- Total Revenue Card -->
-                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex items-center justify-between group hover:border-accent/30 transition-all hover:scale-[1.01]">
-                        <div class="space-y-2">
-                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Revenue</span>
-                            <h3 id="statRevenue" class="text-3xl font-heading font-extrabold text-primary tracking-tight">৳0</h3>
-                            <span class="text-[10px] text-accent font-bold bg-orange-50 px-2 py-0.5 rounded-full">+12% this week</span>
-                        </div>
-                        <div class="w-12 h-12 rounded-2xl bg-green-50 border border-green-100 flex items-center justify-center text-green-600">
-                            <span class="text-xl font-heading font-extrabold">৳</span>
-                        </div>
-                    </div>
-
-                    <!-- Total Products Card -->
-                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex items-center justify-between group hover:border-accent/30 transition-all hover:scale-[1.01]">
-                        <div class="space-y-2">
-                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Products</span>
-                            <h3 id="statProducts" class="text-3xl font-heading font-extrabold text-primary tracking-tight">9</h3>
-                            <span class="text-[10px] text-blue-500 font-bold bg-blue-50 px-2 py-0.5 rounded-full">In Database</span>
-                        </div>
-                        <div class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                        </div>
-                    </div>
-
-                    <!-- Total Customers Card -->
-                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex items-center justify-between group hover:border-accent/30 transition-all hover:scale-[1.01]">
-                        <div class="space-y-2">
-                            <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Customers</span>
-                            <h3 id="statCustomers" class="text-3xl font-heading font-extrabold text-primary tracking-tight">0</h3>
-                            <span class="text-[10px] text-purple-500 font-bold bg-purple-50 px-2 py-0.5 rounded-full">Unique Buyers</span>
-                        </div>
-                        <div class="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Interactive Charts Row -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                    <!-- Sales Trend line chart -->
-                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-4">
-                        <div class="flex items-center justify-between border-b border-gray-50 pb-4">
-                            <h4 class="font-heading font-bold text-sm text-primary tracking-tight">Sales Trend (Line Chart)</h4>
-                            <span class="text-xs font-semibold text-gray-400">Monthly</span>
-                        </div>
-                        <div class="h-64 relative">
-                            <canvas id="salesTrendChart"></canvas>
-                        </div>
-                    </div>
-
-                    <!-- Product Views bar chart -->
-                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-4">
-                        <div class="flex items-center justify-between border-b border-gray-50 pb-4">
-                            <h4 class="font-heading font-bold text-sm text-primary tracking-tight">Product Views (Bar Chart)</h4>
-                            <span class="text-xs font-semibold text-gray-400">Weekly</span>
-                        </div>
-                        <div class="h-64 relative">
-                            <canvas id="productViewsChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bottom Layout: Recent Orders + Top Products sidebar -->
-                <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
-                    
-                    <!-- Recent Orders Table from Supabase -->
-                    <div class="xl:col-span-2 bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-6">
-                        <div class="flex items-center justify-between border-b border-gray-50 pb-4">
-                            <h4 class="font-heading font-bold text-base text-primary tracking-tight">Recent Orders</h4>
-                            <button onclick="fetchOrdersData()" class="text-xs text-accent font-bold hover:underline cursor-pointer flex items-center gap-1">
-                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.2M4 9h5M4 9v5h5"/></svg>
-                                Refresh Table
-                            </button>
-                        </div>
-
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
-                                <thead>
-                                    <tr class="border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-wider">
-                                        <th class="pb-3.5">Order ID</th>
-                                        <th class="pb-3.5">Customer</th>
-                                        <th class="pb-3.5">Date</th>
-                                        <th class="pb-3.5">Total</th>
-                                        <th class="pb-3.5">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="ordersTableBody" class="text-sm font-medium text-primary divide-y divide-gray-50">
-                                    <tr>
-                                        <td colspan="5" class="py-12 text-center text-gray-400 font-semibold">
-                                            <div class="flex flex-col items-center gap-2">
-                                                <svg class="w-6 h-6 animate-spin text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                                                Loading database records...
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Right Side: Top Sold Products -->
-                    <div class="xl:col-span-1 bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-6">
-                        <h4 class="font-heading font-bold text-base text-primary tracking-tight border-b border-gray-50 pb-4">Top Sold Products</h4>
-                        <div class="space-y-4">
-                            <!-- Product 1 -->
-                            <div class="flex items-center gap-4 group p-1.5 rounded-2xl hover:bg-gray-50/50 transition-colors">
-                                <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 border border-gray-100 flex-shrink-0">
-                                    <img src="images/luffy_gear5_1779161050741.png" alt="Luffy" class="w-full h-full object-cover" onerror="this.src='https://picsum.photos/id/100/100/100'">
-                                </div>
-                                <div class="flex-grow text-left">
-                                    <h5 class="font-bold text-sm text-primary truncate max-w-[150px]">Luffy Gear 5</h5>
-                                    <p class="text-[11px] text-gray-400">One Piece Series</p>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-xs font-extrabold text-accent bg-orange-50 px-2.5 py-1 rounded-full">৳2,899</span>
-                                    <span class="text-[10px] text-gray-400 block mt-0.5">32 sales</span>
-                                </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <!-- Total Orders Card -->
+                        <div
+                            class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex items-center justify-between group hover:border-accent/30 transition-all hover:scale-[1.01]">
+                            <div class="space-y-2">
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total
+                                    Orders</span>
+                                <h3 id="statOrders"
+                                    class="text-3xl font-heading font-extrabold text-primary tracking-tight">0</h3>
+                                <span
+                                    class="text-[10px] text-green-500 font-bold bg-green-50 px-2 py-0.5 rounded-full">Live
+                                    Stats</span>
                             </div>
-
-                            <!-- Product 2 -->
-                            <div class="flex items-center gap-4 group p-1.5 rounded-2xl hover:bg-gray-50/50 transition-colors">
-                                <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 border border-gray-100 flex-shrink-0">
-                                    <img src="images/gojo_satoru_1779161136685.png" alt="Gojo" class="w-full h-full object-cover" onerror="this.src='https://picsum.photos/id/200/100/100'">
-                                </div>
-                                <div class="flex-grow text-left">
-                                    <h5 class="font-bold text-sm text-primary truncate max-w-[150px]">Gojo Satoru</h5>
-                                    <p class="text-[11px] text-gray-400">Jujutsu Kaisen Series</p>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-xs font-extrabold text-accent bg-orange-50 px-2.5 py-1 rounded-full">৳4,749</span>
-                                    <span class="text-[10px] text-gray-400 block mt-0.5">24 sales</span>
-                                </div>
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-orange-50 border border-orange-100 flex items-center justify-center text-accent">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                                </svg>
                             </div>
+                        </div>
 
-                            <!-- Product 3 -->
-                            <div class="flex items-center gap-4 group p-1.5 rounded-2xl hover:bg-gray-50/50 transition-colors">
-                                <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 border border-gray-100 flex-shrink-0">
-                                    <img src="images/nezuko_demon_1779161090026.png" alt="Nezuko" class="w-full h-full object-cover" onerror="this.src='https://picsum.photos/id/300/100/100'">
-                                </div>
-                                <div class="flex-grow text-left">
-                                    <h5 class="font-bold text-sm text-primary truncate max-w-[150px]">Nezuko Demon Form</h5>
-                                    <p class="text-[11px] text-gray-400">Demon Slayer Series</p>
-                                </div>
-                                <div class="text-right">
-                                    <span class="text-xs font-extrabold text-accent bg-orange-50 px-2.5 py-1 rounded-full">৳3,499</span>
-                                    <span class="text-[10px] text-gray-400 block mt-0.5">18 sales</span>
-                                </div>
+                        <!-- Total Revenue Card -->
+                        <div
+                            class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex items-center justify-between group hover:border-accent/30 transition-all hover:scale-[1.01]">
+                            <div class="space-y-2">
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total
+                                    Revenue</span>
+                                <h3 id="statRevenue"
+                                    class="text-3xl font-heading font-extrabold text-primary tracking-tight">৳0</h3>
+                                <span
+                                    class="text-[10px] text-accent font-bold bg-orange-50 px-2 py-0.5 rounded-full">+12%
+                                    this week</span>
+                            </div>
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-green-50 border border-green-100 flex items-center justify-center text-green-600">
+                                <span class="text-xl font-heading font-extrabold">৳</span>
+                            </div>
+                        </div>
+
+                        <!-- Total Products Card -->
+                        <div
+                            class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex items-center justify-between group hover:border-accent/30 transition-all hover:scale-[1.01]">
+                            <div class="space-y-2">
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total
+                                    Products</span>
+                                <h3 id="statProducts"
+                                    class="text-3xl font-heading font-extrabold text-primary tracking-tight">9</h3>
+                                <span class="text-[10px] text-blue-500 font-bold bg-blue-50 px-2 py-0.5 rounded-full">In
+                                    Database</span>
+                            </div>
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                </svg>
+                            </div>
+                        </div>
+
+                        <!-- Total Customers Card -->
+                        <div
+                            class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex items-center justify-between group hover:border-accent/30 transition-all hover:scale-[1.01]">
+                            <div class="space-y-2">
+                                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total
+                                    Customers</span>
+                                <h3 id="statCustomers"
+                                    class="text-3xl font-heading font-extrabold text-primary tracking-tight">0</h3>
+                                <span
+                                    class="text-[10px] text-purple-500 font-bold bg-purple-50 px-2 py-0.5 rounded-full">Unique
+                                    Buyers</span>
+                            </div>
+                            <div
+                                class="w-12 h-12 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
                             </div>
                         </div>
                     </div>
 
-                </div>
+                    <!-- Interactive Charts Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Sales Trend line chart -->
+                        <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-4">
+                            <div class="flex items-center justify-between border-b border-gray-50 pb-4">
+                                <h4 class="font-heading font-bold text-sm text-primary tracking-tight">Sales Trend (Line
+                                    Chart)</h4>
+                                <span class="text-xs font-semibold text-gray-400">Monthly</span>
+                            </div>
+                            <div class="h-64 relative">
+                                <canvas id="salesTrendChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Product Views bar chart -->
+                        <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-4">
+                            <div class="flex items-center justify-between border-b border-gray-50 pb-4">
+                                <h4 class="font-heading font-bold text-sm text-primary tracking-tight">Product Views
+                                    (Bar Chart)</h4>
+                                <span class="text-xs font-semibold text-gray-400">Weekly</span>
+                            </div>
+                            <div class="h-64 relative">
+                                <canvas id="productViewsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bottom Layout: Recent Orders + Top Products sidebar -->
+                    <div class="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start">
+
+                        <!-- Recent Orders Table from Supabase -->
+                        <div class="xl:col-span-2 bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-6">
+                            <div class="flex items-center justify-between border-b border-gray-50 pb-4">
+                                <h4 class="font-heading font-bold text-base text-primary tracking-tight">Recent Orders
+                                </h4>
+                                <button onclick="fetchOrdersData()"
+                                    class="text-xs text-accent font-bold hover:underline cursor-pointer flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 8H18.2M4 9h5M4 9v5h5" />
+                                    </svg>
+                                    Refresh Table
+                                </button>
+                            </div>
+
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr
+                                            class="border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-wider">
+                                            <th class="pb-3.5">Order ID</th>
+                                            <th class="pb-3.5">Customer</th>
+                                            <th class="pb-3.5">Date</th>
+                                            <th class="pb-3.5">Total</th>
+                                            <th class="pb-3.5">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ordersTableBody"
+                                        class="text-sm font-medium text-primary divide-y divide-gray-50">
+                                        <tr>
+                                            <td colspan="5" class="py-12 text-center text-gray-400 font-semibold">
+                                                <div class="flex flex-col items-center gap-2">
+                                                    <svg class="w-6 h-6 animate-spin text-accent" fill="none"
+                                                        stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                                            stroke-width="3"
+                                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                                    </svg>
+                                                    Loading database records...
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Right Side: Top Sold Products -->
+                        <div class="xl:col-span-1 bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-6">
+                            <h4
+                                class="font-heading font-bold text-base text-primary tracking-tight border-b border-gray-50 pb-4">
+                                Top Sold Products</h4>
+                            <div class="space-y-4">
+                                <!-- Product 1 -->
+                                <div
+                                    class="flex items-center gap-4 group p-1.5 rounded-2xl hover:bg-gray-50/50 transition-colors">
+                                    <div
+                                        class="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 border border-gray-100 flex-shrink-0">
+                                        <img src="images/luffy_gear5_1779161050741.png" alt="Luffy"
+                                            class="w-full h-full object-cover"
+                                            onerror="this.src='https://picsum.photos/id/100/100/100'">
+                                    </div>
+                                    <div class="flex-grow text-left">
+                                        <h5 class="font-bold text-sm text-primary truncate max-w-[150px]">Luffy Gear 5
+                                        </h5>
+                                        <p class="text-[11px] text-gray-400">One Piece Series</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span
+                                            class="text-xs font-extrabold text-accent bg-orange-50 px-2.5 py-1 rounded-full">৳2,899</span>
+                                        <span class="text-[10px] text-gray-400 block mt-0.5">32 sales</span>
+                                    </div>
+                                </div>
+
+                                <!-- Product 2 -->
+                                <div
+                                    class="flex items-center gap-4 group p-1.5 rounded-2xl hover:bg-gray-50/50 transition-colors">
+                                    <div
+                                        class="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 border border-gray-100 flex-shrink-0">
+                                        <img src="images/gojo_satoru_1779161136685.png" alt="Gojo"
+                                            class="w-full h-full object-cover"
+                                            onerror="this.src='https://picsum.photos/id/200/100/100'">
+                                    </div>
+                                    <div class="flex-grow text-left">
+                                        <h5 class="font-bold text-sm text-primary truncate max-w-[150px]">Gojo Satoru
+                                        </h5>
+                                        <p class="text-[11px] text-gray-400">Jujutsu Kaisen Series</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span
+                                            class="text-xs font-extrabold text-accent bg-orange-50 px-2.5 py-1 rounded-full">৳4,749</span>
+                                        <span class="text-[10px] text-gray-400 block mt-0.5">24 sales</span>
+                                    </div>
+                                </div>
+
+                                <!-- Product 3 -->
+                                <div
+                                    class="flex items-center gap-4 group p-1.5 rounded-2xl hover:bg-gray-50/50 transition-colors">
+                                    <div
+                                        class="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 border border-gray-100 flex-shrink-0">
+                                        <img src="images/nezuko_demon_1779161090026.png" alt="Nezuko"
+                                            class="w-full h-full object-cover"
+                                            onerror="this.src='https://picsum.photos/id/300/100/100'">
+                                    </div>
+                                    <div class="flex-grow text-left">
+                                        <h5 class="font-bold text-sm text-primary truncate max-w-[150px]">Nezuko Demon
+                                            Form</h5>
+                                        <p class="text-[11px] text-gray-400">Demon Slayer Series</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span
+                                            class="text-xs font-extrabold text-accent bg-orange-50 px-2.5 py-1 rounded-full">৳3,499</span>
+                                        <span class="text-[10px] text-gray-400 block mt-0.5">18 sales</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
 
                 </div> <!-- End of #sectionDashboard -->
 
                 <!-- PRODUCTS SECTION -->
                 <div id="sectionProducts" class="hidden space-y-8 animate-fadeIn">
                     <!-- Products Header Controls -->
-                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div
+                        class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
                         <!-- Search and Filter Dropdowns Left Side -->
                         <div class="flex flex-wrap items-center gap-4 w-full md:w-auto">
                             <!-- Search bar -->
                             <div class="relative w-full md:w-72">
-                                <input type="text" id="productSearch" oninput="filterProductsClientSide()" placeholder="Search products by name..." class="w-full bg-gray-50 border border-gray-150 rounded-xl px-5 py-3 outline-none focus:border-accent focus:bg-white text-xs font-semibold pl-11 transition-all">
-                                <svg class="w-4 h-4 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                                <input type="text" id="productSearch" oninput="filterProductsClientSide()"
+                                    placeholder="Search products by name..."
+                                    class="w-full bg-gray-50 border border-gray-150 rounded-xl px-5 py-3 outline-none focus:border-accent focus:bg-white text-xs font-semibold pl-11 transition-all">
+                                <svg class="w-4 h-4 text-gray-400 absolute left-4 top-1/2 transform -translate-y-1/2"
+                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
                             </div>
-                            
+
                             <!-- Category Filter Dropdown -->
-                            <select id="filterCategory" onchange="filterProductsClientSide()" class="bg-gray-50 border border-gray-150 rounded-xl px-4 py-3 outline-none focus:border-accent text-xs font-semibold text-gray-600 transition-all cursor-pointer">
-                                <option value="All">All Categories</option>
-                                <option value="Figures">Figures</option>
-                                <option value="Accessories">Accessories</option>
-                            </select>
-                            
+                            <div class="relative w-full md:w-48 custom-dropdown" id="dropdownCategoryContainer"
+                                onmouseenter="showCustomDropdown('dropdownCategory')" onmouseleave="hideCustomDropdown('dropdownCategory')">
+                                <button type="button" id="dropdownCategoryTrigger"
+                                    class="w-full flex items-center justify-between bg-white border border-[#e85d04] text-xs font-bold text-gray-700 hover:bg-gray-50/50 px-4 py-3 transition-all cursor-pointer select-none"
+                                    style="border-radius: 12px;">
+                                    <span id="dropdownCategoryLabel">All Categories</span>
+                                    <svg class="w-4 h-4 text-[#e85d04] transition-transform duration-300 transform" id="dropdownCategoryArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div id="dropdownCategoryMenu" class="absolute left-0 right-0 mt-2 bg-white border border-gray-100 shadow-xl z-[999] overflow-hidden custom-dropdown-menu"
+                                    style="border-radius: 12px;">
+                                    <div class="p-1.5 space-y-1">
+                                        <div onclick="selectCustomOption('dropdownCategory', 'All', 'All Categories')" data-option-value="All"
+                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none" style="border-radius: 8px;">
+                                            All Categories
+                                        </div>
+                                        <div onclick="selectCustomOption('dropdownCategory', 'Figures', 'Figures')" data-option-value="Figures"
+                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none" style="border-radius: 8px;">
+                                            Figures
+                                        </div>
+                                        <div onclick="selectCustomOption('dropdownCategory', 'Accessories', 'Accessories')" data-option-value="Accessories"
+                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none" style="border-radius: 8px;">
+                                            Accessories
+                                        </div>
+                                    </div>
+                                </div>
+                                <select id="filterCategory" onchange="filterProductsClientSide()" class="hidden">
+                                    <option value="All">All Categories</option>
+                                    <option value="Figures">Figures</option>
+                                    <option value="Accessories">Accessories</option>
+                                </select>
+                            </div>
+
                             <!-- Status Filter Dropdown -->
-                            <select id="filterStatus" onchange="filterProductsClientSide()" class="bg-gray-50 border border-gray-150 rounded-xl px-4 py-3 outline-none focus:border-accent text-xs font-semibold text-gray-600 transition-all cursor-pointer">
-                                <option value="All">All Statuses</option>
-                                <option value="In Stock">In Stock</option>
-                                <option value="Pre-order">Pre-order</option>
-                            </select>
+                            <div class="relative w-full md:w-48 custom-dropdown" id="dropdownStatusContainer"
+                                onmouseenter="showCustomDropdown('dropdownStatus')" onmouseleave="hideCustomDropdown('dropdownStatus')">
+                                <button type="button" id="dropdownStatusTrigger"
+                                    class="w-full flex items-center justify-between bg-white border border-[#e85d04] text-xs font-bold text-gray-700 hover:bg-gray-50/50 px-4 py-3 transition-all cursor-pointer select-none"
+                                    style="border-radius: 12px;">
+                                    <span id="dropdownStatusLabel">All Statuses</span>
+                                    <svg class="w-4 h-4 text-[#e85d04] transition-transform duration-300 transform" id="dropdownStatusArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
+                                    </svg>
+                                </button>
+                                <div id="dropdownStatusMenu" class="absolute left-0 right-0 mt-2 bg-white border border-gray-100 shadow-xl z-[999] overflow-hidden custom-dropdown-menu"
+                                    style="border-radius: 12px;">
+                                    <div class="p-1.5 space-y-1">
+                                        <div onclick="selectCustomOption('dropdownStatus', 'All', 'All Statuses')" data-option-value="All"
+                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none" style="border-radius: 8px;">
+                                            All Statuses
+                                        </div>
+                                        <div onclick="selectCustomOption('dropdownStatus', 'In Stock', 'In Stock')" data-option-value="In Stock"
+                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none" style="border-radius: 8px;">
+                                            In Stock
+                                        </div>
+                                        <div onclick="selectCustomOption('dropdownStatus', 'Pre-order', 'Pre-order')" data-option-value="Pre-order"
+                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none" style="border-radius: 8px;">
+                                            Pre-order
+                                        </div>
+                                    </div>
+                                </div>
+                                <select id="filterStatus" onchange="filterProductsClientSide()" class="hidden">
+                                    <option value="All">All Statuses</option>
+                                    <option value="In Stock">In Stock</option>
+                                    <option value="Pre-order">Pre-order</option>
+                                </select>
+                            </div>
                         </div>
-                        
+
                         <!-- Add New Product Button Right Side -->
-                        <button onclick="openProductModal('add')" class="bg-accent hover:bg-accent-dark text-white px-6 py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-accent/20 cursor-pointer text-xs flex items-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                        <button onclick="openProductModal('add')"
+                            class="bg-accent hover:bg-accent-dark text-white px-6 py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-accent/20 cursor-pointer text-xs flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
                             Add Product
                         </button>
                     </div>
@@ -344,9 +689,12 @@
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse">
                                 <thead>
-                                    <tr class="border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-wider">
+                                    <tr
+                                        class="border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-wider">
                                         <th class="pb-5 px-4 w-10">
-                                            <input type="checkbox" id="selectAllCheckbox" onchange="toggleBulkSelect(this)" class="rounded border-gray-300 text-accent focus:ring-accent w-4 h-4 cursor-pointer">
+                                            <input type="checkbox" id="selectAllCheckbox"
+                                                onchange="toggleBulkSelect(this)"
+                                                class="rounded border-gray-300 text-accent focus:ring-accent w-4 h-4 cursor-pointer">
                                         </th>
                                         <th class="pb-5 px-4">Product Info</th>
                                         <th class="pb-5 px-4">Price</th>
@@ -356,12 +704,51 @@
                                         <th class="pb-5 px-4 text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="productsTableBody" class="text-sm font-medium text-primary divide-y divide-gray-50">
+                                <tbody id="productsTableBody"
+                                    class="text-sm font-medium text-primary divide-y divide-gray-50">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> <!-- End of #sectionProducts -->
+
+                <!-- CUSTOMERS SECTION -->
+                <div id="sectionCustomers" class="hidden space-y-8 animate-fadeIn">
+                    <!-- Customers Header Controls -->
+                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3 w-full md:w-auto">
+                            <h3 class="font-heading font-bold text-lg text-primary">Customers Directory</h3>
+                        </div>
+                        <div class="relative w-full md:w-80">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </span>
+                            <input type="text" id="customerSearchInput" oninput="filterCustomersTable()" placeholder="Search by name, email, or phone..."
+                                class="w-full pl-10 pr-4 py-3 bg-[#f8f9fa] border border-gray-200 rounded-xl outline-none focus:border-accent text-sm font-semibold text-primary transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Customers Table Card -->
+                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-6">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-wider">
+                                        <th class="pb-5 px-4">Customer Name</th>
+                                        <th class="pb-5 px-4">Email Address</th>
+                                        <th class="pb-5 px-4">Phone Number</th>
+                                        <th class="pb-5 px-4 text-center">Total Orders</th>
+                                        <th class="pb-5 px-4 text-right">Total Spent</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="customersTableBody" class="text-sm font-medium text-primary divide-y divide-gray-50">
                                     <tr>
-                                        <td colspan="7" class="py-12 text-center text-gray-400 font-semibold">
+                                        <td colspan="5" class="py-12 text-center text-gray-400 font-semibold">
                                             <div class="flex flex-col items-center gap-2">
                                                 <svg class="w-6 h-6 animate-spin text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                                                Loading product database...
+                                                Loading customer profiles...
                                             </div>
                                         </td>
                                     </tr>
@@ -369,14 +756,157 @@
                             </table>
                         </div>
                     </div>
-                </div> <!-- End of #sectionProducts -->
+                </div> <!-- End of #sectionCustomers -->
+
+                <!-- DISCOUNTS SECTION -->
+                <div id="sectionDiscounts" class="hidden space-y-8 animate-fadeIn">
+                    <!-- Discounts Header Controls -->
+                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <h3 class="font-heading font-bold text-lg text-primary">Discount Codes</h3>
+                        </div>
+                        <button onclick="openDiscountModal()"
+                            class="bg-accent hover:bg-accent-dark text-white px-5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-lg shadow-accent/20 cursor-pointer w-full md:w-auto justify-center select-none">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                            </svg>
+                            Add Discount Code
+                        </button>
+                    </div>
+
+                    <!-- Discounts Table Card -->
+                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-6">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-wider">
+                                        <th class="pb-5 px-4">Coupon Code</th>
+                                        <th class="pb-5 px-4">Percentage Off</th>
+                                        <th class="pb-5 px-4">Expiry Date</th>
+                                        <th class="pb-5 px-4">Status</th>
+                                        <th class="pb-5 px-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="discountsTableBody" class="text-sm font-medium text-primary divide-y divide-gray-50">
+                                    <tr>
+                                        <td colspan="5" class="py-12 text-center text-gray-400 font-semibold">
+                                            <div class="flex flex-col items-center gap-2">
+                                                <svg class="w-6 h-6 animate-spin text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                                Loading discount codes...
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> <!-- End of #sectionDiscounts -->
+
+                <!-- INVOICES SECTION -->
+                <div id="sectionInvoices" class="hidden space-y-8 animate-fadeIn">
+                    <!-- Invoices Header Controls -->
+                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <h3 class="font-heading font-bold text-lg text-primary">Invoices Generator</h3>
+                        </div>
+                    </div>
+
+                    <!-- Invoices Table Card -->
+                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-6">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-wider">
+                                        <th class="pb-5 px-4">Order ID</th>
+                                        <th class="pb-5 px-4">Customer</th>
+                                        <th class="pb-5 px-4">Date</th>
+                                        <th class="pb-5 px-4">Total Amount</th>
+                                        <th class="pb-5 px-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="invoicesTableBody" class="text-sm font-medium text-primary divide-y divide-gray-50">
+                                    <tr>
+                                        <td colspan="5" class="py-12 text-center text-gray-400 font-semibold">
+                                            <div class="flex flex-col items-center gap-2">
+                                                <svg class="w-6 h-6 animate-spin text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                                Loading invoices log...
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div> <!-- End of #sectionInvoices -->
 
             </div>
         </main>
     </div>
 
+    <script>
+        (function() {
+            const hasSession = Object.keys(localStorage).some(key => key.startsWith('sb-') && key.endsWith('-auth-token'));
+            if (hasSession) {
+                const dashboard = document.getElementById('dashboardContent');
+                if (dashboard) {
+                    dashboard.classList.remove('hidden');
+                }
+                const savedTab = sessionStorage.getItem('activeAdminTab');
+                if (savedTab && savedTab !== 'dashboard') {
+                    const targetSec = document.getElementById('section' + savedTab.charAt(0).toUpperCase() + savedTab.slice(1));
+                    const dashSec = document.getElementById('sectionDashboard');
+                    if (targetSec && dashSec) {
+                        dashSec.classList.add('hidden');
+                        targetSec.classList.remove('hidden');
+                    }
+                    const targetNav = document.getElementById('nav-' + savedTab);
+                    const dashNav = document.getElementById('nav-dashboard');
+                    if (targetNav && dashNav) {
+                        dashNav.className = "flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none";
+                        targetNav.className = "flex items-center gap-3 bg-accent text-white px-4 py-3.5 rounded-xl font-bold text-sm transition-all select-none";
+                    }
+                }
+            }
+        })();
+    </script>
+
     <!-- Script Section -->
     <script>
+        // Global Error Debugging Handler (renders visual feedback on exceptions)
+        window.addEventListener('error', function(e) {
+            const errDiv = document.createElement('div');
+            errDiv.style.position = 'fixed';
+            errDiv.style.top = '10px';
+            errDiv.style.left = '10px';
+            errDiv.style.right = '10px';
+            errDiv.style.backgroundColor = 'rgba(255,0,0,0.95)';
+            errDiv.style.color = 'white';
+            errDiv.style.padding = '15px';
+            errDiv.style.zIndex = '99999';
+            errDiv.style.borderRadius = '10px';
+            errDiv.style.fontFamily = 'monospace';
+            errDiv.style.whiteSpace = 'pre-wrap';
+            errDiv.textContent = 'Global Error: ' + e.message + ' at ' + e.filename + ':' + e.lineno;
+            document.body.appendChild(errDiv);
+        });
+
+        window.addEventListener('unhandledrejection', function(e) {
+            const errDiv = document.createElement('div');
+            errDiv.style.position = 'fixed';
+            errDiv.style.top = '10px';
+            errDiv.style.left = '10px';
+            errDiv.style.right = '10px';
+            errDiv.style.backgroundColor = 'rgba(255,0,0,0.95)';
+            errDiv.style.color = 'white';
+            errDiv.style.padding = '15px';
+            errDiv.style.zIndex = '99999';
+            errDiv.style.borderRadius = '10px';
+            errDiv.style.fontFamily = 'monospace';
+            errDiv.style.whiteSpace = 'pre-wrap';
+            errDiv.textContent = 'Unhandled Rejection: ' + (e.reason ? (e.reason.message || e.reason) : 'Unknown Promise Rejection');
+            document.body.appendChild(errDiv);
+        });
+
         // Supabase configurations
         const SUPABASE_URL = 'https://lalafwkxgitckodmyjep.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_gcQvPyKoCQ_UxmjmH9gV9Q_BUAsJfpt';
@@ -390,147 +920,168 @@
             }
         }
 
-        // Authentication checks
-        if (sessionStorage.getItem('otaku_admin_authenticated') === 'true') {
-            document.getElementById('loginOverlay').classList.add('hidden');
-            document.getElementById('dashboardContent').classList.remove('hidden');
-            (async () => {
-                await ensureSupabaseAuth();
-                initializeDashboard();
-            })();
-        }
-
-        async function ensureSupabaseAuth() {
+        // Helper to verify if user email exists in the admins whitelist table
+        async function verifyAdminStatus(user) {
+            if (!user) return false;
             try {
-                if (!supabaseClient) throw new Error("Supabase is not initialized.");
-                
-                // Get active session
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                
-                console.log("[ensureSupabaseAuth] Checking auth session...");
-                
-                if (session) {
-                    console.log("[ensureSupabaseAuth] ACTIVE Session established:", session);
-                    console.log("[ensureSupabaseAuth] User:", session.user);
-                    console.log("[ensureSupabaseAuth] Role:", session.user.role);
-                    console.log("[ensureSupabaseAuth] Headers:", supabaseClient.headers);
-                    return true;
-                }
-                
-                console.log("[ensureSupabaseAuth] No active session. Executing silent sign-in...");
-                const data = await silentSupabaseAuthLogin();
-                
-                if (data && data.session) {
-                    console.log("[ensureSupabaseAuth] Session established successfully via silent login!");
-                    console.log("- session:", data.session);
-                    console.log("- user:", data.user);
-                    console.log("- role:", data.user.role);
-                    console.log("- request headers:", supabaseClient.headers);
-                    return true;
-                }
-                
-                // Fetch session once more to verify auto-signup triggers
-                const { data: { session: finalCheck } } = await supabaseClient.auth.getSession();
-                if (finalCheck) {
-                    console.log("[ensureSupabaseAuth] Verified final auth session:", finalCheck);
-                    console.log("- user:", finalCheck.user);
-                    console.log("- role:", finalCheck.user.role);
-                    console.log("- request headers:", supabaseClient.headers);
-                    return true;
+                const { data: adminRecord, error: adminErr } = await supabaseClient
+                    .from('admins')
+                    .select('email')
+                    .eq('email', user.email)
+                    .maybeSingle();
+
+                if (adminErr) {
+                    console.error("Error checking admin status:", adminErr);
+                    return false;
                 }
 
-                throw new Error("Unable to establish an authenticated session. uid and role are NULL.");
+                if (!adminRecord) {
+                    console.warn("User is authenticated but email is not in the admins table.");
+                    await supabaseClient.auth.signOut();
+                    return false;
+                }
+                return true;
             } catch (err) {
-                console.error("[ensureSupabaseAuth] Auth failed:", err);
-                showNotificationToast(`Authentication error: ${err.message || err}`, false);
+                console.error("Verification exception:", err);
                 return false;
-            }
-        }
-
-        async function silentSupabaseAuthLogin() {
-            try {
-                if (!supabaseClient) return null;
-
-                const email = 'admin@otakuvault.com';
-                const password = 'admin123';
-
-                console.log("[silentSupabaseAuthLogin] Background sign-in...");
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-
-                if (error) {
-                    if (error.message.includes('Invalid login credentials') || error.status === 400 || error.message.includes('User not found')) {
-                        console.log("Admin auth user not found. Automatically registering admin account...");
-                        const { error: signUpError } = await supabaseClient.auth.signUp({
-                            email: email,
-                            password: password
-                        });
-                        
-                        if (signUpError) {
-                            console.error("Failed to automatically register admin auth account:", signUpError);
-                            return null;
-                        } else {
-                            console.log("Admin auth user registered successfully! Re-signing in...");
-                            const { data: retryData, error: retryErr } = await supabaseClient.auth.signInWithPassword({
-                                email: email,
-                                password: password
-                            });
-                            if (retryErr) throw retryErr;
-                            return retryData;
-                        }
-                    } else {
-                        console.error("Supabase sign in failed:", error);
-                        return null;
-                    }
-                } else {
-                    console.log("Supabase Auth successful: admin session established.");
-                    return data;
-                }
-            } catch (err) {
-                console.error("Failed to perform silent Supabase Auth login:", err);
-                return null;
             }
         }
 
         async function handleLogin(e) {
             e.preventDefault();
+            const emailInput = document.getElementById('adminEmail').value.trim();
             const passwordInput = document.getElementById('adminPassword').value.trim();
             const errorLabel = document.getElementById('loginError');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
 
-            if (passwordInput === 'admin123') {
-                errorLabel.classList.add('hidden');
-                sessionStorage.setItem('otaku_admin_authenticated', 'true');
-                
-                // Hide overlay and show content
+            errorLabel.classList.add('hidden');
+            errorLabel.textContent = '';
+            
+            // Set loading state
+            const originalBtnText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Verifying...';
+
+            try {
+                if (!supabaseClient) throw new Error("Supabase client not initialized.");
+
+                // Step 1: Sign in with password
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: emailInput,
+                    password: passwordInput
+                });
+
+                if (error) throw error;
+
+                const user = data.user;
+
+                // Step 2: Check if email exists in admins table
+                const isUserAdmin = await verifyAdminStatus(user);
+                if (!isUserAdmin) {
+                    throw new Error("Access denied. You are not an admin.");
+                }
+
+                // If yes -> Show the dashboard
                 document.getElementById('loginOverlay').classList.add('hidden');
                 document.getElementById('dashboardContent').classList.remove('hidden');
-
-                // Trigger authenticated loading flow
-                await ensureSupabaseAuth();
                 initializeDashboard();
-            } else {
+            } catch (err) {
+                console.error("[Login Failed]", err);
+                errorLabel.textContent = err.message || "Invalid login credentials.";
                 errorLabel.classList.remove('hidden');
-                document.getElementById('adminPassword').value = '';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
             }
         }
 
-        function handleLogout() {
-            sessionStorage.removeItem('otaku_admin_authenticated');
-            if (supabaseClient && supabaseClient.auth) {
-                supabaseClient.auth.signOut().catch(e => console.error("Error signing out from Supabase Auth:", e));
+        async function handleLogout() {
+            if (supabaseClient) {
+                try {
+                    await supabaseClient.auth.signOut();
+                } catch (e) {
+                    console.error("Error signing out from Supabase Auth:", e);
+                }
             }
             document.getElementById('loginOverlay').classList.remove('hidden');
             document.getElementById('dashboardContent').classList.add('hidden');
+            
+            // Clear inputs
+            document.getElementById('adminEmail').value = '';
             document.getElementById('adminPassword').value = '';
+            const errorLabel = document.getElementById('loginError');
+            errorLabel.classList.add('hidden');
+            errorLabel.textContent = '';
         }
+
+        function hideLoaderOverlay() {
+            const dashboard = document.getElementById('dashboardContent');
+            const login = document.getElementById('loginOverlay');
+            if (dashboard) dashboard.classList.remove('blur-content');
+            if (login) login.classList.remove('blur-content');
+
+            const loader = document.getElementById('pageLoaderOverlay');
+            if (loader) {
+                loader.classList.add('loader-fade-out');
+                setTimeout(() => {
+                    loader.remove();
+                }, 500);
+            }
+        }
+
+        // On Page Load: Check session and subscribe to auth state changes
+        window.addEventListener('DOMContentLoaded', async () => {
+            if (!supabaseClient) return;
+
+            // Subscribe to auth state changes (strictly for UI visibility lockouts on logout)
+            supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                console.log(`[onAuthStateChange] Event: ${event}`);
+                if (event === 'SIGNED_OUT' || !session) {
+                    const loginEl = document.getElementById('loginOverlay');
+                    if (loginEl) {
+                        loginEl.classList.remove('hidden');
+                        loginEl.classList.remove('blur-content');
+                    }
+                    document.getElementById('dashboardContent').classList.add('hidden');
+                }
+            });
+
+            // Initial check
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session) {
+                    const isAuthed = await verifyAdminStatus(session.user);
+                    if (isAuthed) {
+                        document.getElementById('loginOverlay').classList.add('hidden');
+                        document.getElementById('dashboardContent').classList.remove('hidden');
+                        initializeDashboard();
+                        hideLoaderOverlay();
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.error("Initial load auth validation check error:", err);
+            }
+            // Defensively fallback to show only the login overlay
+            const loginEl = document.getElementById('loginOverlay');
+            if (loginEl) {
+                loginEl.classList.remove('hidden');
+                loginEl.classList.remove('blur-content');
+            }
+            document.getElementById('dashboardContent').classList.add('hidden');
+            hideLoaderOverlay();
+        });
 
         // Initialize dashboard charts and data
         function initializeDashboard() {
             renderSalesChart();
             renderViewsChart();
-            fetchOrdersData();
+            const savedTab = sessionStorage.getItem('activeAdminTab');
+            if (savedTab && savedTab !== 'dashboard') {
+                switchTab(savedTab);
+            } else {
+                fetchOrdersData();
+            }
         }
 
         async function fetchOrdersData() {
@@ -550,11 +1101,13 @@
 
             if (supabaseClient) {
                 try {
+
+
                     const { data, error } = await supabaseClient
                         .from('orders')
                         .select('*')
                         .order('created_at', { ascending: false });
-                    
+
                     if (error) {
                         console.error("Error fetching from Supabase:", error);
                     } else if (data) {
@@ -595,7 +1148,7 @@
             // Render stats based on database / mock values
             const totalOrders = orders.length;
             const totalRevenue = orders.reduce((sum, item) => sum + Number(item.total), 0);
-            
+
             // Calculate unique customers count
             const uniqueEmails = [...new Set(orders.map(item => item.email || item.customer_name))];
             const totalCustomers = uniqueEmails.length;
@@ -609,7 +1162,7 @@
             orders.forEach(order => {
                 const dateObj = new Date(order.created_at);
                 const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                
+
                 let badgeClass = '';
                 if (order.status === 'Completed') {
                     badgeClass = 'bg-green-50 text-green-500';
@@ -639,7 +1192,7 @@
         // Render Sales Trend line chart
         function renderSalesChart() {
             const ctx = document.getElementById('salesTrendChart').getContext('2d');
-            
+
             const gradient = ctx.createLinearGradient(0, 0, 0, 250);
             gradient.addColorStop(0, 'rgba(216, 83, 46, 0.2)');
             gradient.addColorStop(1, 'rgba(216, 83, 46, 0.00)');
@@ -720,17 +1273,26 @@
 
         // PRODUCTS TAB FUNCTIONALITY
         let allProducts = [];
+        let hasDiscountPercentCol = true;
+        let hasDiscountExpiryCol = true;
 
         // Tab Switching logic
         function switchTab(tabName) {
+            sessionStorage.setItem('activeAdminTab', tabName);
             const sections = {
                 dashboard: document.getElementById('sectionDashboard'),
-                products: document.getElementById('sectionProducts')
+                products: document.getElementById('sectionProducts'),
+                customers: document.getElementById('sectionCustomers'),
+                discounts: document.getElementById('sectionDiscounts'),
+                invoices: document.getElementById('sectionInvoices')
             };
 
             const navLinks = {
                 dashboard: document.getElementById('nav-dashboard'),
-                products: document.getElementById('nav-products')
+                products: document.getElementById('nav-products'),
+                customers: document.getElementById('nav-customers'),
+                discounts: document.getElementById('nav-discounts'),
+                invoices: document.getElementById('nav-invoices')
             };
 
             // Toggle visibility of sections
@@ -762,6 +1324,12 @@
                 if (typeof fetchOrdersData === 'function') {
                     fetchOrdersData();
                 }
+            } else if (tabName === 'customers') {
+                fetchCustomersData();
+            } else if (tabName === 'discounts') {
+                fetchDiscountsData();
+            } else if (tabName === 'invoices') {
+                fetchInvoicesData();
             }
         }
 
@@ -786,11 +1354,44 @@
                     throw new Error("Supabase client is not initialized.");
                 }
 
-                // Enforce authentication gate before fetching database rows
-                const isAuthenticated = await ensureSupabaseAuth();
-                if (!isAuthenticated) {
-                    throw new Error("Authentication failed. Request blocked.");
+                // Check dynamically if products table contains the discount_percent and discount_expiry columns
+                try {
+                    const { error: testColErr } = await supabaseClient
+                        .from('products')
+                        .select('discount_percent, discount_expiry')
+                        .limit(1);
+                    if (!testColErr) {
+                        hasDiscountPercentCol = true;
+                        hasDiscountExpiryCol = true;
+                        console.log("[fetchProductsData] discount_percent and discount_expiry columns detected in Supabase.");
+                    } else {
+                        console.warn("[fetchProductsData] Combined columns check returned error, checking individually:", testColErr);
+                        try {
+                            const { error: testPercentErr } = await supabaseClient
+                                .from('products')
+                                .select('discount_percent')
+                                .limit(1);
+                            hasDiscountPercentCol = !testPercentErr;
+                        } catch (e) {
+                            hasDiscountPercentCol = false;
+                        }
+
+                        try {
+                            const { error: testExpiryErr } = await supabaseClient
+                                .from('products')
+                                .select('discount_expiry')
+                                .limit(1);
+                            hasDiscountExpiryCol = !testExpiryErr;
+                        } catch (e) {
+                            hasDiscountExpiryCol = false;
+                        }
+                    }
+                } catch (colCheckErr) {
+                    console.warn("[fetchProductsData] Failed to check for columns presence:", colCheckErr);
+                    hasDiscountPercentCol = false;
+                    hasDiscountExpiryCol = false;
                 }
+
                 const { data, error } = await supabaseClient
                     .from('products')
                     .select('*')
@@ -829,7 +1430,7 @@
                     'zoro_wado': 'https://images.unsplash.com/photo-1618336753974-aae8e04506aa?w=500&auto=format&fit=crop&q=80',
                     'rengoku_flame': 'https://images.unsplash.com/photo-1613376023733-0a73315d9b06?w=500&auto=format&fit=crop&q=80'
                 };
-                
+
                 for (const [key, val] of Object.entries(mappings)) {
                     if (imgUrl.includes(key)) {
                         return val;
@@ -863,7 +1464,7 @@
                 const isPreorder = product.is_preorder ?? false;
                 let statusToggleClass = isPreorder ? 'bg-accent' : 'bg-emerald-500';
                 let statusTranslateClass = isPreorder ? 'translate-x-7' : 'translate-x-1';
-                
+
                 let stockPct = Math.min(100, Math.max(0, (product.stock / 100) * 100));
                 let stockBarColor = 'bg-emerald-500';
                 if (product.stock <= 2) {
@@ -941,7 +1542,7 @@
             const filtered = allProducts.filter(product => {
                 const matchesSearch = product.name.toLowerCase().includes(searchQuery);
                 const matchesCategory = selectedCategory === 'All' || product.category === selectedCategory;
-                
+
                 let matchesStatus = true;
                 if (selectedStatus === 'In Stock') {
                     matchesStatus = product.is_preorder === false || !product.is_preorder;
@@ -978,12 +1579,8 @@
             try {
                 if (!supabaseClient) throw new Error("Supabase is not initialized.");
 
-                // Enforce authenticated gate before executing database writes
-                const isAuthenticated = await ensureSupabaseAuth();
-                if (!isAuthenticated) {
-                    throw new Error("Operation blocked: Unauthenticated session.");
-                }
-                
+
+
                 // Update locally first to make it responsive
                 const prod = allProducts.find(p => p.id === id);
                 if (prod) prod.is_preorder = isChecked;
@@ -995,7 +1592,7 @@
 
                 if (error) throw error;
                 showNotificationToast(`Status updated to ${isChecked ? 'Pre-order' : 'In Stock'}`);
-                
+
                 // Refresh filters to make sure table displays correct styling
                 filterProductsClientSide();
             } catch (err) {
@@ -1011,7 +1608,7 @@
             const container = document.getElementById('productModalContainer');
             const title = document.getElementById('modalTitle');
             const subtitle = document.getElementById('modalSubtitle');
-            
+
             if (!modal || !container) return;
 
             // Reset Form Fields
@@ -1022,14 +1619,37 @@
             document.getElementById('modalSeries').value = 'One Piece';
             document.getElementById('modalStock').value = '';
             document.getElementById('modalStatus').value = 'In Stock';
+            document.getElementById('modalBadge').value = 'None';
             document.getElementById('modalImageUrl').value = '';
             document.getElementById('modalHoverImageUrl').value = '';
             document.getElementById('modalDescription').value = '';
+            document.getElementById('modalDiscountPercent').value = '';
+            document.getElementById('modalDiscountExpiry').value = '';
+            toggleDiscountFields('None');
+
+            const dbNotice = document.getElementById('dbColumnNotice');
+            const dbNoticeText = document.getElementById('dbColumnNoticeText');
+            if (dbNotice) {
+                if (hasDiscountPercentCol && hasDiscountExpiryCol) {
+                    dbNotice.classList.add('hidden');
+                } else {
+                    dbNotice.classList.remove('hidden');
+                    if (dbNoticeText) {
+                        let missingCols = [];
+                        if (!hasDiscountPercentCol) missingCols.push('discount_percent');
+                        if (!hasDiscountExpiryCol) missingCols.push('discount_expiry');
+                        dbNoticeText.innerHTML = `
+                            <span class="font-bold text-amber-900 block">Supabase Column(s) Missing</span>
+                            Run the appropriate migration scripts in Supabase to enable saving product discounts. Missing: ${missingCols.join(', ')}
+                        `;
+                    }
+                }
+            }
 
             const previewImg = document.getElementById('imagePreviewThumbnail');
             const noPreview = document.getElementById('noPreviewText');
             const uploadLabelText = document.getElementById('uploadLabelText');
-            
+
             if (previewImg && noPreview && uploadLabelText) {
                 previewImg.src = '';
                 previewImg.classList.add('hidden');
@@ -1070,10 +1690,24 @@
                     document.getElementById('modalStock').value = product.stock !== undefined ? product.stock : '';
                     document.getElementById('modalStatus').value = product.is_preorder ? 'Pre-order' : 'In Stock';
                     document.getElementById('modalImageUrl').value = product.image || '';
-                    
+
                     const hoverImgUrl = product.hover_image_url || product.second_image || '';
                     document.getElementById('modalHoverImageUrl').value = hoverImgUrl;
                     document.getElementById('modalDescription').value = '';
+
+                    let initialBadge = product.badge || 'None';
+                    if (initialBadge.startsWith('-') && initialBadge.endsWith('%')) {
+                        initialBadge = 'DISCOUNT';
+                    }
+                    const supportedBadges = ['None', 'NEW', 'HOT', 'UPCOMING', 'DISCOUNT'];
+                    if (!supportedBadges.includes(initialBadge)) {
+                        initialBadge = 'None';
+                    }
+                    document.getElementById('modalBadge').value = initialBadge;
+                    toggleDiscountFields(initialBadge);
+
+                    document.getElementById('modalDiscountPercent').value = product.discount_percent !== undefined && product.discount_percent !== null ? product.discount_percent : '';
+                    document.getElementById('modalDiscountExpiry').value = product.discount_expiry !== undefined && product.discount_expiry !== null ? product.discount_expiry : '';
 
                     if (product.image && previewImg && noPreview) {
                         previewImg.src = product.image;
@@ -1110,6 +1744,17 @@
             }, 300);
         }
 
+        function toggleDiscountFields(badgeValue) {
+            const container = document.getElementById('modalDiscountFieldsContainer');
+            if (container) {
+                if (badgeValue === 'DISCOUNT') {
+                    container.classList.remove('hidden');
+                } else {
+                    container.classList.add('hidden');
+                }
+            }
+        }
+
         // Upload Product Image to Supabase Storage Bucket
         async function handleImageUpload(event, type = 'main') {
             const file = event.target.files[0];
@@ -1128,7 +1773,7 @@
                 noPreview = document.getElementById('noHoverPreviewText');
                 hiddenInputId = 'modalHoverImageUrl';
             }
-            
+
             if (uploadLabelText) uploadLabelText.textContent = "Uploading image...";
 
             try {
@@ -1157,14 +1802,14 @@
                     .getPublicUrl(filePath);
 
                 const publicUrl = publicUrlData.publicUrl;
-                
+
                 console.log(`[Upload success] Uploaded ${type} image.`);
                 console.log(`- Received Public URL: ${publicUrl}`);
                 console.log(`- Setting hidden input: #${hiddenInputId}`);
 
                 // Set value in hidden input and show preview
                 document.getElementById(hiddenInputId).value = publicUrl;
-                
+
                 console.log(`- Verified hidden input value:`, document.getElementById(hiddenInputId).value);
 
                 if (previewImg && noPreview) {
@@ -1188,13 +1833,8 @@
         async function saveProduct(event) {
             event.preventDefault();
 
-            // Enforce authenticated gate before executing database writes
-            const isAuthenticated = await ensureSupabaseAuth();
-            if (!isAuthenticated) {
-                showNotificationToast("Operation blocked: Unauthenticated session.", false);
-                return;
-            }
-            
+
+
             const saveBtn = document.getElementById('saveProductBtn');
             if (saveBtn) {
                 saveBtn.disabled = true;
@@ -1210,7 +1850,14 @@
             const status = document.getElementById('modalStatus').value;
             const image_url = document.getElementById('modalImageUrl').value;
             const hover_image_url = document.getElementById('modalHoverImageUrl').value;
-            
+            const discount_percent = Number(document.getElementById('modalDiscountPercent').value) || 0;
+            const discount_expiry = document.getElementById('modalDiscountExpiry').value || null;
+
+            const badge = document.getElementById('modalBadge').value;
+            const isDiscountBadge = badge === 'DISCOUNT';
+            const final_discount_percent = isDiscountBadge ? discount_percent : 0;
+            const final_discount_expiry = isDiscountBadge ? discount_expiry : null;
+
             const isPreorder = status === 'Pre-order';
 
             const payload = {
@@ -1222,8 +1869,21 @@
                 image: image_url,
                 is_preorder: isPreorder,
                 second_image: hover_image_url || image_url,
-                hover_image_url: hover_image_url || null
+                hover_image_url: hover_image_url || null,
+                badge: badge === 'None' ? 'None' : badge
             };
+
+            if (hasDiscountPercentCol) {
+                payload.discount_percent = final_discount_percent;
+            } else if (final_discount_percent > 0) {
+                showNotificationToast("Warning: Discount % cannot be saved because the discount_percent column is missing in Supabase.", false);
+            }
+
+            if (hasDiscountExpiryCol) {
+                payload.discount_expiry = final_discount_expiry;
+            } else if (final_discount_expiry) {
+                showNotificationToast("Warning: Discount Expiry cannot be saved because the discount_expiry column is missing in Supabase.", false);
+            }
 
             console.log("[saveProduct] Prepared DB Payload:");
             console.log("- ID:", id || "(new product)");
@@ -1318,12 +1978,7 @@
             const id = document.getElementById('deleteProductId').value;
             if (!id) return;
 
-            // Enforce authenticated gate before executing database writes
-            const isAuthenticated = await ensureSupabaseAuth();
-            if (!isAuthenticated) {
-                showNotificationToast("Operation blocked: Unauthenticated session.", false);
-                return;
-            }
+
 
             const deleteBtn = document.querySelector('#deleteConfirmModal button.bg-red-500');
             if (deleteBtn) {
@@ -1407,12 +2062,12 @@
                 <span class="text-sm font-semibold text-primary">${message}</span>
             `;
             container.appendChild(toast);
-            
+
             setTimeout(() => {
                 toast.classList.remove('translate-y-10', 'opacity-0');
                 toast.classList.add('translate-y-0', 'opacity-100');
             }, 10);
-            
+
             setTimeout(() => {
                 toast.classList.remove('translate-y-0', 'opacity-100');
                 toast.classList.add('translate-y-10', 'opacity-0');
@@ -1434,12 +2089,12 @@
                 <span class="text-sm font-semibold text-primary">${sectionName} is under development</span>
             `;
             container.appendChild(toast);
-            
+
             setTimeout(() => {
                 toast.classList.remove('translate-y-10', 'opacity-0');
                 toast.classList.add('translate-y-0', 'opacity-100');
             }, 10);
-            
+
             setTimeout(() => {
                 toast.classList.remove('translate-y-0', 'opacity-100');
                 toast.classList.add('translate-y-10', 'opacity-0');
@@ -1456,164 +2111,944 @@
             document.body.appendChild(container);
             return container;
         }
+
+        // CUSTOMERS TAB FUNCTIONALITY
+        let allCustomers = [];
+
+        async function fetchCustomersData() {
+            const tableBody = document.getElementById('customersTableBody');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="py-12 text-center text-gray-400 font-semibold">
+                        <div class="flex flex-col items-center gap-2">
+                            <svg class="w-6 h-6 animate-spin text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                            Fetching customer directory...
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            let orders = [];
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('orders')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+                    if (data) orders = data;
+                } catch (e) {
+                    console.error("Error loading orders for customers grouping:", e);
+                }
+            }
+
+            // Fallback mock records if database has no orders
+            if (orders.length === 0) {
+                orders = [
+                    { customer_name: "Tanvir Rahman", email: "tanvir@gmail.com", phone: "01711223344", total: 4899 },
+                    { customer_name: "Nabil Ahmed", email: "nabil@gmail.com", phone: "01822334455", total: 10499 },
+                    { customer_name: "Sajjad Hossain", email: "sajjad@gmail.com", phone: "01933445566", total: 3199 },
+                    { customer_name: "Tanvir Rahman", email: "tanvir@gmail.com", phone: "01711223344", total: 2500 }
+                ];
+            }
+
+            // Group by email (or name if email is empty)
+            const customerGroup = {};
+            orders.forEach(order => {
+                const key = (order.email || order.customer_name || 'unknown').toLowerCase().trim();
+                if (!customerGroup[key]) {
+                    customerGroup[key] = {
+                        name: order.customer_name || 'Anonymous Customer',
+                        email: order.email || 'N/A',
+                        phone: order.phone || 'N/A',
+                        totalOrders: 0,
+                        totalSpent: 0
+                    };
+                }
+                customerGroup[key].totalOrders += 1;
+                customerGroup[key].totalSpent += Number(order.total || 0);
+            });
+
+            allCustomers = Object.values(customerGroup);
+            renderCustomersTable(allCustomers);
+        }
+
+        function renderCustomersTable(customersList) {
+            const tableBody = document.getElementById('customersTableBody');
+            tableBody.innerHTML = '';
+
+            if (customersList.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-12 text-center text-gray-400 font-semibold">No customers found.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            customersList.forEach(c => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50/50 transition-colors duration-200';
+                tr.innerHTML = `
+                    <td class="py-4 px-4 font-bold text-primary">${c.name}</td>
+                    <td class="py-4 px-4 text-gray-400 font-semibold">${c.email}</td>
+                    <td class="py-4 px-4 text-gray-400 font-semibold">${c.phone}</td>
+                    <td class="py-4 px-4 text-center font-bold text-primary">${c.totalOrders}</td>
+                    <td class="py-4 px-4 text-right font-extrabold text-accent">৳${c.totalSpent.toLocaleString()}</td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function filterCustomersTable() {
+            const query = document.getElementById('customerSearchInput').value.toLowerCase().trim();
+            const filtered = allCustomers.filter(c => 
+                c.name.toLowerCase().includes(query) || 
+                c.email.toLowerCase().includes(query) || 
+                c.phone.toLowerCase().includes(query)
+            );
+            renderCustomersTable(filtered);
+        }
+
+        // DISCOUNTS TAB FUNCTIONALITY
+        let allDiscounts = [];
+
+        function openDiscountModal() {
+            document.getElementById('discountForm').reset();
+            const modal = document.getElementById('discountModal');
+            const container = document.getElementById('discountModalContainer');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                container.classList.remove('scale-95', 'opacity-0');
+                container.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeDiscountModal() {
+            const modal = document.getElementById('discountModal');
+            const container = document.getElementById('discountModalContainer');
+            container.classList.remove('scale-100', 'opacity-100');
+            container.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        async function fetchDiscountsData() {
+            const tableBody = document.getElementById('discountsTableBody');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="py-12 text-center text-gray-400 font-semibold">
+                        <div class="flex flex-col items-center gap-2">
+                            <svg class="w-6 h-6 animate-spin text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                            Fetching discount codes...
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('discount_codes')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+
+                    if (error) {
+                        console.error("Error loading discounts:", error);
+                    } else if (data) {
+                        allDiscounts = data;
+                    }
+                } catch (e) {
+                    console.error("Exception loading discounts:", e);
+                }
+            }
+
+            // Fallback mock records if database is empty or connection fails
+            if (allDiscounts.length === 0) {
+                allDiscounts = [
+                    { id: "d1", code: "WELCOME10", percentage: 10, expiry_date: "2026-12-31", active: true },
+                    { id: "d2", code: "OTAKU25", percentage: 25, expiry_date: "2026-06-30", active: false },
+                    { id: "d3", code: "MEGA50", percentage: 50, expiry_date: "2026-05-31", active: true }
+                ];
+            }
+
+            renderDiscountsTable();
+        }
+
+        function renderDiscountsTable() {
+            const tableBody = document.getElementById('discountsTableBody');
+            tableBody.innerHTML = '';
+
+            if (allDiscounts.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-12 text-center text-gray-400 font-semibold">No discount codes available.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            allDiscounts.forEach(d => {
+                const dateObj = new Date(d.expiry_date);
+                const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                const isChecked = d.active ? 'checked' : '';
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50/50 transition-colors duration-200';
+                tr.innerHTML = `
+                    <td class="py-4 px-4 font-bold text-accent">${d.code.toUpperCase()}</td>
+                    <td class="py-4 px-4 font-extrabold text-primary">${d.percentage}% OFF</td>
+                    <td class="py-4 px-4 text-gray-400 font-semibold">${dateStr}</td>
+                    <td class="py-4 px-4">
+                        <label class="relative inline-flex items-center cursor-pointer select-none">
+                            <input type="checkbox" ${isChecked} onchange="toggleDiscountActive('${d.id}', ${d.active})"
+                                class="sr-only peer">
+                            <div class="w-9 h-5 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-accent/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
+                        </label>
+                    </td>
+                    <td class="py-4 px-4 text-right">
+                        <button onclick="deleteDiscountCode('${d.id}')" class="text-red-500 hover:text-red-700 font-bold text-xs cursor-pointer select-none">Delete</button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        async function saveDiscountCode(event) {
+            event.preventDefault();
+            const code = document.getElementById('discountCode').value.toUpperCase().trim();
+            const percentage = parseInt(document.getElementById('discountPercentage').value);
+            const expiry_date = document.getElementById('discountExpiry').value;
+            const active = document.getElementById('discountActive').checked;
+            const submitBtn = document.getElementById('saveDiscountBtn');
+            const originalText = submitBtn.textContent;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Saving...';
+
+            if (supabaseClient) {
+                try {
+                    const { error } = await supabaseClient
+                        .from('discount_codes')
+                        .insert([{ code, percentage, expiry_date, active }]);
+                    if (error) throw error;
+                } catch (e) {
+                    console.error("Error creating discount code:", e);
+                    alert("Failed to save discount code: " + e.message);
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                    return;
+                }
+            } else {
+                // Mock local add
+                const newCode = { id: 'mock-' + Date.now(), code, percentage, expiry_date, active };
+                allDiscounts.unshift(newCode);
+            }
+
+            closeDiscountModal();
+            fetchDiscountsData();
+        }
+
+        async function toggleDiscountActive(id, currentStatus) {
+            const newStatus = !currentStatus;
+            if (supabaseClient && !id.startsWith('mock-')) {
+                try {
+                    const { error } = await supabaseClient
+                        .from('discount_codes')
+                        .update({ active: newStatus })
+                        .eq('id', id);
+                    if (error) throw error;
+                } catch (e) {
+                    console.error("Error updating active status:", e);
+                    alert("Failed to update status: " + e.message);
+                    fetchDiscountsData();
+                    return;
+                }
+            }
+
+            // Update in local state
+            const code = allDiscounts.find(item => item.id === id);
+            if (code) code.active = newStatus;
+            renderDiscountsTable();
+        }
+
+        async function deleteDiscountCode(id) {
+            if (!confirm("Are you sure you want to delete this discount code?")) return;
+
+            if (supabaseClient && !id.startsWith('mock-')) {
+                try {
+                    const { error } = await supabaseClient
+                        .from('discount_codes')
+                        .delete()
+                        .eq('id', id);
+                    if (error) throw error;
+                } catch (e) {
+                    console.error("Error deleting discount code:", e);
+                    alert("Failed to delete discount code: " + e.message);
+                    return;
+                }
+            }
+
+            allDiscounts = allDiscounts.filter(item => item.id !== id);
+            renderDiscountsTable();
+        }
+
+        // INVOICES TAB FUNCTIONALITY
+        let allOrdersInvoice = [];
+
+        function openInvoiceModal() {
+            const modal = document.getElementById('invoiceModal');
+            const container = document.getElementById('invoiceModalContainer');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                container.classList.remove('scale-95', 'opacity-0');
+                container.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeInvoiceModal() {
+            const modal = document.getElementById('invoiceModal');
+            const container = document.getElementById('invoiceModalContainer');
+            container.classList.remove('scale-100', 'opacity-100');
+            container.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        async function fetchInvoicesData() {
+            const tableBody = document.getElementById('invoicesTableBody');
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="py-12 text-center text-gray-400 font-semibold">
+                        <div class="flex flex-col items-center gap-2">
+                            <svg class="w-6 h-6 animate-spin text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                            Fetching invoices log...
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('orders')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+                    if (data) allOrdersInvoice = data;
+                } catch (e) {
+                    console.error("Error loading orders for invoices:", e);
+                }
+            }
+
+            // Fallback mock records if database is empty or connection fails
+            if (allOrdersInvoice.length === 0) {
+                allOrdersInvoice = [
+                    {
+                        order_id: "OV-738592",
+                        customer_name: "Tanvir Rahman",
+                        email: "tanvir@gmail.com",
+                        phone: "01711223344",
+                        address: "House 24, Road 12, Banani",
+                        city: "Dhaka",
+                        created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
+                        subtotal: 4799,
+                        delivery_fee: 100,
+                        total: 4899,
+                        payment_method: "Cash on Delivery",
+                        products: JSON.stringify([
+                            { name: "Luffy Gear 5 Figure", quantity: 1, price: 2899 },
+                            { name: "Demon Slayer Keyring", quantity: 2, price: 950 }
+                        ])
+                    },
+                    {
+                        order_id: "OV-184950",
+                        customer_name: "Nabil Ahmed",
+                        email: "nabil@gmail.com",
+                        phone: "01822334455",
+                        address: "Flat 4B, Plaza Heights, Dhanmondi",
+                        city: "Dhaka",
+                        created_at: new Date(Date.now() - 3600000 * 18).toISOString(),
+                        subtotal: 10399,
+                        delivery_fee: 100,
+                        total: 10499,
+                        payment_method: "bKash Online",
+                        products: JSON.stringify([
+                            { name: "Gojo Satoru Premium Statue", quantity: 1, price: 10399 }
+                        ])
+                    },
+                    {
+                        order_id: "OV-658291",
+                        customer_name: "Sajjad Hossain",
+                        email: "sajjad@gmail.com",
+                        phone: "01933445566",
+                        address: "Sector 4, Uttara",
+                        city: "Dhaka",
+                        created_at: new Date(Date.now() - 3600000 * 26).toISOString(),
+                        subtotal: 3099,
+                        delivery_fee: 100,
+                        total: 3199,
+                        payment_method: "Cash on Delivery",
+                        products: JSON.stringify([
+                            { name: "Nezuko Demon Form Figure", quantity: 1, price: 3099 }
+                        ])
+                    }
+                ];
+            }
+
+            renderInvoicesTable();
+        }
+
+        function renderInvoicesTable() {
+            const tableBody = document.getElementById('invoicesTableBody');
+            tableBody.innerHTML = '';
+
+            if (allOrdersInvoice.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-12 text-center text-gray-400 font-semibold">No orders available to generate invoices.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            allOrdersInvoice.forEach(order => {
+                const dateObj = new Date(order.created_at);
+                const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-gray-50/50 transition-colors duration-200';
+                tr.innerHTML = `
+                    <td class="py-4 px-4 font-bold text-accent">#${order.order_id}</td>
+                    <td class="py-4 px-4 text-primary">${order.customer_name}</td>
+                    <td class="py-4 px-4 text-gray-400 font-semibold">${dateStr}</td>
+                    <td class="py-4 px-4 font-extrabold text-primary">৳${Number(order.total).toLocaleString()}</td>
+                    <td class="py-4 px-4 text-right">
+                        <button onclick="generateInvoice('${order.order_id}')"
+                            class="bg-accent/10 hover:bg-accent text-accent hover:text-white px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer select-none">
+                            Generate Invoice
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        function generateInvoice(orderId) {
+            const order = allOrdersInvoice.find(o => o.order_id === orderId);
+            if (!order) {
+                alert("Order details not found.");
+                return;
+            }
+
+            let productsList = [];
+            try {
+                if (typeof order.products === 'string') {
+                    productsList = JSON.parse(order.products);
+                } else if (Array.isArray(order.products)) {
+                    productsList = order.products;
+                }
+            } catch (e) {
+                console.error("Error parsing order products:", e);
+            }
+
+            const dateObj = new Date(order.created_at);
+            const invoiceDate = dateObj.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+            // Generate items table HTML
+            let itemsHtml = '';
+            productsList.forEach((item, index) => {
+                const total = Number(item.price) * Number(item.quantity);
+                itemsHtml += `
+                    <tr class="border-b border-gray-100 text-sm">
+                        <td class="py-3 text-primary font-semibold">${index + 1}</td>
+                        <td class="py-3 text-primary font-semibold">${item.name}</td>
+                        <td class="py-3 text-center text-primary font-semibold">${item.quantity}</td>
+                        <td class="py-3 text-right text-primary font-semibold">৳${Number(item.price).toLocaleString()}</td>
+                        <td class="py-3 text-right text-primary font-extrabold">৳${total.toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+
+            const subtotal = Number(order.subtotal || (Number(order.total) - Number(order.delivery_fee || 100)));
+            const deliveryFee = Number(order.delivery_fee || 100);
+            const total = Number(order.total);
+
+            const printContent = document.getElementById('invoicePrintContent');
+            printContent.innerHTML = `
+                <!-- Logo & Branded Header -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b-2 border-primary pb-6 gap-4">
+                    <div>
+                        <div class="flex items-center gap-2 mb-2">
+                            <span class="text-primary font-heading font-black text-3xl tracking-tight">OTAKU</span>
+                            <span class="text-accent font-heading font-black text-3xl tracking-tight">VAULT</span>
+                        </div>
+                        <p class="text-xs text-gray-400 font-semibold">The Ultimate Anime Merchandise Hub</p>
+                    </div>
+                    <div class="text-left sm:text-right text-xs text-gray-400 font-semibold space-y-1">
+                        <p class="text-sm font-bold text-primary">Otaku Vault Bangladesh</p>
+                        <p>support@otakuvault.com</p>
+                        <p>Dhaka, Bangladesh</p>
+                    </div>
+                </div>
+
+                <!-- Invoice Meta Details -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <div class="space-y-1.5">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Bill To:</h4>
+                        <p class="font-extrabold text-primary text-base">${order.customer_name}</p>
+                        <p class="font-semibold text-gray-400">${order.phone}</p>
+                        <p class="font-semibold text-gray-400">${order.email || 'N/A'}</p>
+                        <p class="font-semibold text-gray-400 max-w-sm">${order.address}, ${order.city}</p>
+                    </div>
+                    <div class="space-y-1.5 md:text-right">
+                        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Invoice Info:</h4>
+                        <p class="font-semibold text-gray-400">Order ID: <span class="font-extrabold text-accent">#${order.order_id}</span></p>
+                        <p class="font-semibold text-gray-400">Date: <span class="font-extrabold text-primary">${invoiceDate}</span></p>
+                        <p class="font-semibold text-gray-400">Payment: <span class="font-extrabold text-primary">${order.payment_method || 'Cash on Delivery'}</span></p>
+                    </div>
+                </div>
+
+                <!-- Items Details Table -->
+                <div class="overflow-x-auto pt-4">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-primary text-gray-400 text-xs font-bold uppercase tracking-wider">
+                                <th class="pb-3 w-8">#</th>
+                                <th class="pb-3">Item Description</th>
+                                <th class="pb-3 text-center w-16">Qty</th>
+                                <th class="pb-3 text-right w-28">Unit Price</th>
+                                <th class="pb-3 text-right w-28">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${itemsHtml}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Summary Panel -->
+                <div class="flex justify-end pt-4">
+                    <div class="w-full md:w-80 space-y-3">
+                        <div class="flex justify-between text-sm text-gray-400 font-semibold border-b border-gray-50 pb-2">
+                            <span>Subtotal</span>
+                            <span class="text-primary">৳${subtotal.toLocaleString()}</span>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-400 font-semibold border-b border-gray-50 pb-2">
+                            <span>Delivery Fee</span>
+                            <span class="text-primary">৳${deliveryFee.toLocaleString()}</span>
+                        </div>
+                        <div class="flex justify-between text-base font-bold border-b border-primary pb-3">
+                            <span class="text-primary">Grand Total</span>
+                            <span class="text-accent text-lg font-extrabold">৳${total.toLocaleString()}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Footer -->
+                <div class="text-center pt-8 border-t border-gray-50 space-y-2">
+                    <h5 class="font-bold text-sm text-primary">Thank you for your purchase!</h5>
+                    <p class="text-[10px] text-gray-400 font-semibold">If you have any questions concerning this invoice, contact our support.</p>
+                </div>
+            `;
+
+            openInvoiceModal();
+        }
+
+        // CUSTOM DROPDOWNS MODULE
+        function showCustomDropdown(dropdownId) {
+            const menu = document.getElementById(`${dropdownId}Menu`);
+            const arrow = document.getElementById(`${dropdownId}Arrow`);
+            
+            // Close other dropdowns first (if any somehow remained open)
+            const allMenus = document.querySelectorAll('.custom-dropdown-menu');
+            const allArrows = document.querySelectorAll('.custom-dropdown svg');
+            allMenus.forEach(m => {
+                if (m.id !== `${dropdownId}Menu`) m.classList.remove('open');
+            });
+            allArrows.forEach(a => {
+                if (a.id !== `${dropdownId}Arrow`) a.classList.remove('rotate-180');
+            });
+
+            if (menu) menu.classList.add('open');
+            if (arrow) arrow.classList.add('rotate-180');
+        }
+
+        function hideCustomDropdown(dropdownId) {
+            const menu = document.getElementById(`${dropdownId}Menu`);
+            const arrow = document.getElementById(`${dropdownId}Arrow`);
+            if (menu) menu.classList.remove('open');
+            if (arrow) arrow.classList.remove('rotate-180');
+        }
+
+        function selectCustomOption(dropdownId, value, displayLabel) {
+            // Update hidden select
+            let selectId = 'filterCategory';
+            if (dropdownId === 'dropdownStatus') selectId = 'filterStatus';
+            
+            const selectEl = document.getElementById(selectId);
+            if (selectEl) {
+                selectEl.value = value;
+                // Dispatch change event to trigger filtering
+                selectEl.dispatchEvent(new Event('change'));
+            }
+
+            // Update visible label
+            const labelEl = document.getElementById(`${dropdownId}Label`);
+            if (labelEl) labelEl.textContent = displayLabel;
+
+            // Highlight selected option
+            const menu = document.getElementById(`${dropdownId}Menu`);
+            if (menu) {
+                const options = menu.querySelectorAll('.custom-option');
+                options.forEach(opt => {
+                    if (opt.getAttribute('data-option-value') === value) {
+                        opt.classList.add('selected');
+                    } else {
+                        opt.classList.remove('selected');
+                    }
+                });
+            }
+
+            // Close menu on selection
+            hideCustomDropdown(dropdownId);
+        }
     </script>
 
     <!-- ADD / EDIT PRODUCT MODAL -->
-    <div id="productModal" class="fixed inset-0 bg-primary/60 backdrop-blur-sm z-[9999] hidden flex items-center justify-center transition-all duration-300">
-        <div class="bg-white border border-gray-100 rounded-3xl p-8 max-w-2xl w-full shadow-2xl space-y-6 mx-4 relative overflow-y-auto max-h-[90vh] scale-95 opacity-0 transition-all duration-300" id="productModalContainer">
+    <div id="productModal" onclick="if(event.target === this) closeProductModal()"
+        class="fixed inset-0 bg-primary/60 backdrop-blur-sm z-[9999] hidden flex items-center justify-center transition-all duration-300">
+        <div class="bg-white border border-gray-100 shadow-2xl mx-4 relative scale-95 opacity-0 transition-all duration-300 flex flex-col"
+            id="productModalContainer" style="border-radius: 16px; overflow: hidden; max-height: 90vh; max-width: 42rem; width: 100%;">
             <!-- Close Button -->
-            <button onclick="closeProductModal()" class="absolute top-6 right-6 text-gray-400 hover:text-primary transition-colors cursor-pointer">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <button onclick="closeProductModal()"
+                class="absolute text-gray-400 hover:text-primary transition-colors cursor-pointer z-10"
+                style="top: 16px; right: 16px;">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
             </button>
-            
-            <div class="space-y-1">
-                <h3 id="modalTitle" class="text-2xl font-heading font-extrabold text-primary">Add New Product</h3>
-                <p id="modalSubtitle" class="text-xs text-gray-400">Fill in the fields below to add a new figure to the shop.</p>
+
+            <!-- Scrollable Inner content -->
+            <div class="p-8 overflow-y-auto" style="max-height: 90vh;">
+                <div class="space-y-1">
+                    <h3 id="modalTitle" class="text-2xl font-heading font-extrabold text-primary">Add New Product</h3>
+                    <p id="modalSubtitle" class="text-xs text-gray-400">Fill in the fields below to add a new figure to the
+                        shop.</p>
+                </div>
+
+                <form onsubmit="saveProduct(event)" class="space-y-5 mt-6">
+                    <input type="hidden" id="modalProductId">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Name -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Product Name</label>
+                            <input type="text" id="modalName" required placeholder="e.g. Naruto Sage Mode"
+                                class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all">
+                        </div>
+
+                        <!-- Price -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Price (৳)</label>
+                            <input type="number" id="modalPrice" required min="0" placeholder="e.g. 3500"
+                                class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Category -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Category</label>
+                            <select id="modalCategory" required
+                                class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all bg-white cursor-pointer">
+                                <option value="Figures">Figures</option>
+                                <option value="Accessories">Accessories</option>
+                            </select>
+                        </div>
+
+                        <!-- Series -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Series</label>
+                            <select id="modalSeries" required
+                                class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all bg-white cursor-pointer">
+                                <option value="One Piece">One Piece</option>
+                                <option value="Naruto">Naruto</option>
+                                <option value="Demon Slayer">Demon Slayer</option>
+                                <option value="Dragon Ball Z">Dragon Ball Z</option>
+                                <option value="Jujutsu Kaisen">Jujutsu Kaisen</option>
+                                <option value="Attack on Titan">Attack on Titan</option>
+                                <option value="My Hero Academia">My Hero Academia</option>
+                                <option value="Black Clover">Black Clover</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                        <!-- Stock -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Stock Quantity</label>
+                            <input type="number" id="modalStock" required min="0" placeholder="e.g. 10"
+                                class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all">
+                        </div>
+
+                        <!-- Status (In Stock vs Pre-order) -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Status</label>
+                            <select id="modalStatus" required
+                                class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all bg-white cursor-pointer">
+                                <option value="In Stock">In Stock</option>
+                                <option value="Pre-order">Pre-order</option>
+                            </select>
+                        </div>
+
+                        <!-- Badge -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Badge</label>
+                            <select id="modalBadge" required onchange="toggleDiscountFields(this.value)"
+                                class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all bg-white cursor-pointer">
+                                <option value="None">None</option>
+                                <option value="NEW">NEW</option>
+                                <option value="HOT">HOT</option>
+                                <option value="UPCOMING">UPCOMING</option>
+                                <option value="DISCOUNT">DISCOUNT</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="modalDiscountFieldsContainer" class="hidden grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <!-- Discount % -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Discount %</label>
+                            <input type="number" id="modalDiscountPercent" min="0" max="100" placeholder="e.g. 20 (0 for none)"
+                                class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all">
+                        </div>
+
+                        <!-- Discount Expiry Date -->
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Discount Expiry Date</label>
+                            <input type="date" id="modalDiscountExpiry"
+                                class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all">
+                        </div>
+                    </div>
+
+                    <!-- Database column notice -->
+                    <div id="dbColumnNotice" class="hidden w-full flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl p-3.5">
+                        <svg class="w-5 h-5 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        <div id="dbColumnNoticeText" class="text-[11px] text-amber-800 leading-normal font-semibold">
+                            <span class="font-bold text-amber-900 block">Supabase Column Missing</span>
+                            Run the appropriate migration scripts in Supabase to enable saving product discounts.
+                        </div>
+                    </div>
+
+                    <!-- Product Image Upload / Public URL Flow -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Product Image</label>
+                        <div class="flex gap-4 items-center">
+                            <div class="flex-grow">
+                                <label for="imageUploadInput"
+                                    class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer hover:border-accent transition-all bg-gray-50/50">
+                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="text-xs font-semibold text-gray-500 mt-1" id="uploadLabelText">Click or
+                                        Drag Image to Upload</span>
+                                    <input type="file" id="imageUploadInput" accept="image/*" class="hidden"
+                                        onchange="handleImageUpload(event, 'main')">
+                                </label>
+                            </div>
+                            <!-- Preview Thumbnail -->
+                            <div
+                                class="w-20 h-20 rounded-xl border border-gray-150 overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center">
+                                <img id="imagePreviewThumbnail" src="" class="w-full h-full object-cover hidden">
+                                <span id="noPreviewText" class="text-[10px] text-gray-400 font-bold text-center p-1">No
+                                    Image</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="modalImageUrl" required>
+                    </div>
+
+                    <!-- Product Hover Image Upload -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Hover Image
+                            (Optional)</label>
+                        <div class="flex gap-4 items-center">
+                            <div class="flex-grow">
+                                <label for="hoverImageUploadInput"
+                                    class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer hover:border-accent transition-all bg-gray-50/50">
+                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="text-xs font-semibold text-gray-500 mt-1" id="hoverUploadLabelText">Click
+                                        or Drag Hover Image to Upload</span>
+                                    <input type="file" id="hoverImageUploadInput" accept="image/*" class="hidden"
+                                        onchange="handleImageUpload(event, 'hover')">
+                                </label>
+                            </div>
+                            <!-- Preview Thumbnail -->
+                            <div
+                                class="w-20 h-20 rounded-xl border border-gray-150 overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center">
+                                <img id="hoverImagePreviewThumbnail" src="" class="w-full h-full object-cover hidden">
+                                <span id="noHoverPreviewText" class="text-[10px] text-gray-400 font-bold text-center p-1">No
+                                    Image</span>
+                            </div>
+                        </div>
+                        <input type="hidden" id="modalHoverImageUrl">
+                    </div>
+
+                    <!-- Description -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Description
+                            (Optional)</label>
+                        <textarea id="modalDescription" rows="3"
+                            placeholder="Describe the figure features, size, and details..."
+                            class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all resize-none"></textarea>
+                    </div>
+
+                    <!-- Modal Actions -->
+                    <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-50">
+                        <button type="button" onclick="closeProductModal()"
+                            class="px-6 py-3 border border-gray-200 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-50 transition-all cursor-pointer">
+                            Cancel
+                        </button>
+                        <button type="submit" id="saveProductBtn"
+                            class="bg-accent hover:bg-accent-dark text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-accent/20 cursor-pointer text-xs">
+                            Save Product
+                        </button>
+                    </div>
+                </form>
             </div>
-            
-            <form onsubmit="saveProduct(event)" class="space-y-5">
-                <input type="hidden" id="modalProductId">
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <!-- Name -->
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Product Name</label>
-                        <input type="text" id="modalName" required placeholder="e.g. Naruto Sage Mode" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all">
+        </div>
+    </div>
+
+    <!-- DELETE CONFIRMATION MODAL -->
+    <div id="deleteConfirmModal"
+        class="fixed inset-0 bg-primary/60 backdrop-blur-sm z-[9999] hidden flex items-center justify-center transition-all duration-300">
+        <div class="bg-white border border-gray-100 rounded-3xl p-8 max-w-md w-full shadow-2xl space-y-6 mx-4 relative scale-95 opacity-0 transition-all duration-300"
+            id="deleteConfirmModalContainer">
+            <div class="text-center space-y-4">
+                <div
+                    class="w-16 h-16 bg-red-50 border border-red-100 rounded-full flex items-center justify-center text-red-500 mx-auto">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
+                <div class="space-y-2">
+                    <h3 class="text-xl font-heading font-bold text-primary">Delete Product?</h3>
+                    <p class="text-xs text-gray-400">Are you sure you want to delete <span id="deleteProductName"
+                            class="font-bold text-primary text-sm"></span>? This action cannot be undone and will remove
+                        the item from the database.</p>
+                </div>
+            </div>
+
+            <input type="hidden" id="deleteProductId">
+
+            <div class="flex items-center justify-center gap-3">
+                <button onclick="closeDeleteConfirmModal()"
+                    class="w-full py-3.5 border border-gray-200 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-50 transition-all cursor-pointer">
+                    Cancel
+                </button>
+                <button onclick="deleteProductExecute()"
+                    class="w-full bg-red-500 hover:bg-red-600 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-red-500/20 cursor-pointer text-xs">
+                    Yes, Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CREATE DISCOUNT CODE MODAL -->
+    <div id="discountModal"
+        class="fixed inset-0 bg-primary/60 backdrop-blur-sm z-[9999] hidden flex items-center justify-center transition-all duration-300">
+        <div class="bg-white border border-gray-100 rounded-3xl p-8 max-w-lg w-full shadow-2xl space-y-6 mx-4 relative scale-95 opacity-0 transition-all duration-300"
+            id="discountModalContainer">
+            <div class="flex items-center justify-between border-b border-gray-50 pb-4">
+                <h3 class="text-xl font-heading font-bold text-primary">Create Discount Code</h3>
+                <button onclick="closeDiscountModal()" class="text-gray-400 hover:text-primary transition-colors cursor-pointer">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <form id="discountForm" onsubmit="saveDiscountCode(event)" class="space-y-4">
+                <div class="space-y-1">
+                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Coupon Code</label>
+                    <input type="text" id="discountCode" required placeholder="e.g., OTAKU50"
+                        class="w-full px-4 py-3 bg-[#f8f9fa] border border-gray-200 rounded-xl outline-none focus:border-accent text-sm font-semibold text-primary transition-all uppercase">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Percentage Off (%)</label>
+                        <input type="number" id="discountPercentage" required min="1" max="100" placeholder="e.g., 20"
+                            class="w-full px-4 py-3 bg-[#f8f9fa] border border-gray-200 rounded-xl outline-none focus:border-accent text-sm font-semibold text-primary transition-all">
                     </div>
-                    
-                    <!-- Price -->
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Price (৳)</label>
-                        <input type="number" id="modalPrice" required min="0" placeholder="e.g. 3500" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all">
+                    <div class="space-y-1">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Expiry Date</label>
+                        <input type="date" id="discountExpiry" required
+                            class="w-full px-4 py-3 bg-[#f8f9fa] border border-gray-200 rounded-xl outline-none focus:border-accent text-sm font-semibold text-primary transition-all">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <!-- Category -->
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Category</label>
-                        <select id="modalCategory" required class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all bg-white cursor-pointer">
-                            <option value="Figures">Figures</option>
-                            <option value="Accessories">Accessories</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Series -->
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Series</label>
-                        <select id="modalSeries" required class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all bg-white cursor-pointer">
-                            <option value="One Piece">One Piece</option>
-                            <option value="Naruto">Naruto</option>
-                            <option value="Demon Slayer">Demon Slayer</option>
-                            <option value="Dragon Ball Z">Dragon Ball Z</option>
-                            <option value="Jujutsu Kaisen">Jujutsu Kaisen</option>
-                            <option value="Attack on Titan">Attack on Titan</option>
-                            <option value="My Hero Academia">My Hero Academia</option>
-                            <option value="Black Clover">Black Clover</option>
-                        </select>
-                    </div>
+                <div class="flex items-center gap-3 py-2">
+                    <input type="checkbox" id="discountActive" checked
+                        class="rounded border-gray-300 text-accent focus:ring-accent w-4 h-4 cursor-pointer">
+                    <label for="discountActive" class="text-sm font-bold text-primary cursor-pointer select-none">Active immediately</label>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    <!-- Stock -->
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Stock Quantity</label>
-                        <input type="number" id="modalStock" required min="0" placeholder="e.g. 10" class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all">
-                    </div>
-                    
-                    <!-- Status (In Stock vs Pre-order) -->
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Status</label>
-                        <select id="modalStatus" required class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all bg-white cursor-pointer">
-                            <option value="In Stock">In Stock</option>
-                            <option value="Pre-order">Pre-order</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Product Image Upload / Public URL Flow -->
-                <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Product Image</label>
-                    <div class="flex gap-4 items-center">
-                        <div class="flex-grow">
-                            <label for="imageUploadInput" class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer hover:border-accent transition-all bg-gray-50/50">
-                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                <span class="text-xs font-semibold text-gray-500 mt-1" id="uploadLabelText">Click or Drag Image to Upload</span>
-                                <input type="file" id="imageUploadInput" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'main')">
-                            </label>
-                        </div>
-                        <!-- Preview Thumbnail -->
-                        <div class="w-20 h-20 rounded-xl border border-gray-150 overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center">
-                            <img id="imagePreviewThumbnail" src="" class="w-full h-full object-cover hidden">
-                            <span id="noPreviewText" class="text-[10px] text-gray-400 font-bold text-center p-1">No Image</span>
-                        </div>
-                    </div>
-                    <input type="hidden" id="modalImageUrl" required>
-                </div>
-
-                <!-- Product Hover Image Upload -->
-                <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Hover Image (Optional)</label>
-                    <div class="flex gap-4 items-center">
-                        <div class="flex-grow">
-                            <label for="hoverImageUploadInput" class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer hover:border-accent transition-all bg-gray-50/50">
-                                <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                <span class="text-xs font-semibold text-gray-500 mt-1" id="hoverUploadLabelText">Click or Drag Hover Image to Upload</span>
-                                <input type="file" id="hoverImageUploadInput" accept="image/*" class="hidden" onchange="handleImageUpload(event, 'hover')">
-                            </label>
-                        </div>
-                        <!-- Preview Thumbnail -->
-                        <div class="w-20 h-20 rounded-xl border border-gray-150 overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center">
-                            <img id="hoverImagePreviewThumbnail" src="" class="w-full h-full object-cover hidden">
-                            <span id="noHoverPreviewText" class="text-[10px] text-gray-400 font-bold text-center p-1">No Image</span>
-                        </div>
-                    </div>
-                    <input type="hidden" id="modalHoverImageUrl">
-                </div>
-
-                <!-- Description -->
-                <div class="space-y-1.5">
-                    <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Description (Optional)</label>
-                    <textarea id="modalDescription" rows="3" placeholder="Describe the figure features, size, and details..." class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all resize-none"></textarea>
-                </div>
-
-                <!-- Modal Actions -->
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-50">
-                    <button type="button" onclick="closeProductModal()" class="px-6 py-3 border border-gray-200 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-50 transition-all cursor-pointer">
+                    <button type="button" onclick="closeDiscountModal()"
+                        class="px-6 py-3 border border-gray-200 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-50 transition-all cursor-pointer">
                         Cancel
                     </button>
-                    <button type="submit" id="saveProductBtn" class="bg-accent hover:bg-accent-dark text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-accent/20 cursor-pointer text-xs">
-                        Save Product
+                    <button type="submit" id="saveDiscountBtn"
+                        class="bg-accent hover:bg-accent-dark text-white px-8 py-3 rounded-xl font-bold transition-all shadow-lg shadow-accent/20 cursor-pointer text-xs">
+                        Create Code
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- DELETE CONFIRMATION MODAL -->
-    <div id="deleteConfirmModal" class="fixed inset-0 bg-primary/60 backdrop-blur-sm z-[9999] hidden flex items-center justify-center transition-all duration-300">
-        <div class="bg-white border border-gray-100 rounded-3xl p-8 max-w-md w-full shadow-2xl space-y-6 mx-4 relative scale-95 opacity-0 transition-all duration-300" id="deleteConfirmModalContainer">
-            <div class="text-center space-y-4">
-                <div class="w-16 h-16 bg-red-50 border border-red-100 rounded-full flex items-center justify-center text-red-500 mx-auto">
-                    <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                </div>
-                <div class="space-y-2">
-                    <h3 class="text-xl font-heading font-bold text-primary">Delete Product?</h3>
-                    <p class="text-xs text-gray-400">Are you sure you want to delete <span id="deleteProductName" class="font-bold text-primary text-sm"></span>? This action cannot be undone and will remove the item from the database.</p>
+    <!-- INVOICE PREVIEW MODAL -->
+    <div id="invoiceModal"
+        class="fixed inset-0 bg-primary/60 backdrop-blur-sm z-[9999] hidden flex items-center justify-center transition-all duration-300">
+        <div class="bg-white border border-gray-100 rounded-3xl p-8 max-w-4xl w-full shadow-2xl space-y-6 mx-4 relative scale-95 opacity-0 transition-all duration-300 flex flex-col max-h-[90vh]"
+            id="invoiceModalContainer">
+            <!-- Modal Header (Hidden on print) -->
+            <div class="flex items-center justify-between border-b border-gray-50 pb-4 no-print flex-shrink-0">
+                <h3 class="text-xl font-heading font-bold text-primary">Invoice Preview</h3>
+                <div class="flex items-center gap-3">
+                    <button onclick="window.print()"
+                        class="bg-accent hover:bg-accent-dark text-white px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 shadow-lg shadow-accent/20 cursor-pointer select-none">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                        </svg>
+                        Print Invoice
+                    </button>
+                    <button onclick="closeInvoiceModal()" class="text-gray-400 hover:text-primary transition-colors cursor-pointer">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
-            
-            <input type="hidden" id="deleteProductId">
-            
-            <div class="flex items-center justify-center gap-3">
-                <button onclick="closeDeleteConfirmModal()" class="w-full py-3.5 border border-gray-200 rounded-xl text-xs font-bold text-gray-500 hover:bg-gray-50 transition-all cursor-pointer">
-                    Cancel
-                </button>
-                <button onclick="deleteProductExecute()" class="w-full bg-red-500 hover:bg-red-600 text-white py-3.5 rounded-xl font-bold transition-all shadow-lg shadow-red-500/20 cursor-pointer text-xs">
-                    Yes, Delete
-                </button>
+
+            <!-- Invoice Content (This will be printed) -->
+            <div id="invoicePrintContent" class="overflow-y-auto pr-2 space-y-8 p-4 bg-white text-primary flex-grow font-sans">
+                <!-- Inner JS renders this -->
             </div>
         </div>
     </div>
 </body>
+
 </html>

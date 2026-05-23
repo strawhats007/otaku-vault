@@ -595,6 +595,8 @@
                 size: "21cm",
                 stock: 10,
                 badge: "-20%",
+                discount_percent: 20,
+                discount_expiry: "2029-12-31",
                 is_preorder: false
             },
             {
@@ -611,6 +613,8 @@
                 size: "22cm",
                 stock: 5,
                 badge: "NEW",
+                discount_percent: 0,
+                discount_expiry: null,
                 is_preorder: false
             },
             {
@@ -627,6 +631,8 @@
                 size: "18cm",
                 stock: 8,
                 badge: "HOT",
+                discount_percent: 0,
+                discount_expiry: null,
                 is_preorder: false
             },
             {
@@ -643,6 +649,8 @@
                 size: "30cm",
                 stock: 3,
                 badge: null,
+                discount_percent: 25,
+                discount_expiry: "2020-01-01",
                 is_preorder: false
             },
             {
@@ -659,6 +667,8 @@
                 size: "25cm",
                 stock: 7,
                 badge: "-15%",
+                discount_percent: 15,
+                discount_expiry: null,
                 is_preorder: false
             },
             {
@@ -675,6 +685,8 @@
                 size: "26cm",
                 stock: 4,
                 badge: "NEW",
+                discount_percent: 0,
+                discount_expiry: null,
                 is_preorder: false
             },
             {
@@ -691,6 +703,8 @@
                 size: "20cm",
                 stock: 12,
                 badge: null,
+                discount_percent: 0,
+                discount_expiry: null,
                 is_preorder: false
             },
             {
@@ -707,6 +721,8 @@
                 size: "104cm",
                 stock: 2,
                 badge: "-25%",
+                discount_percent: 25,
+                discount_expiry: "2029-12-31",
                 is_preorder: false
             },
             {
@@ -723,6 +739,8 @@
                 size: "22cm",
                 stock: 0,
                 badge: "PRE-ORDER",
+                discount_percent: 0,
+                discount_expiry: null,
                 is_preorder: true
             }
         ];
@@ -794,11 +812,12 @@
 
                     // Race the Supabase request against the timeout
                     const { data, error } = await Promise.race([
-                        supabaseClient.from('products').select('*').order('id', { ascending: true }),
+                        supabaseClient.from('products').select('*, discount_percent, discount_expiry, badge').order('id', { ascending: true }),
                         timeoutPromise
                     ]);
 
                     if (error) throw error;
+                    console.log("Raw product data fetched from Supabase:", data);
                     if (data && data.length > 0) {
                         productsList = data;
                     }
@@ -808,9 +827,46 @@
             }
 
             grid.innerHTML = productsList.map(product => {
-                const originalPriceHtml = product.original_price ? `<span class="text-gray-400 line-through text-xs ml-1">৳${product.original_price}</span>` : '';
-                const badgeHtml = product.badge ? `<span class="absolute top-3 left-3 ${product.badge.includes('%') || product.badge.toLowerCase().includes('sale') ? 'bg-sale' : 'bg-accent'} text-white text-xs font-bold px-3 py-1 rounded-full z-20">${product.badge}</span>` : '';
+                const today = new Date();
+                const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
                 
+                const isDiscountBadge = product.badge === 'DISCOUNT' || (product.badge && product.badge.startsWith('-') && product.badge.endsWith('%'));
+                const hasActiveDiscount = isDiscountBadge && product.discount_percent > 0 && 
+                    (!product.discount_expiry || product.discount_expiry >= todayStr);
+
+                let activeBadge = null;
+                let activeBadgeClass = 'bg-accent';
+
+                if (hasActiveDiscount) {
+                    activeBadge = `-${product.discount_percent}%`;
+                    activeBadgeClass = 'bg-sale';
+                } else if (product.badge === 'NEW') {
+                    activeBadge = 'NEW';
+                    activeBadgeClass = 'bg-emerald-600';
+                } else if (product.badge === 'HOT') {
+                    activeBadge = 'HOT';
+                    activeBadgeClass = 'bg-red-650 bg-red-600';
+                } else if (product.badge === 'UPCOMING') {
+                    activeBadge = 'UPCOMING';
+                    activeBadgeClass = 'bg-blue-600';
+                } else if (product.badge && product.badge !== 'None' && product.badge !== 'DISCOUNT' && !product.badge.startsWith('-')) {
+                    activeBadge = product.badge;
+                    activeBadgeClass = 'bg-accent';
+                }
+
+                const badgeHtml = activeBadge ? `<span class="absolute top-3 left-3 ${activeBadgeClass} text-white text-xs font-bold px-3 py-1 rounded-full z-20">${activeBadge}</span>` : '';
+                
+                let originalPrice = product.price;
+                let finalPrice = product.price;
+                let originalPriceHtml = '';
+
+                if (hasActiveDiscount) {
+                    finalPrice = Math.round(product.price * (1 - product.discount_percent / 100));
+                    originalPriceHtml = `<span class="text-gray-400 line-through text-xs ml-1">৳${originalPrice}</span>`;
+                } else if (product.original_price) {
+                    originalPriceHtml = `<span class="text-gray-400 line-through text-xs ml-1">৳${product.original_price}</span>`;
+                }
+
                 const defaultImg = getProductImageUrl(product.image);
                 const hoverImg = getProductImageUrl(product.hover_image_url || product.second_image || product.image);
 
@@ -832,7 +888,7 @@
                         <div class="p-3 flex flex-col justify-between flex-1">
                             <div>
                                 <h3 class="font-bold text-primary text-sm truncate leading-tight" title="${product.name}">${product.name}</h3>
-                                <span class="text-accent font-bold text-base">৳${product.price}</span>
+                                <span class="text-accent font-bold text-base">৳${finalPrice}</span>
                                 ${originalPriceHtml}
                             </div>
                             <div class="flex items-center justify-between pt-2 border-t border-gray-100">
@@ -840,7 +896,7 @@
                             </div>
                             <div class="flex gap-2 mt-2">
                                 <button class="flex-grow bg-gray-100 hover:bg-gray-200 hover:-translate-y-[3px] hover:shadow-md text-primary py-2 rounded-xl font-semibold text-xs transition-all duration-300 add-to-cart-btn" data-product-id="${product.id}">Add to Cart</button>
-                                <button class="flex-grow bg-accent hover:bg-accent-dark hover:-translate-y-[3px] hover:shadow-md text-white py-2 rounded-xl font-semibold text-xs transition-all duration-300">Buy Now</button>
+                                <button class="flex-grow bg-accent hover:bg-accent-dark hover:-translate-y-[3px] hover:shadow-md text-white py-2 rounded-xl font-semibold text-xs transition-all duration-300 buy-now-btn" data-product-id="${product.id}">Buy Now</button>
                             </div>
                         </div>
                     </div>
@@ -854,7 +910,16 @@
                     const productId = this.getAttribute('data-product-id');
                     const product = productsList.find(p => String(p.id) === String(productId));
                     if (product) {
-                        addToCart(product);
+                        const finalProduct = { ...product };
+                        const today = new Date();
+                        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                        const isDiscountBadge = product.badge === 'DISCOUNT' || (product.badge && product.badge.startsWith('-') && product.badge.endsWith('%'));
+                        const hasActiveDiscount = isDiscountBadge && product.discount_percent > 0 && 
+                            (!product.discount_expiry || product.discount_expiry >= todayStr);
+                        if (hasActiveDiscount) {
+                            finalProduct.price = Math.round(product.price * (1 - product.discount_percent / 100));
+                        }
+                        addToCart(finalProduct);
                     }
 
                     if (this.classList.contains('bg-green-500')) return;
@@ -868,6 +933,28 @@
                         this.classList.remove('bg-green-500', 'text-white', 'hover:bg-green-600');
                         this.classList.add('bg-gray-100', 'text-primary', 'hover:bg-gray-200');
                     }, 2000);
+                });
+            });
+
+            // Re-bind click event listeners to buy-now buttons
+            const buyNowBtns = grid.querySelectorAll('.buy-now-btn');
+            buyNowBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const productId = this.getAttribute('data-product-id');
+                    const product = productsList.find(p => String(p.id) === String(productId));
+                    if (product) {
+                        const finalProduct = { ...product };
+                        const today = new Date();
+                        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+                        const isDiscountBadge = product.badge === 'DISCOUNT' || (product.badge && product.badge.startsWith('-') && product.badge.endsWith('%'));
+                        const hasActiveDiscount = isDiscountBadge && product.discount_percent > 0 && 
+                            (!product.discount_expiry || product.discount_expiry >= todayStr);
+                        if (hasActiveDiscount) {
+                            finalProduct.price = Math.round(product.price * (1 - product.discount_percent / 100));
+                        }
+                        addToCart(finalProduct);
+                        window.location.href = 'checkout.html';
+                    }
                 });
             });
         }

@@ -26,17 +26,10 @@ ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public read access" ON public.products
     FOR SELECT USING (true);
 
--- Allow authenticated admins to CREATE products
-CREATE POLICY "Allow admin insert" ON public.products
-    FOR INSERT TO authenticated WITH CHECK (true);
-
--- Allow authenticated admins to UPDATE products
-CREATE POLICY "Allow admin update" ON public.products
-    FOR UPDATE TO authenticated USING (true) WITH CHECK (true);
-
--- Allow authenticated admins to DELETE products
-CREATE POLICY "Allow admin delete" ON public.products
-    FOR DELETE TO authenticated USING (true);
+-- Only whitelisted admins can modify products
+CREATE POLICY "Admin products write access" ON public.products
+    FOR ALL TO authenticated
+    USING (EXISTS (SELECT 1 FROM public.admins WHERE public.admins.id = auth.uid()));
 
 
 -- 4. Seed the products table with sample anime figures

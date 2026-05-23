@@ -19,6 +19,10 @@ CREATE TABLE IF NOT EXISTS public.orders (
 -- Enable Row Level Security (RLS)
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
--- Create policies to allow anyone to insert orders and read orders
-CREATE POLICY "Allow insert" ON public.orders FOR INSERT WITH CHECK (true);
-CREATE POLICY "Allow read" ON public.orders FOR SELECT USING (true);
+-- Create policies to allow anyone to insert orders
+CREATE POLICY "Allow public insert orders" ON public.orders FOR INSERT WITH CHECK (true);
+
+-- Only whitelisted admins can read and update orders
+CREATE POLICY "Admin orders access" ON public.orders
+    FOR ALL TO authenticated
+    USING (EXISTS (SELECT 1 FROM public.admins WHERE public.admins.id = auth.uid()));
