@@ -191,12 +191,6 @@
             background-color: #d8532e !important;
             color: #ffffff !important;
         }
-        
-        .status-option.selected, .sort-option.selected {
-            background-color: #d8532e !important;
-            color: #ffffff !important;
-            font-weight: 600 !important;
-        }
 
         /* Product Modal inputs border radius overrides */
         #productModal input,
@@ -3499,16 +3493,6 @@
             const textEl = document.getElementById('selectedStatusText');
             if (textEl) textEl.textContent = text;
             
-            // Highlight selected option in status panel with 100% precision
-            const options = document.querySelectorAll('.status-option');
-            options.forEach(opt => {
-                if (opt.getAttribute('data-value') === val) {
-                    opt.classList.add('selected');
-                } else {
-                    opt.classList.remove('selected');
-                }
-            });
-
             // Filter orders instantly
             filterOrders();
 
@@ -3524,16 +3508,6 @@
             const textEl = document.getElementById('selectedSortText');
             if (textEl) textEl.textContent = text;
             
-            // Highlight selected option in sort panel with 100% precision
-            const options = document.querySelectorAll('.sort-option');
-            options.forEach(opt => {
-                if (opt.getAttribute('data-value') === val) {
-                    opt.classList.add('selected');
-                } else {
-                    opt.classList.remove('selected');
-                }
-            });
-
             // Filter orders instantly
             filterOrders();
 
@@ -3541,33 +3515,8 @@
             hideCustomDropdown('sort', true);
         }
 
-        function syncOrdersDropdowns() {
-            // Sync Status Dropdown Option UI
-            const statusVal = document.getElementById('orderStatusDropdown') ? document.getElementById('orderStatusDropdown').value : 'All';
-            const statusOptions = document.querySelectorAll('.status-option');
-            statusOptions.forEach(opt => {
-                if (opt.getAttribute('data-value') === statusVal) {
-                    opt.classList.add('selected');
-                } else {
-                    opt.classList.remove('selected');
-                }
-            });
-
-            // Sync Sort Dropdown Option UI
-            const sortVal = document.getElementById('orderSortDropdown') ? document.getElementById('orderSortDropdown').value : 'newest';
-            const sortOptions = document.querySelectorAll('.sort-option');
-            sortOptions.forEach(opt => {
-                if (opt.getAttribute('data-value') === sortVal) {
-                    opt.classList.add('selected');
-                } else {
-                    opt.classList.remove('selected');
-                }
-            });
-        }
-
         function initOrdersTab() {
             recalculateOrderStats();
-            syncOrdersDropdowns();
             renderOrders();
         }
 
