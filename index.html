@@ -222,7 +222,7 @@
     </section>
 
     <!-- Main Content Area -->
-    <section class="bg-bg-light py-12">
+    <section id="shopProductSection" class="bg-bg-light py-12">
         <div class="max-w-[1600px] mx-auto px-8 md:px-16">
             <div class="flex gap-8 items-start">
                 <!-- Left Sidebar -->
@@ -1035,6 +1035,15 @@
             }
             
             renderProducts(filtered);
+
+            // Smooth scroll down to the product section container
+            const productSection = document.getElementById('shopProductSection');
+            if (productSection) {
+                productSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
         }
         window.filterProductsByCategory = filterProductsByCategory;
 
