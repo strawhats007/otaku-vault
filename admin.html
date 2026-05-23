@@ -1664,15 +1664,24 @@
                     prod.is_preorder = nextStatus === 'Pre-order';
                 }
 
-                const { error } = await supabaseClient
-                    .from('products')
-                    .update({ 
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({
                         status: nextStatus,
                         is_preorder: nextStatus === 'Pre-order'
                     })
-                    .eq('id', id);
+                });
 
-                if (error) throw error;
+                if (!response.ok) {
+                    const errText = await response.text();
+                    throw new Error(errText || `HTTP ${response.status}`);
+                }
                 showNotificationToast(`Status updated to ${nextStatus === 'stock_out' ? 'Stock Out' : nextStatus}`);
 
                 // Refresh filters to make sure table displays correct styling
