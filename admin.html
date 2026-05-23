@@ -2645,17 +2645,17 @@
             allDiscounts.forEach(d => {
                 const dateObj = new Date(d.expiry_date);
                 const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                const isChecked = d.is_active ? 'checked' : '';
+                const isChecked = d.active ? 'checked' : '';
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50/50 transition-colors duration-200';
                 tr.innerHTML = `
                     <td class="py-4 px-4 font-bold text-accent">${d.code.toUpperCase()}</td>
-                    <td class="py-4 px-4 font-extrabold text-primary">${d.percentage_off}% OFF</td>
+                    <td class="py-4 px-4 font-extrabold text-primary">${d.percentage}% OFF</td>
                     <td class="py-4 px-4 text-gray-400 font-semibold">${dateStr}</td>
                     <td class="py-4 px-4">
                         <label class="relative inline-flex items-center cursor-pointer select-none">
-                            <input type="checkbox" ${isChecked} onchange="toggleDiscountActive(${d.id}, ${d.is_active})"
+                            <input type="checkbox" ${isChecked} onchange="toggleDiscountActive(${d.id}, ${d.active})"
                                 class="sr-only peer">
                             <div class="w-9 h-5 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-accent/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
                         </label>
@@ -2671,9 +2671,9 @@
         async function saveDiscountCode(event) {
             event.preventDefault();
             const code = document.getElementById('discountCode').value.toUpperCase().trim();
-            const percentage_off = parseInt(document.getElementById('discountPercentage').value);
+            const percentage = parseInt(document.getElementById('discountPercentage').value);
             const expiry_date = document.getElementById('discountExpiry').value;
-            const is_active = document.getElementById('discountActive').checked;
+            const active = document.getElementById('discountActive').checked;
             const submitBtn = document.getElementById('saveDiscountBtn');
             const originalText = submitBtn.textContent;
 
@@ -2684,7 +2684,7 @@
                 try {
                     const { error } = await supabaseClient
                         .from('discount_codes')
-                        .insert([{ code, percentage_off, expiry_date, is_active }]);
+                        .insert([{ code, percentage, expiry_date, active }]);
                     if (error) throw error;
                     showNotificationToast("Discount code created!");
                 } catch (e) {
@@ -2707,14 +2707,14 @@
 
             // Optimistic local update
             const disc = allDiscounts.find(item => item.id === id);
-            if (disc) disc.is_active = newStatus;
+            if (disc) disc.active = newStatus;
             renderDiscountsTable();
 
             if (supabaseClient) {
                 try {
                     const { error } = await supabaseClient
                         .from('discount_codes')
-                        .update({ is_active: newStatus })
+                        .update({ active: newStatus })
                         .eq('id', id);
                     if (error) throw error;
                     showNotificationToast("Discount status updated!");
@@ -2722,7 +2722,7 @@
                     console.error("Error updating is_active:", e);
                     showNotificationToast("Failed to update: " + e.message, false);
                     // Revert on failure
-                    if (disc) disc.is_active = currentStatus;
+                    if (disc) disc.active = currentStatus;
                     renderDiscountsTable();
                 }
             }
