@@ -40,8 +40,7 @@
             position: relative;
             width: 56px;
             height: 28px;
-            background-color: #9ca3af;
-            /* Default grey */
+            background-color: #9ca3af; /* Default grey */
             border-radius: 9999px;
             cursor: pointer;
             transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -49,8 +48,7 @@
         }
 
         .liquid-switch.active {
-            background-color: #10b981;
-            /* Green */
+            background-color: #10b981; /* Green */
             box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
         }
 
@@ -63,9 +61,9 @@
             background-color: white;
             border-radius: 50%;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1.2),
-                width 0.4s cubic-bezier(0.4, 0, 0.2, 1.2),
-                border-radius 0.4s cubic-bezier(0.4, 0, 0.2, 1.2);
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1.2), 
+                        width 0.4s cubic-bezier(0.4, 0, 0.2, 1.2), 
+                        border-radius 0.4s cubic-bezier(0.4, 0, 0.2, 1.2);
         }
 
         /* Active Switch position */
@@ -76,14 +74,12 @@
         /* Morphing transitions on click (knob stretches like a liquid droplet) */
         .liquid-switch.transitioning .liquid-switch-knob {
             width: 28px;
-            border-radius: 40% 60% 60% 40% / 50%;
-            /* Stretches left-to-right */
+            border-radius: 40% 60% 60% 40% / 50%; /* Stretches left-to-right */
         }
 
         .liquid-switch.transitioning.active .liquid-switch-knob {
             width: 28px;
-            border-radius: 60% 40% 40% 60% / 50%;
-            /* Stretches right-to-left */
+            border-radius: 60% 40% 40% 60% / 50%; /* Stretches right-to-left */
         }
 
         * {
@@ -109,24 +105,20 @@
             opacity: 0;
             transform: scale(0.95) translateY(-8px);
         }
-
         .custom-dropdown-menu.open {
             visibility: visible;
             opacity: 1;
             transform: scale(1) translateY(0);
         }
-
         .custom-option {
             transition: background-color 0.3s ease, color 0.3s ease, border-left-color 0.3s ease;
             border-left: 3px solid transparent;
         }
-
         .custom-option:hover {
             background-color: #e85d04 !important;
             color: #ffffff !important;
             border-left-color: transparent !important;
         }
-
         .custom-option.selected {
             background-color: transparent !important;
             color: #e85d04 !important;
@@ -204,11 +196,9 @@
         #productModalContainer .overflow-y-auto::-webkit-scrollbar {
             width: 4px !important;
         }
-
         #productModalContainer .overflow-y-auto::-webkit-scrollbar-track {
             background: transparent !important;
         }
-
         #productModalContainer .overflow-y-auto::-webkit-scrollbar-thumb {
             background: #e85d04 !important;
             border-radius: 4px !important;
@@ -225,13 +215,8 @@
         }
 
         @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .loader-fade-out {
@@ -246,7 +231,7 @@
         }
 
         /* Hide inner table/content loading indicators while pageLoaderOverlay is active */
-        #pageLoaderOverlay~* .animate-spin {
+        #pageLoaderOverlay ~ * .animate-spin {
             display: none !important;
         }
 
@@ -254,12 +239,9 @@
             body * {
                 visibility: hidden;
             }
-
-            #invoiceModal,
-            #invoiceModal * {
+            #invoiceModal, #invoiceModal * {
                 visibility: visible;
             }
-
             #invoiceModal {
                 position: absolute;
                 left: 0;
@@ -275,14 +257,12 @@
                 background: white;
                 z-index: auto !important;
             }
-
             #invoicePrintContent {
                 overflow: visible;
                 padding: 0;
                 margin: 0;
                 width: 100%;
             }
-
             .no-print {
                 display: none !important;
             }
@@ -342,8 +322,7 @@
                     <input type="password" id="adminPassword" required placeholder="••••••••"
                         class="w-full bg-[#141414] border border-gray-800 rounded-xl px-4 py-3 outline-none focus:border-accent text-white text-sm font-semibold transition-all">
                 </div>
-                <div id="loginError"
-                    class="hidden text-xs text-red-400 font-bold bg-red-950/30 border border-red-900/50 py-2.5 rounded-xl text-center">
+                <div id="loginError" class="hidden text-xs text-red-400 font-bold bg-red-950/30 border border-red-900/50 py-2.5 rounded-xl text-center">
                 </div>
                 <button type="submit"
                     class="w-full bg-accent hover:bg-accent-dark text-white py-4 rounded-xl font-bold transition-all shadow-lg shadow-accent/20 cursor-pointer text-sm text-center">
@@ -740,39 +719,28 @@
 
                             <!-- Category Filter Dropdown -->
                             <div class="relative w-full md:w-48 custom-dropdown" id="dropdownCategoryContainer"
-                                onmouseenter="showCustomDropdown('dropdownCategory')"
-                                onmouseleave="hideCustomDropdown('dropdownCategory')">
+                                onmouseenter="showCustomDropdown('dropdownCategory')" onmouseleave="hideCustomDropdown('dropdownCategory')">
                                 <button type="button" id="dropdownCategoryTrigger"
                                     class="w-full flex items-center justify-between bg-white border border-[#e85d04] text-xs font-bold text-gray-700 hover:bg-gray-50/50 px-4 py-3 transition-all cursor-pointer select-none"
                                     style="border-radius: 12px;">
                                     <span id="dropdownCategoryLabel">All Categories</span>
-                                    <svg class="w-4 h-4 text-[#e85d04] transition-transform duration-300 transform"
-                                        id="dropdownCategoryArrow" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                            d="M19 9l-7 7-7-7" />
+                                    <svg class="w-4 h-4 text-[#e85d04] transition-transform duration-300 transform" id="dropdownCategoryArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
-                                <div id="dropdownCategoryMenu"
-                                    class="absolute left-0 right-0 mt-2 bg-white border border-gray-100 shadow-xl z-[999] overflow-hidden custom-dropdown-menu"
+                                <div id="dropdownCategoryMenu" class="absolute left-0 right-0 mt-2 bg-white border border-gray-100 shadow-xl z-[999] overflow-hidden custom-dropdown-menu"
                                     style="border-radius: 12px;">
                                     <div class="p-1.5 space-y-1">
-                                        <div onclick="selectCustomOption('dropdownCategory', 'All', 'All Categories')"
-                                            data-option-value="All"
-                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none"
-                                            style="border-radius: 8px;">
+                                        <div onclick="selectCustomOption('dropdownCategory', 'All', 'All Categories')" data-option-value="All"
+                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none" style="border-radius: 8px;">
                                             All Categories
                                         </div>
-                                        <div onclick="selectCustomOption('dropdownCategory', 'Figures', 'Figures')"
-                                            data-option-value="Figures"
-                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none"
-                                            style="border-radius: 8px;">
+                                        <div onclick="selectCustomOption('dropdownCategory', 'Figures', 'Figures')" data-option-value="Figures"
+                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none" style="border-radius: 8px;">
                                             Figures
                                         </div>
-                                        <div onclick="selectCustomOption('dropdownCategory', 'Accessories', 'Accessories')"
-                                            data-option-value="Accessories"
-                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none"
-                                            style="border-radius: 8px;">
+                                        <div onclick="selectCustomOption('dropdownCategory', 'Accessories', 'Accessories')" data-option-value="Accessories"
+                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none" style="border-radius: 8px;">
                                             Accessories
                                         </div>
                                     </div>
@@ -786,38 +754,28 @@
 
                             <!-- Status Filter Dropdown -->
                             <div class="relative w-full md:w-48 custom-dropdown" id="dropdownStatusContainer"
-                                onmouseenter="showCustomDropdown('dropdownStatus')"
-                                onmouseleave="hideCustomDropdown('dropdownStatus')">
+                                onmouseenter="showCustomDropdown('dropdownStatus')" onmouseleave="hideCustomDropdown('dropdownStatus')">
                                 <button type="button" id="dropdownStatusTrigger"
                                     class="w-full flex items-center justify-between bg-white border border-[#e85d04] text-xs font-bold text-gray-700 hover:bg-gray-50/50 px-4 py-3 transition-all cursor-pointer select-none"
                                     style="border-radius: 12px;">
                                     <span id="dropdownStatusLabel">All Statuses</span>
-                                    <svg class="w-4 h-4 text-[#e85d04] transition-transform duration-300 transform"
-                                        id="dropdownStatusArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                            d="M19 9l-7 7-7-7" />
+                                    <svg class="w-4 h-4 text-[#e85d04] transition-transform duration-300 transform" id="dropdownStatusArrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" />
                                     </svg>
                                 </button>
-                                <div id="dropdownStatusMenu"
-                                    class="absolute left-0 right-0 mt-2 bg-white border border-gray-100 shadow-xl z-[999] overflow-hidden custom-dropdown-menu"
+                                <div id="dropdownStatusMenu" class="absolute left-0 right-0 mt-2 bg-white border border-gray-100 shadow-xl z-[999] overflow-hidden custom-dropdown-menu"
                                     style="border-radius: 12px;">
                                     <div class="p-1.5 space-y-1">
-                                        <div onclick="selectCustomOption('dropdownStatus', 'All', 'All Statuses')"
-                                            data-option-value="All"
-                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none"
-                                            style="border-radius: 8px;">
+                                        <div onclick="selectCustomOption('dropdownStatus', 'All', 'All Statuses')" data-option-value="All"
+                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none" style="border-radius: 8px;">
                                             All Statuses
                                         </div>
-                                        <div onclick="selectCustomOption('dropdownStatus', 'in_stock', 'In Stock')"
-                                            data-option-value="in_stock"
-                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none"
-                                            style="border-radius: 8px;">
+                                        <div onclick="selectCustomOption('dropdownStatus', 'in_stock', 'In Stock')" data-option-value="in_stock"
+                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none" style="border-radius: 8px;">
                                             In Stock
                                         </div>
-                                        <div onclick="selectCustomOption('dropdownStatus', 'stock_out', 'Stock Out')"
-                                            data-option-value="stock_out"
-                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none"
-                                            style="border-radius: 8px;">
+                                        <div onclick="selectCustomOption('dropdownStatus', 'stock_out', 'Stock Out')" data-option-value="stock_out"
+                                            class="custom-option px-4 py-2.5 text-xs font-semibold text-gray-700 cursor-pointer select-none" style="border-radius: 8px;">
                                             Stock Out
                                         </div>
                                     </div>
@@ -872,21 +830,17 @@
                 <!-- CUSTOMERS SECTION -->
                 <div id="sectionCustomers" class="hidden space-y-8 animate-fadeIn">
                     <!-- Customers Header Controls -->
-                    <div
-                        class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
                         <div class="flex items-center gap-3 w-full md:w-auto">
                             <h3 class="font-heading font-bold text-lg text-primary">Customers Directory</h3>
                         </div>
                         <div class="relative w-full md:w-80">
-                            <span
-                                class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </span>
-                            <input type="text" id="customerSearchInput" oninput="filterCustomersTable()"
-                                placeholder="Search by name, email, or phone..."
+                            <input type="text" id="customerSearchInput" oninput="filterCustomersTable()" placeholder="Search by name, email, or phone..."
                                 class="w-full pl-10 pr-4 py-3 bg-[#f8f9fa] border border-gray-200 rounded-xl outline-none focus:border-accent text-sm font-semibold text-primary transition-all">
                         </div>
                     </div>
@@ -896,8 +850,7 @@
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse">
                                 <thead>
-                                    <tr
-                                        class="border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-wider">
+                                    <tr class="border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-wider">
                                         <th class="pb-5 px-4">Customer Name</th>
                                         <th class="pb-5 px-4">Email Address</th>
                                         <th class="pb-5 px-4">Phone Number</th>
@@ -905,17 +858,11 @@
                                         <th class="pb-5 px-4 text-right">Total Spent</th>
                                     </tr>
                                 </thead>
-                                <tbody id="customersTableBody"
-                                    class="text-sm font-medium text-primary divide-y divide-gray-50">
+                                <tbody id="customersTableBody" class="text-sm font-medium text-primary divide-y divide-gray-50">
                                     <tr>
                                         <td colspan="5" class="py-12 text-center text-gray-400 font-semibold">
                                             <div class="flex flex-col items-center gap-2">
-                                                <svg class="w-6 h-6 animate-spin text-accent" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="3"
-                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                                </svg>
+                                                <svg class="w-6 h-6 animate-spin text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
                                                 Loading customer profiles...
                                             </div>
                                         </td>
@@ -929,15 +876,13 @@
                 <!-- DISCOUNTS SECTION -->
                 <div id="sectionDiscounts" class="hidden space-y-8 animate-fadeIn">
                     <!-- Discounts Header Controls -->
-                    <div
-                        class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
                         <div class="flex items-center gap-3">
                             <h3 class="font-heading font-bold text-lg text-primary">Discount Codes</h3>
                         </div>
                         <button onclick="openDiscountModal()"
                             class="bg-accent hover:bg-accent-dark text-white px-5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-lg shadow-accent/20 cursor-pointer w-full md:w-auto justify-center select-none">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5"
-                                viewBox="0 0 24 24">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                             </svg>
                             Add Discount Code
@@ -949,8 +894,7 @@
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse">
                                 <thead>
-                                    <tr
-                                        class="border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-wider">
+                                    <tr class="border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-wider">
                                         <th class="pb-5 px-4">Coupon Code</th>
                                         <th class="pb-5 px-4">Percentage Off</th>
                                         <th class="pb-5 px-4">Expiry Date</th>
@@ -958,17 +902,11 @@
                                         <th class="pb-5 px-4 text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="discountsTableBody"
-                                    class="text-sm font-medium text-primary divide-y divide-gray-50">
+                                <tbody id="discountsTableBody" class="text-sm font-medium text-primary divide-y divide-gray-50">
                                     <tr>
                                         <td colspan="5" class="py-12 text-center text-gray-400 font-semibold">
                                             <div class="flex flex-col items-center gap-2">
-                                                <svg class="w-6 h-6 animate-spin text-accent" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="3"
-                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                                </svg>
+                                                <svg class="w-6 h-6 animate-spin text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
                                                 Loading discount codes...
                                             </div>
                                         </td>
@@ -982,8 +920,7 @@
                 <!-- INVOICES SECTION -->
                 <div id="sectionInvoices" class="hidden space-y-8 animate-fadeIn">
                     <!-- Invoices Header Controls -->
-                    <div
-                        class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
                         <div class="flex items-center gap-3">
                             <h3 class="font-heading font-bold text-lg text-primary">Invoices Generator</h3>
                         </div>
@@ -994,8 +931,7 @@
                         <div class="overflow-x-auto">
                             <table class="w-full text-left border-collapse">
                                 <thead>
-                                    <tr
-                                        class="border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-wider">
+                                    <tr class="border-b border-gray-100 text-gray-400 text-xs font-bold uppercase tracking-wider">
                                         <th class="pb-5 px-4">Order ID</th>
                                         <th class="pb-5 px-4">Customer</th>
                                         <th class="pb-5 px-4">Date</th>
@@ -1003,17 +939,11 @@
                                         <th class="pb-5 px-4 text-right">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="invoicesTableBody"
-                                    class="text-sm font-medium text-primary divide-y divide-gray-50">
+                                <tbody id="invoicesTableBody" class="text-sm font-medium text-primary divide-y divide-gray-50">
                                     <tr>
                                         <td colspan="5" class="py-12 text-center text-gray-400 font-semibold">
                                             <div class="flex flex-col items-center gap-2">
-                                                <svg class="w-6 h-6 animate-spin text-accent" fill="none"
-                                                    stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                                        stroke-width="3"
-                                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                                                </svg>
+                                                <svg class="w-6 h-6 animate-spin text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
                                                 Loading invoices log...
                                             </div>
                                         </td>
@@ -1029,36 +959,36 @@
     </div>
 
     <script>
-            (function () {
-                const hasSession = Object.keys(localStorage).some(key => key.startsWith('sb-') && key.endsWith('-auth-token'));
-                if (hasSession) {
-                    const dashboard = document.getElementById('dashboardContent');
-                    if (dashboard) {
-                        dashboard.classList.remove('hidden');
+        (function() {
+            const hasSession = Object.keys(localStorage).some(key => key.startsWith('sb-') && key.endsWith('-auth-token'));
+            if (hasSession) {
+                const dashboard = document.getElementById('dashboardContent');
+                if (dashboard) {
+                    dashboard.classList.remove('hidden');
+                }
+                const savedTab = sessionStorage.getItem('activeAdminTab');
+                if (savedTab && savedTab !== 'dashboard') {
+                    const targetSec = document.getElementById('section' + savedTab.charAt(0).toUpperCase() + savedTab.slice(1));
+                    const dashSec = document.getElementById('sectionDashboard');
+                    if (targetSec && dashSec) {
+                        dashSec.classList.add('hidden');
+                        targetSec.classList.remove('hidden');
                     }
-                    const savedTab = sessionStorage.getItem('activeAdminTab');
-                    if (savedTab && savedTab !== 'dashboard') {
-                        const targetSec = document.getElementById('section' + savedTab.charAt(0).toUpperCase() + savedTab.slice(1));
-                        const dashSec = document.getElementById('sectionDashboard');
-                        if (targetSec && dashSec) {
-                            dashSec.classList.add('hidden');
-                            targetSec.classList.remove('hidden');
-                        }
-                        const targetNav = document.getElementById('nav-' + savedTab);
-                        const dashNav = document.getElementById('nav-dashboard');
-                        if (targetNav && dashNav) {
-                            dashNav.className = "flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none";
-                            targetNav.className = "flex items-center gap-3 bg-accent text-white px-4 py-3.5 rounded-xl font-bold text-sm transition-all select-none";
-                        }
+                    const targetNav = document.getElementById('nav-' + savedTab);
+                    const dashNav = document.getElementById('nav-dashboard');
+                    if (targetNav && dashNav) {
+                        dashNav.className = "flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none";
+                        targetNav.className = "flex items-center gap-3 bg-accent text-white px-4 py-3.5 rounded-xl font-bold text-sm transition-all select-none";
                     }
                 }
-            })();
+            }
+        })();
     </script>
 
     <!-- Script Section -->
     <script>
         // Global Error Debugging Handler (renders visual feedback on exceptions)
-        window.addEventListener('error', function (e) {
+        window.addEventListener('error', function(e) {
             const errDiv = document.createElement('div');
             errDiv.style.position = 'fixed';
             errDiv.style.top = '10px';
@@ -1075,7 +1005,7 @@
             document.body.appendChild(errDiv);
         });
 
-        window.addEventListener('unhandledrejection', function (e) {
+        window.addEventListener('unhandledrejection', function(e) {
             const errDiv = document.createElement('div');
             errDiv.style.position = 'fixed';
             errDiv.style.top = '10px';
@@ -1141,7 +1071,7 @@
 
             errorLabel.classList.add('hidden');
             errorLabel.textContent = '';
-
+            
             // Set loading state
             const originalBtnText = submitBtn.textContent;
             submitBtn.disabled = true;
@@ -1190,7 +1120,7 @@
             }
             document.getElementById('loginOverlay').classList.remove('hidden');
             document.getElementById('dashboardContent').classList.add('hidden');
-
+            
             // Clear inputs
             document.getElementById('adminEmail').value = '';
             document.getElementById('adminPassword').value = '';
@@ -2057,14 +1987,14 @@
                 const selectId = wrapper.getAttribute('data-select-id');
                 const nativeSelect = document.getElementById(selectId);
                 if (!nativeSelect) return;
-
+                
                 const trigger = wrapper.querySelector('.custom-select-trigger');
                 const triggerText = trigger.querySelector('.selected-text');
                 const options = wrapper.querySelectorAll('.custom-option');
-
+                
                 // Hide native select visually
                 nativeSelect.classList.add('hidden');
-
+                
                 // Update selected text initial value
                 if (nativeSelect.value) {
                     const selectedOpt = wrapper.querySelector(`.custom-option[data-value="${nativeSelect.value}"]`);
@@ -2074,17 +2004,17 @@
                         selectedOpt.classList.add('selected');
                     }
                 }
-
+                
                 // Bind click event handlers
                 options.forEach(option => {
-                    option.addEventListener('click', function () {
+                    option.addEventListener('click', function() {
                         const val = this.getAttribute('data-value');
                         nativeSelect.value = val;
                         triggerText.textContent = this.textContent;
-
+                        
                         options.forEach(opt => opt.classList.remove('selected'));
                         this.classList.add('selected');
-
+                        
                         // Dispatch native select change event so any listeners (like toggleDiscountFields) are fired!
                         nativeSelect.dispatchEvent(new Event('change'));
                     });
@@ -2116,10 +2046,10 @@
                 const selectId = wrapper.getAttribute('data-select-id');
                 const nativeSelect = document.getElementById(selectId);
                 if (!nativeSelect) return;
-
+                
                 const triggerText = wrapper.querySelector('.selected-text');
                 const options = wrapper.querySelectorAll('.custom-option');
-
+                
                 const val = nativeSelect.value;
                 const activeOpt = wrapper.querySelector(`.custom-option[data-value="${val}"]`) || options[0];
                 if (activeOpt && triggerText) {
@@ -2574,9 +2504,9 @@
 
         function filterCustomersTable() {
             const query = document.getElementById('customerSearchInput').value.toLowerCase().trim();
-            const filtered = allCustomers.filter(c =>
-                c.name.toLowerCase().includes(query) ||
-                c.email.toLowerCase().includes(query) ||
+            const filtered = allCustomers.filter(c => 
+                c.name.toLowerCase().includes(query) || 
+                c.email.toLowerCase().includes(query) || 
                 c.phone.toLowerCase().includes(query)
             );
             renderCustomersTable(filtered);
@@ -3064,7 +2994,7 @@
         function showCustomDropdown(dropdownId) {
             const menu = document.getElementById(`${dropdownId}Menu`);
             const arrow = document.getElementById(`${dropdownId}Arrow`);
-
+            
             // Close other dropdowns first (if any somehow remained open)
             const allMenus = document.querySelectorAll('.custom-dropdown-menu');
             const allArrows = document.querySelectorAll('.custom-dropdown svg');
@@ -3090,7 +3020,7 @@
             // Update hidden select
             let selectId = 'filterCategory';
             if (dropdownId === 'dropdownStatus') selectId = 'filterStatus';
-
+            
             const selectEl = document.getElementById(selectId);
             if (selectEl) {
                 selectEl.value = value;
@@ -3124,8 +3054,7 @@
     <div id="productModal" onclick="if(event.target === this) closeProductModal()"
         class="fixed inset-0 bg-primary/60 backdrop-blur-sm z-[9999] hidden flex items-center justify-center transition-all duration-300">
         <div class="bg-white border border-gray-100 shadow-2xl mx-4 relative scale-95 opacity-0 transition-all duration-300 flex flex-col"
-            id="productModalContainer"
-            style="border-radius: 16px; overflow: hidden; max-height: 90vh; max-width: 42rem; width: 100%;">
+            id="productModalContainer" style="border-radius: 16px; overflow: hidden; max-height: 90vh; max-width: 42rem; width: 100%;">
             <!-- Close Button -->
             <button onclick="closeProductModal()"
                 class="absolute text-gray-400 hover:text-primary transition-colors cursor-pointer z-10"
@@ -3139,8 +3068,7 @@
             <div class="p-8 overflow-y-auto" style="max-height: 90vh;">
                 <div class="space-y-1">
                     <h3 id="modalTitle" class="text-2xl font-heading font-extrabold text-primary">Add New Product</h3>
-                    <p id="modalSubtitle" class="text-xs text-gray-400">Fill in the fields below to add a new figure to
-                        the
+                    <p id="modalSubtitle" class="text-xs text-gray-400">Fill in the fields below to add a new figure to the
                         shop.</p>
                 </div>
 
@@ -3167,7 +3095,7 @@
                         <!-- Category -->
                         <div class="space-y-1.5 custom-dropdown-wrapper" data-select-id="modalCategory">
                             <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Category</label>
-
+                            
                             <!-- Hidden Native Select -->
                             <select id="modalCategory" required class="hidden">
                                 <option value="Figures">Figures</option>
@@ -3175,23 +3103,17 @@
                             </select>
 
                             <!-- Custom Trigger Button -->
-                            <div
-                                class="custom-select-trigger w-full border border-gray-200 rounded-xl px-4 py-3 outline-none hover:border-[#e85d04] focus:border-[#e85d04] text-sm font-semibold transition-all bg-white cursor-pointer flex justify-between items-center select-none">
+                            <div class="custom-select-trigger w-full border border-gray-200 rounded-xl px-4 py-3 outline-none hover:border-[#e85d04] focus:border-[#e85d04] text-sm font-semibold transition-all bg-white cursor-pointer flex justify-between items-center select-none">
                                 <span class="selected-text">Figures</span>
-                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 pointer-events-none"
-                                    fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                                 </svg>
                             </div>
-
+                            
                             <!-- Custom Options Dropdown List Container -->
-                            <div
-                                class="custom-select-options absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-150 rounded-xl shadow-xl overflow-hidden opacity-0 pointer-events-none transform -translate-y-2 scale-95 transition-all duration-300 origin-top p-1 space-y-0.5">
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="Figures">Figures</div>
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="Accessories">Accessories</div>
+                            <div class="custom-select-options absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-150 rounded-xl shadow-xl overflow-hidden opacity-0 pointer-events-none transform -translate-y-2 scale-95 transition-all duration-300 origin-top p-1 space-y-0.5">
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Figures">Figures</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Accessories">Accessories</div>
                             </div>
                         </div>
 
@@ -3212,35 +3134,23 @@
                             </select>
 
                             <!-- Custom Trigger Button -->
-                            <div
-                                class="custom-select-trigger w-full border border-gray-200 rounded-xl px-4 py-3 outline-none hover:border-[#e85d04] focus:border-[#e85d04] text-sm font-semibold transition-all bg-white cursor-pointer flex justify-between items-center select-none">
+                            <div class="custom-select-trigger w-full border border-gray-200 rounded-xl px-4 py-3 outline-none hover:border-[#e85d04] focus:border-[#e85d04] text-sm font-semibold transition-all bg-white cursor-pointer flex justify-between items-center select-none">
                                 <span class="selected-text">One Piece</span>
-                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 pointer-events-none"
-                                    fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                                 </svg>
                             </div>
 
                             <!-- Custom Options Dropdown List Container -->
-                            <div
-                                class="custom-select-options absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-150 rounded-xl shadow-xl overflow-hidden opacity-0 pointer-events-none transform -translate-y-2 scale-95 transition-all duration-300 origin-top p-1 space-y-0.5">
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="One Piece">One Piece</div>
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="Naruto">Naruto</div>
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="Demon Slayer">Demon Slayer</div>
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="Dragon Ball Z">Dragon Ball Z</div>
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="Jujutsu Kaisen">Jujutsu Kaisen</div>
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="Attack on Titan">Attack on Titan</div>
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="My Hero Academia">My Hero Academia</div>
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="Black Clover">Black Clover</div>
+                            <div class="custom-select-options absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-150 rounded-xl shadow-xl overflow-hidden opacity-0 pointer-events-none transform -translate-y-2 scale-95 transition-all duration-300 origin-top p-1 space-y-0.5">
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="One Piece">One Piece</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Naruto">Naruto</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Demon Slayer">Demon Slayer</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Dragon Ball Z">Dragon Ball Z</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Jujutsu Kaisen">Jujutsu Kaisen</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Attack on Titan">Attack on Titan</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="My Hero Academia">My Hero Academia</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Black Clover">Black Clover</div>
                             </div>
                         </div>
                     </div>
@@ -3248,8 +3158,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                         <!-- Stock -->
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Stock
-                                Quantity</label>
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Stock Quantity</label>
                             <input type="number" id="modalStock" required min="0" placeholder="e.g. 10"
                                 class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all">
                         </div>
@@ -3257,7 +3166,7 @@
                         <!-- Status (In Stock vs Stock Out) -->
                         <div class="space-y-1.5 custom-dropdown-wrapper" data-select-id="modalStatus">
                             <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Status</label>
-
+                            
                             <!-- Hidden Native Select -->
                             <select id="modalStatus" required class="hidden">
                                 <option value="in_stock">In Stock</option>
@@ -3265,30 +3174,24 @@
                             </select>
 
                             <!-- Custom Trigger Button -->
-                            <div
-                                class="custom-select-trigger w-full border border-gray-200 rounded-xl px-4 py-3 outline-none hover:border-[#e85d04] focus:border-[#e85d04] text-sm font-semibold transition-all bg-white cursor-pointer flex justify-between items-center select-none">
+                            <div class="custom-select-trigger w-full border border-gray-200 rounded-xl px-4 py-3 outline-none hover:border-[#e85d04] focus:border-[#e85d04] text-sm font-semibold transition-all bg-white cursor-pointer flex justify-between items-center select-none">
                                 <span class="selected-text">In Stock</span>
-                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 pointer-events-none"
-                                    fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                                 </svg>
                             </div>
 
                             <!-- Custom Options Dropdown List Container -->
-                            <div
-                                class="custom-select-options absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-150 rounded-xl shadow-xl overflow-hidden opacity-0 pointer-events-none transform -translate-y-2 scale-95 transition-all duration-300 origin-top p-1 space-y-0.5">
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="in_stock">In Stock</div>
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="stock_out">Stock Out</div>
+                            <div class="custom-select-options absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-150 rounded-xl shadow-xl overflow-hidden opacity-0 pointer-events-none transform -translate-y-2 scale-95 transition-all duration-300 origin-top p-1 space-y-0.5">
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="in_stock">In Stock</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="stock_out">Stock Out</div>
                             </div>
                         </div>
 
                         <!-- Badge -->
                         <div class="space-y-1.5 custom-dropdown-wrapper" data-select-id="modalBadge">
                             <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Badge</label>
-
+                            
                             <!-- Hidden Native Select -->
                             <select id="modalBadge" required onchange="toggleDiscountFields(this.value)" class="hidden">
                                 <option value="None">None</option>
@@ -3299,29 +3202,20 @@
                             </select>
 
                             <!-- Custom Trigger Button -->
-                            <div
-                                class="custom-select-trigger w-full border border-gray-200 rounded-xl px-4 py-3 outline-none hover:border-[#e85d04] focus:border-[#e85d04] text-sm font-semibold transition-all bg-white cursor-pointer flex justify-between items-center select-none">
+                            <div class="custom-select-trigger w-full border border-gray-200 rounded-xl px-4 py-3 outline-none hover:border-[#e85d04] focus:border-[#e85d04] text-sm font-semibold transition-all bg-white cursor-pointer flex justify-between items-center select-none">
                                 <span class="selected-text">None</span>
-                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 pointer-events-none"
-                                    fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
                                 </svg>
                             </div>
 
                             <!-- Custom Options Dropdown List Container -->
-                            <div
-                                class="custom-select-options absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-150 rounded-xl shadow-xl overflow-hidden opacity-0 pointer-events-none transform -translate-y-2 scale-95 transition-all duration-300 origin-top p-1 space-y-0.5">
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="None">None</div>
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="NEW">NEW</div>
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="HOT">HOT</div>
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="UPCOMING">UPCOMING</div>
-                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none"
-                                    data-value="DISCOUNT">DISCOUNT</div>
+                            <div class="custom-select-options absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-150 rounded-xl shadow-xl overflow-hidden opacity-0 pointer-events-none transform -translate-y-2 scale-95 transition-all duration-300 origin-top p-1 space-y-0.5">
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="None">None</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="NEW">NEW</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="HOT">HOT</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="UPCOMING">UPCOMING</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="DISCOUNT">DISCOUNT</div>
                             </div>
                         </div>
                     </div>
@@ -3330,27 +3224,22 @@
                         <!-- Discount % -->
                         <div class="space-y-1.5">
                             <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Discount %</label>
-                            <input type="number" id="modalDiscountPercent" min="0" max="100"
-                                placeholder="e.g. 20 (0 for none)"
+                            <input type="number" id="modalDiscountPercent" min="0" max="100" placeholder="e.g. 20 (0 for none)"
                                 class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all">
                         </div>
 
                         <!-- Discount Expiry Date -->
                         <div class="space-y-1.5">
-                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Discount Expiry
-                                Date</label>
+                            <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Discount Expiry Date</label>
                             <input type="date" id="modalDiscountExpiry"
                                 class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all">
                         </div>
                     </div>
 
                     <!-- Database column notice -->
-                    <div id="dbColumnNotice"
-                        class="hidden w-full flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl p-3.5">
-                        <svg class="w-5 h-5 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor"
-                            stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    <div id="dbColumnNotice" class="hidden w-full flex items-center gap-3 bg-amber-50 border border-amber-200 rounded-xl p-3.5">
+                        <svg class="w-5 h-5 text-amber-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                         </svg>
                         <div id="dbColumnNoticeText" class="text-[11px] text-amber-800 leading-normal font-semibold">
                             <span class="font-bold text-amber-900 block">Supabase Column Missing</span>
@@ -3400,8 +3289,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <span class="text-xs font-semibold text-gray-500 mt-1"
-                                        id="hoverUploadLabelText">Click
+                                    <span class="text-xs font-semibold text-gray-500 mt-1" id="hoverUploadLabelText">Click
                                         or Drag Hover Image to Upload</span>
                                     <input type="file" id="hoverImageUploadInput" accept="image/*" class="hidden"
                                         onchange="handleImageUpload(event, 'hover')">
@@ -3411,8 +3299,7 @@
                             <div
                                 class="w-20 h-20 rounded-xl border border-gray-150 overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center">
                                 <img id="hoverImagePreviewThumbnail" src="" class="w-full h-full object-cover hidden">
-                                <span id="noHoverPreviewText"
-                                    class="text-[10px] text-gray-400 font-bold text-center p-1">No
+                                <span id="noHoverPreviewText" class="text-[10px] text-gray-400 font-bold text-center p-1">No
                                     Image</span>
                             </div>
                         </div>
@@ -3487,11 +3374,9 @@
             id="discountModalContainer">
             <div class="flex items-center justify-between border-b border-gray-50 pb-4">
                 <h3 class="text-xl font-heading font-bold text-primary">Create Discount Code</h3>
-                <button onclick="closeDiscountModal()"
-                    class="text-gray-400 hover:text-primary transition-colors cursor-pointer">
+                <button onclick="closeDiscountModal()" class="text-gray-400 hover:text-primary transition-colors cursor-pointer">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                            d="M6 18L18 6M6 6l12 12" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
                 </button>
             </div>
@@ -3505,8 +3390,7 @@
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="space-y-1">
-                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Percentage Off
-                            (%)</label>
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Percentage Off (%)</label>
                         <input type="number" id="discountPercentage" required min="1" max="100" placeholder="e.g., 20"
                             class="w-full px-4 py-3 bg-[#f8f9fa] border border-gray-200 rounded-xl outline-none focus:border-accent text-sm font-semibold text-primary transition-all">
                     </div>
@@ -3520,8 +3404,7 @@
                 <div class="flex items-center gap-3 py-2">
                     <input type="checkbox" id="discountActive" checked
                         class="rounded border-gray-300 text-accent focus:ring-accent w-4 h-4 cursor-pointer">
-                    <label for="discountActive" class="text-sm font-bold text-primary cursor-pointer select-none">Active
-                        immediately</label>
+                    <label for="discountActive" class="text-sm font-bold text-primary cursor-pointer select-none">Active immediately</label>
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-50">
@@ -3550,24 +3433,20 @@
                     <button onclick="window.print()"
                         class="bg-accent hover:bg-accent-dark text-white px-4 py-2.5 rounded-xl font-bold text-xs transition-all flex items-center gap-2 shadow-lg shadow-accent/20 cursor-pointer select-none">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                         </svg>
                         Print Invoice
                     </button>
-                    <button onclick="closeInvoiceModal()"
-                        class="text-gray-400 hover:text-primary transition-colors cursor-pointer">
+                    <button onclick="closeInvoiceModal()" class="text-gray-400 hover:text-primary transition-colors cursor-pointer">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                                d="M6 18L18 6M6 6l12 12" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
                         </svg>
                     </button>
                 </div>
             </div>
 
             <!-- Invoice Content (This will be printed) -->
-            <div id="invoicePrintContent"
-                class="overflow-y-auto pr-2 space-y-8 p-4 bg-white text-primary flex-grow font-sans">
+            <div id="invoicePrintContent" class="overflow-y-auto pr-2 space-y-8 p-4 bg-white text-primary flex-grow font-sans">
                 <!-- Inner JS renders this -->
             </div>
         </div>
