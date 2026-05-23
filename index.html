@@ -75,7 +75,7 @@
         /* Liquid Underline Indicator styling */
         .nav-underline-indicator {
             position: absolute;
-            bottom: -2px;
+            bottom: 0px;
             height: 3px;
             background-color: #d8532e;
             border-radius: 9999px;
@@ -88,8 +88,7 @@
 </head>
 <body class="font-body">
 
-    <!-- Navbar -->
-    <nav id="mainNavbar" class="fixed top-0 left-0 right-0 bg-white z-50 border-b border-gray-100 shadow-sm transition-transform duration-300 ease-in-out">
+    <nav id="mainNavbar" class="fixed top-0 left-0 right-0 bg-white z-50 border-b border-gray-200 shadow-sm transition-transform duration-300 ease-in-out">
         <div class="max-w-[1600px] mx-auto px-8 md:px-16 h-[70px] flex items-center justify-between relative">
             <!-- Left: Logo -->
             <a href="#" class="flex items-center gap-2 flex-shrink-0">
@@ -98,10 +97,10 @@
             </a>
 
             <!-- Center: Navigation Links -->
-            <div id="navLinksContainer" class="hidden lg:flex items-center gap-8 justify-center absolute left-1/2 transform -translate-x-1/2">
+            <div id="navLinksContainer" class="hidden lg:flex items-center gap-8 justify-center absolute left-1/2 transform -translate-x-1/2 h-full">
                 <a href="index.html" class="nav-item-link text-primary hover:text-accent transition-colors font-medium">Home</a>
                 <!-- Shop Dropdown Menu -->
-                <div class="nav-item-link relative py-2" id="shopDropdownWrapper">
+                <div class="nav-item-link relative py-2 h-full flex items-center" id="shopDropdownWrapper">
                     <button class="flex items-center gap-1.5 text-primary hover:text-accent transition-colors font-medium cursor-pointer" id="shopBtn">
                         <span>Shop</span>
                         <svg id="shopDropdownArrow" class="w-2.5 h-1.5 transition-transform duration-300 transform" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -109,7 +108,7 @@
                         </svg>
                     </button>
                     <!-- Dropdown Menu -->
-                    <div id="shopDropdownMenu" class="absolute top-[calc(100%-4px)] left-1/2 transform -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2.5 transition-all duration-200 ease-in-out opacity-0 scale-95 pointer-events-none z-50">
+                    <div id="shopDropdownMenu" class="absolute top-full left-1/2 transform -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2.5 transition-all duration-200 ease-in-out opacity-0 scale-95 pointer-events-none z-50 mt-1">
                         <button class="shop-category-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-category="all">All Figures</button>
                         <button class="shop-category-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-category="Action Figures">Action Figures</button>
                         <button class="shop-category-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-category="Nendoroids">Nendoroids</button>
