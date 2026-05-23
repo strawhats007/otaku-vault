@@ -153,7 +153,7 @@
                         <button class="arrivals-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-tag="discount">Discount</button>
                     </div>
                 </div>
-                <a href="#" class="nav-item-link text-primary hover:text-accent transition-colors font-medium py-2">About</a>
+                <a href="about.html" class="nav-item-link text-primary hover:text-accent transition-colors font-medium py-2">About</a>
                 
                 <!-- Fluid Underline Indicator -->
                 <div class="nav-underline-indicator" id="navIndicator"></div>
@@ -163,10 +163,12 @@
             <div class="flex items-center gap-3">
                 <!-- Search Bar -->
                 <div class="hidden md:flex items-center bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200 rounded-full px-4 py-1.5 w-60">
-                    <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                    <input type="text" placeholder="Search figures..." class="bg-transparent text-primary text-xs w-full outline-none placeholder-gray-400">
+                    <button id="desktopSearchBtn" class="focus:outline-none cursor-pointer text-gray-400 hover:text-accent transition-colors mr-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </button>
+                    <input type="text" id="desktopSearchInput" placeholder="Search figures..." class="bg-transparent text-primary text-xs w-full outline-none placeholder-gray-400">
                 </div>
 
                 <!-- Account Icon -->
@@ -208,9 +210,14 @@
                 <a href="#" class="block text-primary hover:text-accent font-medium py-2">Shop</a>
                 <a href="#" class="block text-primary hover:text-accent font-medium py-2">Series</a>
                 <a href="#" class="block text-primary hover:text-accent font-medium py-2">New Arrivals</a>
-                <a href="#" class="block text-primary hover:text-accent font-medium py-2">About</a>
-                <div class="pt-2">
-                    <input type="text" placeholder="Search figures..." class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-primary outline-none placeholder-gray-400">
+                <a href="about.html" class="block text-primary hover:text-accent font-medium py-2">About</a>
+                <div class="pt-2 flex gap-2">
+                    <input type="text" id="mobileSearchInput" placeholder="Search figures..." class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-primary outline-none placeholder-gray-400">
+                    <button id="mobileSearchBtn" class="bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-lg font-semibold transition-all cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
@@ -866,13 +873,23 @@
             if (!grid) return;
 
             if (!productsList || productsList.length === 0) {
+                const queryText = window.currentSearchQuery ? ` for "${window.currentSearchQuery}"` : '';
                 grid.innerHTML = `
-                    <div class="col-span-full py-16 text-center">
-                        <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/>
-                        </svg>
-                        <h3 class="font-heading font-bold text-lg text-primary mb-1">No products found</h3>
-                        <p class="text-sm text-gray-500">Try matching another category or clearing filters.</p>
+                    <div class="col-span-full py-16 text-center space-y-4">
+                        <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto text-gray-450 text-gray-400">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="space-y-1">
+                            <h3 class="font-heading font-bold text-lg text-primary">No products found${queryText}</h3>
+                            <p class="text-sm text-gray-500">Try matching another keyword or clearing search filters.</p>
+                        </div>
+                        ${window.currentSearchQuery ? `
+                        <button onclick="document.getElementById('desktopSearchInput').value=''; document.getElementById('mobileSearchInput').value=''; window.filterProductsBySearch('');" class="inline-flex bg-accent hover:bg-accent-dark text-white px-6 py-2.5 rounded-full font-semibold transition-all hover:scale-105 cursor-pointer">
+                            Clear Search
+                        </button>
+                        ` : ''}
                     </div>
                 `;
                 return;
@@ -1178,6 +1195,37 @@
         }
         window.filterProductsByBadge = filterProductsByBadge;
 
+        // Custom Search Filter
+        window.currentSearchQuery = '';
+        function filterProductsBySearch(query) {
+            window.currentSearchQuery = query;
+            const allProducts = window.allProducts || fallbackProducts;
+            const heading = document.querySelector('.flex-grow h2.font-heading, .flex-1 h2.font-heading');
+            
+            let filtered;
+            const cleanQuery = (query || '').trim().toLowerCase();
+            
+            if (cleanQuery) {
+                filtered = allProducts.filter(p => (p.name || '').toLowerCase().includes(cleanQuery));
+                if (heading) heading.textContent = `Search Results for "${query}"`;
+            } else {
+                filtered = allProducts;
+                if (heading) heading.textContent = 'All Products';
+            }
+            
+            renderProducts(filtered);
+
+            // Smooth scroll down to the product section container
+            const productSection = document.getElementById('shopProductSection');
+            if (productSection) {
+                productSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+        window.filterProductsBySearch = filterProductsBySearch;
+
         // Fetch and Render Products Dynamically
         async function fetchAndRenderProducts() {
             let productsList = fallbackProducts;
@@ -1207,8 +1255,29 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Products
             fetchAndRenderProducts();
+
+            // Handle URL Query parameters for filter routing from other pages
+            setTimeout(() => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const category = urlParams.get('category');
+                const series = urlParams.get('series');
+                const badge = urlParams.get('badge');
+
+                if (category) {
+                    if (typeof window.filterProductsByCategory === 'function') {
+                        window.filterProductsByCategory(category);
+                    }
+                } else if (series) {
+                    if (typeof window.filterProductsBySeries === 'function') {
+                        window.filterProductsBySeries(series);
+                    }
+                } else if (badge) {
+                    if (typeof window.filterProductsByBadge === 'function') {
+                        window.filterProductsByBadge(badge);
+                    }
+                }
+            }, 300);
 
             // Navbar auto-hide/show on scroll
             let lastScrollY = window.scrollY;
@@ -1769,6 +1838,79 @@
                     navIndicator.style.opacity = '0';
                 });
             }
+
+            // Debounced Live Search and Event Bindings
+            const desktopSearchInput = document.getElementById('desktopSearchInput');
+            const mobileSearchInput = document.getElementById('mobileSearchInput');
+            const desktopSearchBtn = document.getElementById('desktopSearchBtn');
+            const mobileSearchBtn = document.getElementById('mobileSearchBtn');
+            
+            let searchDebounceTimeout = null;
+
+            function triggerSearch(queryText) {
+                if (typeof window.filterProductsBySearch === 'function') {
+                    window.filterProductsBySearch(queryText);
+                }
+            }
+
+            function handleLiveSearch(e) {
+                const val = e.target.value;
+                
+                // Sync search inputs across desktop and mobile
+                if (desktopSearchInput && e.target !== desktopSearchInput) desktopSearchInput.value = val;
+                if (mobileSearchInput && e.target !== mobileSearchInput) mobileSearchInput.value = val;
+
+                // Debounce trigger
+                if (searchDebounceTimeout) clearTimeout(searchDebounceTimeout);
+                searchDebounceTimeout = setTimeout(() => {
+                    triggerSearch(val);
+                }, 300);
+            }
+
+            if (desktopSearchInput) {
+                desktopSearchInput.addEventListener('input', handleLiveSearch);
+                desktopSearchInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        triggerSearch(desktopSearchInput.value);
+                    }
+                });
+            }
+
+            if (mobileSearchInput) {
+                mobileSearchInput.addEventListener('input', handleLiveSearch);
+                mobileSearchInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        triggerSearch(mobileSearchInput.value);
+                    }
+                });
+            }
+
+            if (desktopSearchBtn && desktopSearchInput) {
+                desktopSearchBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    triggerSearch(desktopSearchInput.value);
+                });
+            }
+
+            if (mobileSearchBtn && mobileSearchInput) {
+                mobileSearchBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    triggerSearch(mobileSearchInput.value);
+                });
+            }
+
+            // Route from about.html page using URL Query parameter search
+            setTimeout(() => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const query = urlParams.get('search');
+                if (query) {
+                    if (desktopSearchInput) desktopSearchInput.value = query;
+                    if (mobileSearchInput) mobileSearchInput.value = query;
+                    triggerSearch(query);
+                }
+            }, 350);
 
             window.setQVActiveImage = setQVActiveImage;
             window.closeQuickView = closeQuickView;
