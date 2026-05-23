@@ -3195,30 +3195,6 @@
         }
 
         // CUSTOM DROPDOWNS MODULE
-        function showCustomDropdown(dropdownId) {
-            const menu = document.getElementById(`${dropdownId}Menu`);
-            const arrow = document.getElementById(`${dropdownId}Arrow`);
-            
-            // Close other dropdowns first (if any somehow remained open)
-            const allMenus = document.querySelectorAll('.custom-dropdown-menu');
-            const allArrows = document.querySelectorAll('.custom-dropdown svg');
-            allMenus.forEach(m => {
-                if (m.id !== `${dropdownId}Menu`) m.classList.remove('open');
-            });
-            allArrows.forEach(a => {
-                if (a.id !== `${dropdownId}Arrow`) a.classList.remove('rotate-180');
-            });
-
-            if (menu) menu.classList.add('open');
-            if (arrow) arrow.classList.add('rotate-180');
-        }
-
-        function hideCustomDropdown(dropdownId) {
-            const menu = document.getElementById(`${dropdownId}Menu`);
-            const arrow = document.getElementById(`${dropdownId}Arrow`);
-            if (menu) menu.classList.remove('open');
-            if (arrow) arrow.classList.remove('rotate-180');
-        }
 
         function selectCustomOption(dropdownId, value, displayLabel) {
             // Update hidden select
@@ -3250,7 +3226,7 @@
             }
 
             // Close menu on selection
-            hideCustomDropdown(dropdownId);
+            hideCustomDropdown(dropdownId, true);
         }
 
         // ==================== ORDERS TAB DATABASE & CONTROL LOGIC ====================
@@ -3425,8 +3401,37 @@
         let selectedOrderSortValue = 'newest';
         let dropdownTimeouts = {
             status: null,
-            sort: null
+            sort: null,
+            dropdownCategory: null,
+            dropdownStatus: null
         };
+
+        function getDropdownElements(type) {
+            let panelId, chevronId, triggerId, openClass, rotateClass;
+            
+            if (type === 'status' || type === 'sort') {
+                panelId = type + 'DropdownPanel';
+                chevronId = type + 'Chevron';
+                triggerId = type + 'Trigger';
+                openClass = 'show';
+                rotateClass = 'rotate';
+            } else {
+                // Products tab dropdowns
+                panelId = type + 'Menu';
+                chevronId = type + 'Arrow';
+                triggerId = type + 'Trigger';
+                openClass = 'open';
+                rotateClass = 'rotate-180';
+            }
+            
+            return {
+                panel: document.getElementById(panelId),
+                chevron: document.getElementById(chevronId),
+                trigger: document.getElementById(triggerId),
+                openClass: openClass,
+                rotateClass: rotateClass
+            };
+        }
 
         function showCustomDropdown(type) {
             if (dropdownTimeouts[type]) {
@@ -3434,12 +3439,22 @@
                 dropdownTimeouts[type] = null;
             }
             
-            const panel = document.getElementById(type + 'DropdownPanel');
-            const chevron = document.getElementById(type + 'Chevron');
-            const trigger = document.getElementById(type + 'Trigger');
+            const { panel, chevron, trigger, openClass, rotateClass } = getDropdownElements(type);
             
-            if (panel) panel.classList.add('show');
-            if (chevron) chevron.classList.add('rotate');
+            // Close other menus if it's Products tab
+            if (type === 'dropdownCategory' || type === 'dropdownStatus') {
+                const allMenus = document.querySelectorAll('.custom-dropdown-menu');
+                const allArrows = document.querySelectorAll('.custom-dropdown svg');
+                allMenus.forEach(m => {
+                    if (panel && m.id !== panel.id) m.classList.remove('open');
+                });
+                allArrows.forEach(a => {
+                    if (chevron && a.id !== chevron.id) a.classList.remove('rotate-180');
+                });
+            }
+
+            if (panel) panel.classList.add(openClass);
+            if (chevron) chevron.classList.add(rotateClass);
             if (trigger) {
                 trigger.classList.add('border-accent');
                 trigger.classList.remove('border-gray-200');
@@ -3453,12 +3468,10 @@
             }
             
             const closeAction = () => {
-                const panel = document.getElementById(type + 'DropdownPanel');
-                const chevron = document.getElementById(type + 'Chevron');
-                const trigger = document.getElementById(type + 'Trigger');
+                const { panel, chevron, trigger, openClass, rotateClass } = getDropdownElements(type);
                 
-                if (panel) panel.classList.remove('show');
-                if (chevron) chevron.classList.remove('rotate');
+                if (panel) panel.classList.remove(openClass);
+                if (chevron) chevron.classList.remove(rotateClass);
                 if (trigger) {
                     trigger.classList.remove('border-accent');
                     trigger.classList.add('border-gray-200');
