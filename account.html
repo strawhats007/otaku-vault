@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account | OtakuVaultBD - Premium Anime Figures</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1a1a1a',
+                        accent: '#d8532e',
+                        'accent-dark': '#c53b2b',
+                        'bg-light': '#f5f5f5',
+                        'card-bg': '#ffffff',
+                        'text-muted': '#666666',
+                        'border-light': '#e0e0e0',
+                    },
+                    fontFamily: {
+                        'heading': ['Poppins', 'sans-serif'],
+                        'body': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #f9f9f9; color: #1a1a1a; }
+        
+        /* Underline indicator style */
+        .nav-underline-indicator {
+            position: absolute;
+            bottom: 4px;
+            height: 3px;
+            background-color: #d8532e;
+            border-radius: 9999px;
+            transition: left 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), width 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.2s ease-in-out;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .tab-btn {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .tab-underline {
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            height: 2px;
+            background-color: #d8532e;
+            transition: transform 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), width 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 flex flex-col min-h-screen">
+
+    <!-- Top Info Bar -->
+    <div class="bg-primary text-gray-300 text-xs py-2 px-8 flex justify-between items-center border-b border-white/5 font-medium">
+        <div class="flex items-center gap-4">
+            <span class="flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-accent" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                </svg>
+                +880 1712-345678
+            </span>
+            <span class="flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5 text-accent" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                </svg>
+                support@otakuvaultbd.com
+            </span>
+        </div>
+        <div class="flex items-center gap-4">
+            <span>Uttara, Dhaka, Bangladesh</span>
+            <span class="text-accent font-bold">🇧🇩 PREMIER ANIME SHOP</span>
+        </div>
+    </div>
+
+    <!-- Navigation Header -->
+    <nav class="bg-white/95 backdrop-blur-md border-b border-gray-100 sticky top-0 z-[100] h-[70px] flex items-center select-none shadow-xs">
+        <div class="max-w-[1600px] w-full mx-auto px-8 md:px-16 flex justify-between items-center relative">
+            <!-- Left: Logo -->
+            <a href="index.html" class="flex items-center gap-2 z-10">
+                <span class="text-primary font-heading font-extrabold text-2xl tracking-tight">OTAKU</span>
+                <span class="text-accent font-heading font-extrabold text-2xl tracking-tight">VAULTBD</span>
+            </a>
+
+            <!-- Center: Navigation Links -->
+            <div id="navLinksContainer" class="hidden lg:flex items-center gap-8 justify-center absolute left-1/2 transform -translate-x-1/2">
+                <a href="index.html" class="nav-item-link text-primary hover:text-accent transition-colors font-medium py-2">Home</a>
+                
+                <!-- Shop Dropdown Menu -->
+                <div class="nav-item-link relative py-2" id="shopDropdownWrapper">
+                    <button class="flex items-center gap-1.5 text-primary hover:text-accent transition-colors font-medium cursor-pointer" id="shopBtn">
+                        <span>Shop</span>
+                        <svg id="shopDropdownArrow" class="w-2.5 h-1.5 transition-transform duration-300 transform" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 1L6 7L11 1" stroke="#d8532e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="shopDropdownMenu" class="absolute top-full left-1/2 transform -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2.5 transition-all duration-200 ease-in-out opacity-0 scale-95 pointer-events-none z-50 mt-1">
+                        <button class="shop-category-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-category="all">All Figures</button>
+                        <button class="shop-category-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-category="Action Figures">Action Figures</button>
+                        <button class="shop-category-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-category="Nendoroids">Nendoroids</button>
+                        <button class="shop-category-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-category="Figma">Figma</button>
+                        <button class="shop-category-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-category="Statues/PVC">Statues/PVC</button>
+                    </div>
+                </div>
+
+                <!-- Series Dropdown Menu -->
+                <div class="nav-item-link relative py-2" id="seriesDropdownWrapper">
+                    <button class="flex items-center gap-1.5 text-primary hover:text-accent transition-colors font-medium cursor-pointer" id="seriesBtn">
+                        <span>Series</span>
+                        <svg id="seriesDropdownArrow" class="w-2.5 h-1.5 transition-transform duration-300 transform" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 1L6 7L11 1" stroke="#d8532e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="seriesDropdownMenu" class="absolute top-full left-1/2 transform -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2.5 transition-all duration-200 ease-in-out opacity-0 scale-95 pointer-events-none z-50 mt-1">
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="all">All Series</button>
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="One Piece">One Piece</button>
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="Naruto">Naruto</button>
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="Demon Slayer">Demon Slayer</button>
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="Dragon Ball Z">Dragon Ball Z</button>
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="Jujutsu Kaisen">Jujutsu Kaisen</button>
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="Attack on Titan">Attack on Titan</button>
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="My Hero Academia">My Hero Academia</button>
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="Black Clover">Black Clover</button>
+                    </div>
+                </div>
+
+                <!-- New Arrivals Dropdown Menu -->
+                <div class="nav-item-link relative py-2" id="arrivalsDropdownWrapper">
+                    <button class="flex items-center gap-1.5 text-primary hover:text-accent transition-colors font-medium cursor-pointer" id="arrivalsBtn">
+                        <span>New Arrivals</span>
+                        <svg id="arrivalsDropdownArrow" class="w-2.5 h-1.5 transition-transform duration-300 transform" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 1L6 7L11 1" stroke="#d8532e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="arrivalsDropdownMenu" class="absolute top-full left-1/2 transform -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2.5 transition-all duration-200 ease-in-out opacity-0 scale-95 pointer-events-none z-50 mt-1">
+                        <button class="arrivals-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-tag="new">New</button>
+                        <button class="arrivals-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-tag="hot">Hot</button>
+                        <button class="arrivals-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-tag="upcoming">Upcoming</button>
+                        <button class="arrivals-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-tag="discount">Discount</button>
+                    </div>
+                </div>
+
+                <a href="about.html" class="nav-item-link text-primary hover:text-accent transition-colors font-medium py-2">About</a>
+                
+                <!-- Fluid Underline Indicator -->
+                <div class="nav-underline-indicator" id="navIndicator"></div>
+            </div>
+
+            <!-- Right: Icons -->
+            <div class="flex items-center gap-3">
+                <!-- Search Bar -->
+                <div class="hidden md:flex items-center bg-gray-50 hover:bg-gray-100 transition-colors border border-gray-200 rounded-full px-4 py-1.5 w-60">
+                    <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input type="text" id="aboutSearchInput" placeholder="Search figures..." class="bg-transparent text-primary text-xs w-full outline-none placeholder-gray-400">
+                </div>
+
+                <!-- Account Icon -->
+                <a href="account.html" class="text-primary/80 hover:text-accent transition-colors p-2 cursor-pointer inline-block" title="Account">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                </a>
+
+                <!-- Wishlist Icon -->
+                <button class="text-primary/80 hover:text-accent transition-colors p-2 cursor-pointer" title="Wishlist">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+                    </svg>
+                </button>
+
+                <!-- Cart Button -->
+                <a href="cart.html" class="flex items-center gap-2 bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-full font-semibold transition-all hover:scale-105 cursor-pointer">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                    </svg>
+                    <span class="text-xs">Cart</span>
+                    <span id="aboutCartBadge" class="bg-white text-accent text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none">0</span>
+                </a>
+
+                <!-- Mobile Menu Button -->
+                <button class="lg:hidden text-primary p-2 cursor-pointer" id="menuBtn">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div class="lg:hidden hidden bg-white border-t border-gray-100 shadow-lg absolute top-full left-0 right-0" id="mobileMenu">
+            <div class="px-4 py-4 space-y-3">
+                <a href="index.html" class="block text-primary hover:text-accent font-medium py-2">Home</a>
+                <a href="index.html" class="block text-primary hover:text-accent font-medium py-2">Shop</a>
+                <a href="index.html" class="block text-primary hover:text-accent font-medium py-2">Series</a>
+                <a href="index.html" class="block text-primary hover:text-accent font-medium py-2">New Arrivals</a>
+                <a href="about.html" class="block text-primary hover:text-accent font-medium py-2">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Section -->
+    <main class="flex-grow flex items-center justify-center py-16 px-4 bg-gray-50">
+        <div class="w-full max-w-[450px] bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden relative">
+            
+            <!-- Tabs Top Wrapper -->
+            <div class="flex border-b border-gray-100 relative">
+                <button id="loginTabBtn" onclick="switchTab('login')" class="tab-btn w-1/2 py-5 text-sm font-heading font-bold text-accent transition-colors focus:outline-none cursor-pointer">
+                    Login
+                </button>
+                <button id="registerTabBtn" onclick="switchTab('register')" class="tab-btn w-1/2 py-5 text-sm font-heading font-bold text-gray-400 hover:text-primary transition-colors focus:outline-none cursor-pointer">
+                    Register
+                </button>
+                <!-- Smooth Underline Marker -->
+                <div id="tabIndicator" class="tab-underline w-1/2 absolute bottom-0 left-0"></div>
+            </div>
+
+            <!-- Tab Panels Wrapper -->
+            <div class="p-8">
+                
+                <!-- LOGIN FORM -->
+                <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="space-y-5 block transition-opacity duration-300">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Email Address</label>
+                        <input type="email" id="loginEmail" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-primary outline-none focus:border-accent focus:bg-white transition-all placeholder-gray-400" placeholder="yourname@domain.com">
+                    </div>
+                    
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between items-center">
+                            <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Password</label>
+                            <a href="#" onclick="showToast('Password reset link sent to your email!', 'success')" class="text-xs font-semibold text-accent hover:text-accent-dark transition-colors">Forgot Password?</a>
+                        </div>
+                        <div class="relative">
+                            <input type="password" id="loginPassword" required class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-4 pr-11 py-3 text-sm text-primary outline-none focus:border-accent focus:bg-white transition-all placeholder-gray-400" placeholder="••••••••">
+                            <button type="button" onclick="togglePasswordVisibility('loginPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-accent transition-colors p-1 cursor-pointer">
+                                <svg class="w-5 h-5 eye-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-accent hover:bg-accent-dark text-white font-heading font-bold text-sm py-3.5 rounded-xl shadow-lg shadow-accent/20 transition-all hover:scale-[1.02] cursor-pointer mt-2">
+                        Sign In
+                    </button>
+
+                    <div class="text-center pt-2">
+                        <p class="text-xs text-gray-500">
+                            Don't have an account? 
+                            <a href="#" onclick="event.preventDefault(); switchTab('register');" class="text-accent font-bold hover:underline">Register Now</a>
+                        </p>
+                    </div>
+                </form>
+
+                <!-- REGISTER FORM -->
+                <form id="registerForm" onsubmit="handleRegisterSubmit(event)" class="space-y-4 hidden transition-opacity duration-300">
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Full Name</label>
+                        <input type="text" id="regName" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-primary outline-none focus:border-accent focus:bg-white transition-all placeholder-gray-400" placeholder="e.g. Tanvir Rahman">
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Email Address</label>
+                        <input type="email" id="regEmail" required class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-primary outline-none focus:border-accent focus:bg-white transition-all placeholder-gray-400" placeholder="tanvir@example.com">
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Phone Number</label>
+                        <input type="tel" id="regPhone" required pattern="^\+8801[3-9]\d{8}$" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sm text-primary outline-none focus:border-accent focus:bg-white transition-all placeholder-gray-400" placeholder="+8801712345678">
+                        <p class="text-[10px] text-gray-400 font-medium">Must start with +880 (e.g. +8801712345678)</p>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Password</label>
+                        <div class="relative">
+                            <input type="password" id="regPassword" required minlength="6" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-4 pr-11 py-3 text-sm text-primary outline-none focus:border-accent focus:bg-white transition-all placeholder-gray-400" placeholder="Minimum 6 characters">
+                            <button type="button" onclick="togglePasswordVisibility('regPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-accent transition-colors p-1 cursor-pointer">
+                                <svg class="w-5 h-5 eye-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1.5">
+                        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wider">Confirm Password</label>
+                        <div class="relative">
+                            <input type="password" id="regConfirmPassword" required minlength="6" class="w-full bg-gray-50 border border-gray-200 rounded-xl pl-4 pr-11 py-3 text-sm text-primary outline-none focus:border-accent focus:bg-white transition-all placeholder-gray-400" placeholder="Confirm your password">
+                            <button type="button" onclick="togglePasswordVisibility('regConfirmPassword', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-accent transition-colors p-1 cursor-pointer">
+                                <svg class="w-5 h-5 eye-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-accent hover:bg-accent-dark text-white font-heading font-bold text-sm py-3.5 rounded-xl shadow-lg shadow-accent/20 transition-all hover:scale-[1.02] cursor-pointer mt-4">
+                        Register Account
+                    </button>
+
+                    <div class="text-center pt-2">
+                        <p class="text-xs text-gray-500">
+                            Already have an account? 
+                            <a href="#" onclick="event.preventDefault(); switchTab('login');" class="text-accent font-bold hover:underline">Login here</a>
+                        </p>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Success Toast Container -->
+    <div id="toastContainer" class="fixed bottom-6 right-6 z-[999] flex flex-col gap-2"></div>
+
+    <!-- Footer -->
+    <footer class="bg-primary pt-16 pb-8 border-t border-white/5">
+        <div class="max-w-[1600px] mx-auto px-8 md:px-16">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+                <!-- Brand Column -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="text-white font-heading font-bold text-2xl">OTAKU</span>
+                        <span class="text-accent font-heading font-bold text-2xl">VAULTBD</span>
+                    </div>
+                    <p class="text-gray-400 text-sm mb-4">Your ultimate destination for authentic anime figures and collectibles in Bangladesh. Quality products, competitive prices, excellent service.</p>
+                </div>
+
+                <!-- Shop Links -->
+                <div>
+                    <h4 class="font-heading font-bold text-white text-lg mb-4">Shop</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-400 hover:text-accent transition-colors text-sm">All Figures</a></li>
+                        <li><a href="index.html?badge=new" class="text-gray-400 hover:text-accent transition-colors text-sm">New Arrivals</a></li>
+                        <li><a href="index.html?badge=hot" class="text-gray-400 hover:text-accent transition-colors text-sm">Best Sellers</a></li>
+                        <li><a href="index.html?badge=upcoming" class="text-gray-400 hover:text-accent transition-colors text-sm">Pre-Orders</a></li>
+                        <li><a href="index.html?badge=discount" class="text-gray-400 hover:text-accent transition-colors text-sm">Sale Items</a></li>
+                    </ul>
+                </div>
+
+                <!-- Series Links -->
+                <div>
+                    <h4 class="font-heading font-bold text-white text-lg mb-4">Series</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html?series=One%20Piece" class="text-gray-400 hover:text-accent transition-colors text-sm">One Piece</a></li>
+                        <li><a href="index.html?series=Naruto" class="text-gray-400 hover:text-accent transition-colors text-sm">Naruto</a></li>
+                        <li><a href="index.html?series=Demon%20Slayer" class="text-gray-400 hover:text-accent transition-colors text-sm">Demon Slayer</a></li>
+                        <li><a href="index.html?series=Dragon%20Ball%20Z" class="text-gray-400 hover:text-accent transition-colors text-sm">Dragon Ball Z</a></li>
+                    </ul>
+                </div>
+
+                <!-- Support Links -->
+                <div>
+                    <h4 class="font-heading font-bold text-white text-lg mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="about.html" class="text-gray-400 hover:text-accent transition-colors text-sm">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">Shipping Info</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-accent transition-colors text-sm">Return Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="border-t border-white/10 pt-8 text-center">
+                <p class="text-gray-500 text-sm">© 2026 OtakuVaultBD. All rights reserved. Made with ❤️ for anime collectors in Bangladesh.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Actions & Routing -->
+    <script>
+        // Tab switching logic
+        function switchTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const loginTabBtn = document.getElementById('loginTabBtn');
+            const registerTabBtn = document.getElementById('registerTabBtn');
+            const tabIndicator = document.getElementById('tabIndicator');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                
+                loginTabBtn.classList.add('text-accent');
+                loginTabBtn.classList.remove('text-gray-400');
+                
+                registerTabBtn.classList.remove('text-accent');
+                registerTabBtn.classList.add('text-gray-400');
+                
+                tabIndicator.style.transform = 'translateX(0%)';
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                
+                loginTabBtn.classList.remove('text-accent');
+                loginTabBtn.classList.add('text-gray-400');
+                
+                registerTabBtn.classList.add('text-accent');
+                registerTabBtn.classList.remove('text-gray-400');
+                
+                tabIndicator.style.transform = 'translateX(100%)';
+            }
+        }
+
+        // Toggle Password Eye visibility
+        function togglePasswordVisibility(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+
+            // Swap SVG details
+            btn.innerHTML = isPassword ? `
+                <svg class="w-5 h-5 eye-icon text-accent" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                </svg>
+            ` : `
+                <svg class="w-5 h-5 eye-icon text-gray-400 hover:text-accent transition-colors" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+            `;
+        }
+
+        // Show premium success toast
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = 'flex items-center gap-3 bg-white border border-gray-150 shadow-2xl rounded-2xl p-4 pr-6 transform translate-y-4 opacity-0 transition-all duration-300 min-w-[280px] max-w-[360px]';
+            
+            const iconHtml = type === 'success' ? `
+                <div class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+            ` : `
+                <div class="w-8 h-8 bg-red-100 text-red-600 rounded-full flex items-center justify-center shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </div>
+            `;
+
+            toast.innerHTML = `
+                ${iconHtml}
+                <div class="flex-grow">
+                    <p class="text-sm font-semibold text-primary">${message}</p>
+                </div>
+            `;
+
+            container.appendChild(toast);
+
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-y-4', 'opacity-0');
+            }, 50);
+
+            // Animate out
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y--2');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Submit Handlers
+        function handleLoginSubmit(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            
+            showToast(`Welcome back! Successfully logged in.`, 'success');
+            
+            // Redirect to home/dashboard shortly after
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        }
+
+        function handleRegisterSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const phone = document.getElementById('regPhone').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const confirmPassword = document.getElementById('regConfirmPassword').value;
+
+            // Password match check
+            if (password !== confirmPassword) {
+                showToast("Passwords do not match!", "error");
+                return;
+            }
+
+            showToast(`Congratulations ${name}! Registration successful.`, 'success');
+
+            // Switch to Login tab shortly after
+            setTimeout(() => {
+                switchTab('login');
+                // Auto-fill login email
+                const loginEmail = document.getElementById('loginEmail');
+                if (loginEmail) loginEmail.value = email;
+            }, 1800);
+        }
+
+        // Global DOM loaded setup
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load and Sync Cart Counter on startup
+            function loadCartBadge() {
+                const cart = JSON.parse(localStorage.getItem('animeCart')) || [];
+                const totalItems = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+                const badge = document.getElementById('aboutCartBadge');
+                if (badge) {
+                    badge.textContent = totalItems;
+                }
+            }
+            loadCartBadge();
+
+            // Mobile Menu Toggle
+            const menuBtn = document.getElementById('menuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            if (menuBtn && mobileMenu) {
+                menuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            // Search Bar Router on Enter
+            const searchInput = document.getElementById('aboutSearchInput');
+            if (searchInput) {
+                searchInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        const val = searchInput.value.trim();
+                        if (val) {
+                            window.location.href = 'index.html?search=' + encodeURIComponent(val);
+                        }
+                    }
+                });
+            }
+
+            // Dropdown routing redirects to main catalog on index.html with parameters
+            const shopDropdownWrapper = document.getElementById('shopDropdownWrapper');
+            const shopDropdownMenu = document.getElementById('shopDropdownMenu');
+            const shopDropdownArrow = document.getElementById('shopDropdownArrow');
+            const categoryOptions = document.querySelectorAll('.shop-category-option');
+
+            if (shopDropdownWrapper && shopDropdownMenu) {
+                let closeTimeout = null;
+
+                function showShopMenu() {
+                    if (closeTimeout) {
+                        clearTimeout(closeTimeout);
+                        closeTimeout = null;
+                    }
+                    shopDropdownMenu.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+                    shopDropdownMenu.classList.add('opacity-100', 'scale-100');
+                    if (shopDropdownArrow) shopDropdownArrow.classList.add('rotate-180');
+                }
+
+                function hideShopMenu() {
+                    if (closeTimeout) {
+                        clearTimeout(closeTimeout);
+                    }
+                    closeTimeout = setTimeout(() => {
+                        shopDropdownMenu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                        shopDropdownMenu.classList.remove('opacity-100', 'scale-100');
+                        if (shopDropdownArrow) shopDropdownArrow.classList.remove('rotate-180');
+                    }, 100);
+                }
+
+                shopDropdownWrapper.addEventListener('mouseenter', showShopMenu);
+                shopDropdownWrapper.addEventListener('mouseleave', hideShopMenu);
+
+                categoryOptions.forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const cat = option.getAttribute('data-category');
+                        window.location.href = 'index.html?category=' + encodeURIComponent(cat);
+                    });
+                });
+            }
+
+            // Series Dropdown Router
+            const seriesDropdownWrapper = document.getElementById('seriesDropdownWrapper');
+            const seriesDropdownMenu = document.getElementById('seriesDropdownMenu');
+            const seriesDropdownArrow = document.getElementById('seriesDropdownArrow');
+            const seriesOptions = document.querySelectorAll('.series-option');
+
+            if (seriesDropdownWrapper && seriesDropdownMenu) {
+                let closeTimeout = null;
+
+                function showSeriesMenu() {
+                    if (closeTimeout) {
+                        clearTimeout(closeTimeout);
+                        closeTimeout = null;
+                    }
+                    seriesDropdownMenu.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+                    seriesDropdownMenu.classList.add('opacity-100', 'scale-100');
+                    if (seriesDropdownArrow) seriesDropdownArrow.classList.add('rotate-180');
+                }
+
+                function hideSeriesMenu() {
+                    if (closeTimeout) {
+                        clearTimeout(closeTimeout);
+                    }
+                    closeTimeout = setTimeout(() => {
+                        seriesDropdownMenu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                        seriesDropdownMenu.classList.remove('opacity-100', 'scale-100');
+                        if (seriesDropdownArrow) seriesDropdownArrow.classList.remove('rotate-180');
+                    }, 100);
+                }
+
+                seriesDropdownWrapper.addEventListener('mouseenter', showSeriesMenu);
+                seriesDropdownWrapper.addEventListener('mouseleave', hideSeriesMenu);
+
+                seriesOptions.forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const series = option.getAttribute('data-series');
+                        window.location.href = 'index.html?series=' + encodeURIComponent(series);
+                    });
+                });
+            }
+
+            // Arrivals Dropdown Router
+            const arrivalsDropdownWrapper = document.getElementById('arrivalsDropdownWrapper');
+            const arrivalsDropdownMenu = document.getElementById('arrivalsDropdownMenu');
+            const arrivalsDropdownArrow = document.getElementById('arrivalsDropdownArrow');
+            const arrivalsOptions = document.querySelectorAll('.arrivals-option');
+
+            if (arrivalsDropdownWrapper && arrivalsDropdownMenu) {
+                let closeTimeout = null;
+
+                function showArrivalsMenu() {
+                    if (closeTimeout) {
+                        clearTimeout(closeTimeout);
+                        closeTimeout = null;
+                    }
+                    arrivalsDropdownMenu.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+                    arrivalsDropdownMenu.classList.add('opacity-100', 'scale-100');
+                    if (arrivalsDropdownArrow) arrivalsDropdownArrow.classList.add('rotate-180');
+                }
+
+                function hideArrivalsMenu() {
+                    if (closeTimeout) {
+                        clearTimeout(closeTimeout);
+                    }
+                    closeTimeout = setTimeout(() => {
+                        arrivalsDropdownMenu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                        arrivalsDropdownMenu.classList.remove('opacity-100', 'scale-100');
+                        if (arrivalsDropdownArrow) arrivalsDropdownArrow.classList.remove('rotate-180');
+                    }, 100);
+                }
+
+                arrivalsDropdownWrapper.addEventListener('mouseenter', showArrivalsMenu);
+                arrivalsDropdownWrapper.addEventListener('mouseleave', hideArrivalsMenu);
+
+                arrivalsOptions.forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const tag = option.getAttribute('data-tag');
+                        window.location.href = 'index.html?badge=' + encodeURIComponent(tag);
+                    });
+                });
+            }
+
+            // Fluid Underline Animation on Hover
+            const navLinksContainer = document.getElementById('navLinksContainer');
+            const navIndicator = document.getElementById('navIndicator');
+            const navItems = document.querySelectorAll('.nav-item-link');
+
+            if (navLinksContainer && navIndicator) {
+                navItems.forEach(item => {
+                    item.addEventListener('mouseenter', () => {
+                        const rect = item.getBoundingClientRect();
+                        const containerRect = navLinksContainer.getBoundingClientRect();
+                        const left = rect.left - containerRect.left;
+                        const width = rect.width;
+                        
+                        navIndicator.style.left = `${left}px`;
+                        navIndicator.style.width = `${width}px`;
+                        navIndicator.style.opacity = '1';
+                    });
+                });
+
+                navLinksContainer.addEventListener('mouseleave', () => {
+                    navIndicator.style.opacity = '0';
+                });
+            }
+        });
+    </script>
+</body>
+</html>
