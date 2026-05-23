@@ -137,7 +137,22 @@
                         <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="Black Clover">Black Clover</button>
                     </div>
                 </div>
-                <a href="#" class="nav-item-link text-primary hover:text-accent transition-colors font-medium py-2">New Arrivals</a>
+                <!-- New Arrivals Dropdown Menu -->
+                <div class="nav-item-link relative py-2" id="arrivalsDropdownWrapper">
+                    <button class="flex items-center gap-1.5 text-primary hover:text-accent transition-colors font-medium cursor-pointer" id="arrivalsBtn">
+                        <span>New Arrivals</span>
+                        <svg id="arrivalsDropdownArrow" class="w-2.5 h-1.5 transition-transform duration-300 transform" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 1L6 7L11 1" stroke="#d8532e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="arrivalsDropdownMenu" class="absolute top-full left-1/2 transform -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2.5 transition-all duration-200 ease-in-out opacity-0 scale-95 pointer-events-none z-50 mt-1">
+                        <button class="arrivals-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-tag="new">New</button>
+                        <button class="arrivals-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-tag="hot">Hot</button>
+                        <button class="arrivals-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-tag="upcoming">Upcoming</button>
+                        <button class="arrivals-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-tag="discount">Discount</button>
+                    </div>
+                </div>
                 <a href="#" class="nav-item-link text-primary hover:text-accent transition-colors font-medium py-2">About</a>
                 
                 <!-- Fluid Underline Indicator -->
@@ -1119,6 +1134,50 @@
         }
         window.filterProductsBySeries = filterProductsBySeries;
 
+        // Custom Badge/Tag Filter
+        function filterProductsByBadge(tag) {
+            const allProducts = window.allProducts || fallbackProducts;
+            const heading = document.querySelector('.flex-grow h2.font-heading, .flex-1 h2.font-heading');
+            
+            let filtered;
+            const tagLower = tag.trim().toLowerCase();
+            
+            if (tagLower === 'new') {
+                filtered = allProducts.filter(p => (p.badge || '').toUpperCase() === 'NEW');
+                if (heading) heading.textContent = 'New Arrivals';
+            } else if (tagLower === 'hot') {
+                filtered = allProducts.filter(p => (p.badge || '').toUpperCase() === 'HOT');
+                if (heading) heading.textContent = 'Hot Trending';
+            } else if (tagLower === 'upcoming') {
+                filtered = allProducts.filter(p => (p.badge || '').toUpperCase() === 'UPCOMING');
+                if (heading) heading.textContent = 'Upcoming Releases';
+            } else if (tagLower === 'discount') {
+                const todayStr = new Date().toISOString().split('T')[0];
+                filtered = allProducts.filter(p => {
+                    const isDiscountBadge = p.badge === 'DISCOUNT' || (p.badge && p.badge.startsWith('-') && p.badge.endsWith('%'));
+                    const hasActiveDiscount = isDiscountBadge && p.discount_percent > 0 && 
+                        (!p.discount_expiry || p.discount_expiry >= todayStr);
+                    return hasActiveDiscount || (p.discount_percent > 0) || (p.original_price > p.price);
+                });
+                if (heading) heading.textContent = 'Special Offers & Discounts';
+            } else {
+                filtered = allProducts;
+                if (heading) heading.textContent = 'All Products';
+            }
+            
+            renderProducts(filtered);
+
+            // Smooth scroll down to the product section container
+            const productSection = document.getElementById('shopProductSection');
+            if (productSection) {
+                productSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+        window.filterProductsByBadge = filterProductsByBadge;
+
         // Fetch and Render Products Dynamically
         async function fetchAndRenderProducts() {
             let productsList = fallbackProducts;
@@ -1633,6 +1692,54 @@
                         }
                         
                         hideSeriesMenu();
+                    });
+                });
+            }
+
+            // New Arrivals Dropdown Mega Menu Hover and Click Logic
+            const arrivalsDropdownWrapper = document.getElementById('arrivalsDropdownWrapper');
+            const arrivalsDropdownMenu = document.getElementById('arrivalsDropdownMenu');
+            const arrivalsDropdownArrow = document.getElementById('arrivalsDropdownArrow');
+            const arrivalsOptions = document.querySelectorAll('.arrivals-option');
+
+            if (arrivalsDropdownWrapper && arrivalsDropdownMenu) {
+                let closeTimeout = null;
+
+                function showArrivalsMenu() {
+                    if (closeTimeout) {
+                        clearTimeout(closeTimeout);
+                        closeTimeout = null;
+                    }
+                    arrivalsDropdownMenu.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+                    arrivalsDropdownMenu.classList.add('opacity-100', 'scale-100');
+                    if (arrivalsDropdownArrow) arrivalsDropdownArrow.classList.add('rotate-180');
+                }
+
+                function hideArrivalsMenu() {
+                    if (closeTimeout) {
+                        clearTimeout(closeTimeout);
+                    }
+                    closeTimeout = setTimeout(() => {
+                        arrivalsDropdownMenu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                        arrivalsDropdownMenu.classList.remove('opacity-100', 'scale-100');
+                        if (arrivalsDropdownArrow) arrivalsDropdownArrow.classList.remove('rotate-180');
+                    }, 100);
+                }
+
+                arrivalsDropdownWrapper.addEventListener('mouseenter', showArrivalsMenu);
+                arrivalsDropdownWrapper.addEventListener('mouseleave', hideArrivalsMenu);
+
+                arrivalsOptions.forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const tag = option.getAttribute('data-tag');
+                        
+                        if (typeof window.filterProductsByBadge === 'function') {
+                            window.filterProductsByBadge(tag);
+                        }
+                        
+                        hideArrivalsMenu();
                     });
                 });
             }
