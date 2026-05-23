@@ -116,7 +116,27 @@
                         <button class="shop-category-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-category="Statues/PVC">Statues/PVC</button>
                     </div>
                 </div>
-                <a href="#" class="nav-item-link text-primary hover:text-accent transition-colors font-medium py-2">Series</a>
+                <!-- Series Dropdown Menu -->
+                <div class="nav-item-link relative py-2" id="seriesDropdownWrapper">
+                    <button class="flex items-center gap-1.5 text-primary hover:text-accent transition-colors font-medium cursor-pointer" id="seriesBtn">
+                        <span>Series</span>
+                        <svg id="seriesDropdownArrow" class="w-2.5 h-1.5 transition-transform duration-300 transform" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M1 1L6 7L11 1" stroke="#d8532e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                    <!-- Dropdown Menu -->
+                    <div id="seriesDropdownMenu" class="absolute top-full left-1/2 transform -translate-x-1/2 w-48 bg-white border border-gray-100 rounded-2xl shadow-xl py-2.5 transition-all duration-200 ease-in-out opacity-0 scale-95 pointer-events-none z-50 mt-1">
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="all">All Series</button>
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="One Piece">One Piece</button>
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="Naruto">Naruto</button>
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="Demon Slayer">Demon Slayer</button>
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="Dragon Ball Z">Dragon Ball Z</button>
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="Jujutsu Kaisen">Jujutsu Kaisen</button>
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="Attack on Titan">Attack on Titan</button>
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="My Hero Academia">My Hero Academia</button>
+                        <button class="series-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-series="Black Clover">Black Clover</button>
+                    </div>
+                </div>
                 <a href="#" class="nav-item-link text-primary hover:text-accent transition-colors font-medium py-2">New Arrivals</a>
                 <a href="#" class="nav-item-link text-primary hover:text-accent transition-colors font-medium py-2">About</a>
                 
@@ -1060,6 +1080,45 @@
         }
         window.filterProductsByCategory = filterProductsByCategory;
 
+        // Custom Series Filter
+        function filterProductsBySeries(seriesName) {
+            const allProducts = window.allProducts || fallbackProducts;
+            const heading = document.querySelector('.flex-grow h2.font-heading, .flex-1 h2.font-heading');
+            
+            let filtered;
+            const seriesLower = seriesName.trim().toLowerCase();
+            
+            if (seriesLower === 'all' || seriesLower === 'all series') {
+                filtered = allProducts;
+                if (heading) heading.textContent = 'All Products';
+            } else {
+                filtered = allProducts.filter(p => (p.series || '').toLowerCase() === seriesLower);
+                if (heading) heading.textContent = seriesName;
+            }
+            
+            renderProducts(filtered);
+
+            // Update series pill active state visually if it exists
+            const pillBtns = document.querySelectorAll('.pill-btn');
+            pillBtns.forEach(btn => {
+                const btnText = btn.textContent.trim().toLowerCase();
+                if (btnText === seriesLower || ((seriesLower === 'all' || seriesLower === 'all series') && btnText === 'all series')) {
+                    pillBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                }
+            });
+
+            // Smooth scroll down to the product section container
+            const productSection = document.getElementById('shopProductSection');
+            if (productSection) {
+                productSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }
+        window.filterProductsBySeries = filterProductsBySeries;
+
         // Fetch and Render Products Dynamically
         async function fetchAndRenderProducts() {
             let productsList = fallbackProducts;
@@ -1142,6 +1201,8 @@
                 btn.addEventListener('click', () => {
                     pillBtns.forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
+                    const seriesName = btn.textContent.trim();
+                    filterProductsBySeries(seriesName);
                 });
             });
 
@@ -1524,6 +1585,54 @@
                         }
                         
                         hideShopMenu();
+                    });
+                });
+            }
+
+            // Series Dropdown Mega Menu Hover and Click Logic
+            const seriesDropdownWrapper = document.getElementById('seriesDropdownWrapper');
+            const seriesDropdownMenu = document.getElementById('seriesDropdownMenu');
+            const seriesDropdownArrow = document.getElementById('seriesDropdownArrow');
+            const seriesOptions = document.querySelectorAll('.series-option');
+
+            if (seriesDropdownWrapper && seriesDropdownMenu) {
+                let closeTimeout = null;
+
+                function showSeriesMenu() {
+                    if (closeTimeout) {
+                        clearTimeout(closeTimeout);
+                        closeTimeout = null;
+                    }
+                    seriesDropdownMenu.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+                    seriesDropdownMenu.classList.add('opacity-100', 'scale-100');
+                    if (seriesDropdownArrow) seriesDropdownArrow.classList.add('rotate-180');
+                }
+
+                function hideSeriesMenu() {
+                    if (closeTimeout) {
+                        clearTimeout(closeTimeout);
+                    }
+                    closeTimeout = setTimeout(() => {
+                        seriesDropdownMenu.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                        seriesDropdownMenu.classList.remove('opacity-100', 'scale-100');
+                        if (seriesDropdownArrow) seriesDropdownArrow.classList.remove('rotate-180');
+                    }, 100);
+                }
+
+                seriesDropdownWrapper.addEventListener('mouseenter', showSeriesMenu);
+                seriesDropdownWrapper.addEventListener('mouseleave', hideSeriesMenu);
+
+                seriesOptions.forEach(option => {
+                    option.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const series = option.getAttribute('data-series');
+                        
+                        if (typeof window.filterProductsBySeries === 'function') {
+                            window.filterProductsBySeries(series);
+                        }
+                        
+                        hideSeriesMenu();
                     });
                 });
             }
