@@ -72,6 +72,17 @@
             background-color: #d8532e !important;
             color: white !important;
         }
+        /* Liquid Underline Indicator styling */
+        .nav-underline-indicator {
+            position: absolute;
+            bottom: -2px;
+            height: 3px;
+            background-color: #d8532e;
+            border-radius: 9999px;
+            transition: left 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), width 0.3s cubic-bezier(0.25, 0.1, 0.25, 1), opacity 0.2s ease-in-out;
+            opacity: 0;
+            pointer-events: none;
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -87,10 +98,10 @@
             </a>
 
             <!-- Center: Navigation Links -->
-            <div class="hidden lg:flex items-center gap-8 justify-center absolute left-1/2 transform -translate-x-1/2">
-                <a href="index.html" class="text-primary hover:text-accent transition-colors font-medium">Home</a>
+            <div id="navLinksContainer" class="hidden lg:flex items-center gap-8 justify-center absolute left-1/2 transform -translate-x-1/2">
+                <a href="index.html" class="nav-item-link text-primary hover:text-accent transition-colors font-medium">Home</a>
                 <!-- Shop Dropdown Menu -->
-                <div class="relative py-2" id="shopDropdownWrapper">
+                <div class="nav-item-link relative py-2" id="shopDropdownWrapper">
                     <button class="flex items-center gap-1.5 text-primary hover:text-accent transition-colors font-medium cursor-pointer" id="shopBtn">
                         <span>Shop</span>
                         <svg id="shopDropdownArrow" class="w-2.5 h-1.5 transition-transform duration-300 transform" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -106,9 +117,12 @@
                         <button class="shop-category-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-category="Statues/PVC">Statues/PVC</button>
                     </div>
                 </div>
-                <a href="#" class="text-primary hover:text-accent transition-colors font-medium">Series</a>
-                <a href="#" class="text-primary hover:text-accent transition-colors font-medium">New Arrivals</a>
-                <a href="#" class="text-primary hover:text-accent transition-colors font-medium">About</a>
+                <a href="#" class="nav-item-link text-primary hover:text-accent transition-colors font-medium">Series</a>
+                <a href="#" class="nav-item-link text-primary hover:text-accent transition-colors font-medium">New Arrivals</a>
+                <a href="#" class="nav-item-link text-primary hover:text-accent transition-colors font-medium">About</a>
+                
+                <!-- Fluid Underline Indicator -->
+                <div class="nav-underline-indicator" id="navIndicator"></div>
             </div>
 
             <!-- Right: Icons (Search, Account, Wishlist, Cart) -->
@@ -1501,6 +1515,32 @@
                         
                         hideShopMenu();
                     });
+                });
+            }
+
+            // Fluid Animated Underline for Navbar
+            const navLinksContainer = document.getElementById('navLinksContainer');
+            const navIndicator = document.getElementById('navIndicator');
+            const navItems = document.querySelectorAll('.nav-item-link');
+
+            if (navLinksContainer && navIndicator) {
+                navItems.forEach(item => {
+                    item.addEventListener('mouseenter', () => {
+                        const rect = item.getBoundingClientRect();
+                        const containerRect = navLinksContainer.getBoundingClientRect();
+                        
+                        // Calculate offset position relative to navLinksContainer
+                        const left = rect.left - containerRect.left;
+                        const width = rect.width;
+                        
+                        navIndicator.style.left = `${left}px`;
+                        navIndicator.style.width = `${width}px`;
+                        navIndicator.style.opacity = '1';
+                    });
+                });
+
+                navLinksContainer.addEventListener('mouseleave', () => {
+                    navIndicator.style.opacity = '0';
                 });
             }
 
