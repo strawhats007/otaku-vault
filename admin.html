@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - OtakuVault</title>
+    <title>Admin Dashboard - OtakuVaultBD</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -326,7 +326,7 @@
         class="flex flex-col items-center justify-center transition-opacity duration-500">
         <div class="flex flex-col items-center gap-4">
             <div class="loading-spinner"></div>
-            <span class="text-xs font-bold text-white tracking-widest uppercase">LOADING OTAKU VAULT...</span>
+            <span class="text-xs font-bold text-white tracking-widest uppercase">LOADING OTAKU VAULTBD...</span>
         </div>
     </div>
 
@@ -338,7 +338,7 @@
             <!-- Logo -->
             <div class="flex items-center gap-2 justify-center mb-2">
                 <span class="text-white font-heading font-bold text-3xl tracking-tight">OTAKU</span>
-                <span class="text-accent font-heading font-bold text-3xl tracking-tight">VAULT</span>
+                <span class="text-accent font-heading font-bold text-3xl tracking-tight">VAULTBD</span>
             </div>
             <div class="space-y-2">
                 <h2 class="text-lg font-heading font-bold text-white uppercase tracking-wider">Admin Login</h2>
@@ -374,7 +374,7 @@
                 <!-- Brand Logo -->
                 <a href="index.html" class="flex items-center gap-2 px-2">
                     <span class="text-white font-heading font-bold text-2xl tracking-tight">OTAKU</span>
-                    <span class="text-accent font-heading font-bold text-2xl tracking-tight">VAULT</span>
+                    <span class="text-accent font-heading font-bold text-2xl tracking-tight">VAULTBD</span>
                 </a>
 
                 <!-- Navigation List -->
@@ -1276,7 +1276,7 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div class="space-y-1.5">
                                         <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingStoreName">Store Name</label>
-                                        <input type="text" id="settingStoreName" placeholder="Otaku Vault" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all" value="Otaku Vault">
+                                        <input type="text" id="settingStoreName" placeholder="Otaku VaultBD" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all" value="Otaku VaultBD">
                                     </div>
                                     <div class="space-y-1.5">
                                         <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingStoreEmail">Store Email</label>
@@ -2888,7 +2888,7 @@
             const outsideEl = document.getElementById('settingDeliveryOutside');
             const thresholdEl = document.getElementById('settingFreeThreshold');
 
-            if (nameEl) nameEl.value = localStorage.getItem('storeSettingsName') || 'Otaku Vault';
+            if (nameEl) nameEl.value = localStorage.getItem('storeSettingsName') || 'Otaku VaultBD';
             if (emailEl) emailEl.value = localStorage.getItem('storeSettingsEmail') || 'support@otakuvault.com';
             if (addrEl) addrEl.value = localStorage.getItem('storeSettingsAddress') || 'Banani, Dhaka, Bangladesh';
             if (dhakaEl) dhakaEl.value = localStorage.getItem('deliveryDhaka') || '60';
@@ -3560,13 +3560,13 @@
                     <div class="relative z-10">
                         <div class="flex items-center gap-2 mb-1.5">
                             <span class="text-white font-heading font-black text-3xl tracking-tight">OTAKU</span>
-                            <span class="text-[#e85d04] font-heading font-black text-3xl tracking-tight">VAULT</span>
+                            <span class="text-[#e85d04] font-heading font-black text-3xl tracking-tight">VAULTBD</span>
                         </div>
                         <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">The Ultimate Anime Merchandise Hub</p>
                     </div>
                     
                     <div class="relative z-10 text-left sm:text-right text-xs text-gray-400 font-semibold space-y-1.5">
-                        <p class="text-sm font-bold text-white">Otaku Vault Bangladesh</p>
+                        <p class="text-sm font-bold text-white">Otaku VaultBD Bangladesh</p>
                         <p class="flex items-center sm:justify-end gap-1.5">
                             <svg class="w-3.5 h-3.5 text-[#e85d04]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L22 8m-2 11a2 2 0 01-2 2H6a2 2 0 01-2-2V8a2 2 0 012-2h12a2 2 0 012 2v11z"/></svg>
                             support@otakuvault.com
