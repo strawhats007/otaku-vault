@@ -179,6 +179,25 @@
             border-left: none !important;
         }
 
+        /* Orders tab custom dropdown option styles */
+        .status-option, .sort-option {
+            color: #333333 !important;
+            font-weight: 500 !important;
+            background-color: transparent !important;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+        
+        .status-option:hover, .sort-option:hover {
+            background-color: #d8532e !important;
+            color: #ffffff !important;
+        }
+        
+        .status-option.selected, .sort-option.selected {
+            background-color: #d8532e !important;
+            color: #ffffff !important;
+            font-weight: 600 !important;
+        }
+
         /* Product Modal inputs border radius overrides */
         #productModal input,
         #productModal select,
@@ -1067,10 +1086,10 @@
                                     </div>
                                     <!-- Dropdown List Panel -->
                                     <div id="statusDropdownPanel" class="absolute left-0 top-full mt-1.5 w-48 bg-white border border-gray-150 rounded-xl shadow-lg z-30 p-1 space-y-0.5 custom-dropdown-panel">
-                                        <div onclick="selectOrderStatusOption('All', 'All Statuses')" class="status-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#d8532e] hover:text-white rounded-lg transition-all cursor-pointer" data-value="All">All Statuses</div>
-                                        <div onclick="selectOrderStatusOption('Processing', 'Processing')" class="status-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#d8532e] hover:text-white rounded-lg transition-all cursor-pointer" data-value="Processing">Processing</div>
-                                        <div onclick="selectOrderStatusOption('Shipped', 'Shipped')" class="status-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#d8532e] hover:text-white rounded-lg transition-all cursor-pointer" data-value="Shipped">Shipped</div>
-                                        <div onclick="selectOrderStatusOption('Delivered', 'Delivered')" class="status-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#d8532e] hover:text-white rounded-lg transition-all cursor-pointer" data-value="Delivered">Delivered</div>
+                                        <div onclick="selectOrderStatusOption('All', 'All Statuses')" class="status-option px-3.5 py-2 text-xs rounded-lg transition-all cursor-pointer" data-value="All">All Statuses</div>
+                                        <div onclick="selectOrderStatusOption('Processing', 'Processing')" class="status-option px-3.5 py-2 text-xs rounded-lg transition-all cursor-pointer" data-value="Processing">Processing</div>
+                                        <div onclick="selectOrderStatusOption('Shipped', 'Shipped')" class="status-option px-3.5 py-2 text-xs rounded-lg transition-all cursor-pointer" data-value="Shipped">Shipped</div>
+                                        <div onclick="selectOrderStatusOption('Delivered', 'Delivered')" class="status-option px-3.5 py-2 text-xs rounded-lg transition-all cursor-pointer" data-value="Delivered">Delivered</div>
                                     </div>
                                 </div>
 
@@ -1087,8 +1106,8 @@
                                     </div>
                                     <!-- Dropdown List Panel -->
                                     <div id="sortDropdownPanel" class="absolute right-0 top-full mt-1.5 w-40 bg-white border border-gray-150 rounded-xl shadow-lg z-30 p-1 space-y-0.5 custom-dropdown-panel">
-                                        <div onclick="selectOrderSortOption('newest', 'Newest First')" class="sort-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#d8532e] hover:text-white rounded-lg transition-all cursor-pointer" data-value="newest">Newest First</div>
-                                        <div onclick="selectOrderSortOption('oldest', 'Oldest First')" class="sort-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#d8532e] hover:text-white rounded-lg transition-all cursor-pointer" data-value="oldest">Oldest First</div>
+                                        <div onclick="selectOrderSortOption('newest', 'Newest First')" class="sort-option px-3.5 py-2 text-xs rounded-lg transition-all cursor-pointer" data-value="newest">Newest First</div>
+                                        <div onclick="selectOrderSortOption('oldest', 'Oldest First')" class="sort-option px-3.5 py-2 text-xs rounded-lg transition-all cursor-pointer" data-value="oldest">Oldest First</div>
                                     </div>
                                 </div>
                             </div>
@@ -3484,11 +3503,9 @@
             const options = document.querySelectorAll('.status-option');
             options.forEach(opt => {
                 if (opt.getAttribute('data-value') === val) {
-                    opt.classList.add('bg-accent', 'text-white', 'font-semibold');
-                    opt.classList.remove('text-primary', 'font-medium', 'hover:bg-[#d8532e]', 'hover:text-white');
+                    opt.classList.add('selected');
                 } else {
-                    opt.classList.remove('bg-accent', 'text-white', 'font-semibold');
-                    opt.classList.add('text-primary', 'font-medium', 'hover:bg-[#d8532e]', 'hover:text-white');
+                    opt.classList.remove('selected');
                 }
             });
 
@@ -3511,11 +3528,9 @@
             const options = document.querySelectorAll('.sort-option');
             options.forEach(opt => {
                 if (opt.getAttribute('data-value') === val) {
-                    opt.classList.add('bg-accent', 'text-white', 'font-semibold');
-                    opt.classList.remove('text-primary', 'font-medium', 'hover:bg-[#d8532e]', 'hover:text-white');
+                    opt.classList.add('selected');
                 } else {
-                    opt.classList.remove('bg-accent', 'text-white', 'font-semibold');
-                    opt.classList.add('text-primary', 'font-medium', 'hover:bg-[#d8532e]', 'hover:text-white');
+                    opt.classList.remove('selected');
                 }
             });
 
@@ -3532,11 +3547,9 @@
             const statusOptions = document.querySelectorAll('.status-option');
             statusOptions.forEach(opt => {
                 if (opt.getAttribute('data-value') === statusVal) {
-                    opt.classList.add('bg-accent', 'text-white', 'font-semibold');
-                    opt.classList.remove('text-primary', 'font-medium', 'hover:bg-[#d8532e]', 'hover:text-white');
+                    opt.classList.add('selected');
                 } else {
-                    opt.classList.remove('bg-accent', 'text-white', 'font-semibold');
-                    opt.classList.add('text-primary', 'font-medium', 'hover:bg-[#d8532e]', 'hover:text-white');
+                    opt.classList.remove('selected');
                 }
             });
 
@@ -3545,11 +3558,9 @@
             const sortOptions = document.querySelectorAll('.sort-option');
             sortOptions.forEach(opt => {
                 if (opt.getAttribute('data-value') === sortVal) {
-                    opt.classList.add('bg-accent', 'text-white', 'font-semibold');
-                    opt.classList.remove('text-primary', 'font-medium', 'hover:bg-[#d8532e]', 'hover:text-white');
+                    opt.classList.add('selected');
                 } else {
-                    opt.classList.remove('bg-accent', 'text-white', 'font-semibold');
-                    opt.classList.add('text-primary', 'font-medium', 'hover:bg-[#d8532e]', 'hover:text-white');
+                    opt.classList.remove('selected');
                 }
             });
         }
