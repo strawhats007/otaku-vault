@@ -1647,17 +1647,25 @@
 
                 const nextStatus = currentStatus === 'in_stock' ? 'stock_out' : 'in_stock';
 
+                // Get current auth session token
+                let token = SUPABASE_ANON_KEY;
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session && session.access_token) {
+                    token = session.access_token;
+                }
+
                 // Update locally first to make it responsive
                 const prod = allProducts.find(p => p.id === id);
                 if (prod) {
                     prod.status = nextStatus;
                 }
 
+                // Trigger PATCH request with access token
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${id}`, {
                     method: 'PATCH',
                     headers: {
                         'apikey': SUPABASE_ANON_KEY,
-                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json',
                         'Prefer': 'return=minimal'
                     },
@@ -1670,6 +1678,28 @@
                     const errText = await response.text();
                     throw new Error(errText || `HTTP ${response.status}`);
                 }
+
+                // Re-fetch the product from Supabase to confirm the value was actually saved
+                const verifyRes = await fetch(`${SUPABASE_URL}/rest/v1/products?id=eq.${id}`, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!verifyRes.ok) {
+                    throw new Error("Failed to re-fetch product status for verification.");
+                }
+
+                const verifyData = await verifyRes.json();
+                const savedStatus = verifyData[0]?.status;
+                console.log(`[cycleProductStatus Verification] ID: ${id}, Expected: ${nextStatus}, Saved in DB: ${savedStatus}`);
+
+                if (savedStatus !== nextStatus) {
+                    throw new Error(`Status change did not persist in database. Check admin session/Row-Level Security (RLS) policies. DB state: '${savedStatus}'`);
+                }
+
                 showNotificationToast(`Status updated to ${nextStatus === 'in_stock' ? 'In Stock' : 'Stock Out'}`);
 
                 // Refresh filters to make sure table displays correct styling
