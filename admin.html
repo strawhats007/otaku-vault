@@ -1067,10 +1067,10 @@
                                     </div>
                                     <!-- Dropdown List Panel -->
                                     <div id="statusDropdownPanel" class="absolute left-0 top-full mt-1.5 w-48 bg-white border border-gray-150 rounded-xl shadow-lg z-30 p-1 space-y-0.5 custom-dropdown-panel">
-                                        <div onclick="selectOrderStatusOption('All', 'All Statuses')" class="status-option px-3.5 py-2 text-xs font-semibold bg-accent text-white rounded-lg transition-all cursor-pointer" data-value="All">All Statuses</div>
-                                        <div onclick="selectOrderStatusOption('Processing', 'Processing')" class="status-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#fff1ee] hover:text-[#d8532e] rounded-lg transition-all cursor-pointer" data-value="Processing">Processing</div>
-                                        <div onclick="selectOrderStatusOption('Shipped', 'Shipped')" class="status-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#fff1ee] hover:text-[#d8532e] rounded-lg transition-all cursor-pointer" data-value="Shipped">Shipped</div>
-                                        <div onclick="selectOrderStatusOption('Delivered', 'Delivered')" class="status-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#fff1ee] hover:text-[#d8532e] rounded-lg transition-all cursor-pointer" data-value="Delivered">Delivered</div>
+                                        <div onclick="selectOrderStatusOption('All', 'All Statuses')" class="status-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#d8532e] hover:text-white rounded-lg transition-all cursor-pointer" data-value="All">All Statuses</div>
+                                        <div onclick="selectOrderStatusOption('Processing', 'Processing')" class="status-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#d8532e] hover:text-white rounded-lg transition-all cursor-pointer" data-value="Processing">Processing</div>
+                                        <div onclick="selectOrderStatusOption('Shipped', 'Shipped')" class="status-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#d8532e] hover:text-white rounded-lg transition-all cursor-pointer" data-value="Shipped">Shipped</div>
+                                        <div onclick="selectOrderStatusOption('Delivered', 'Delivered')" class="status-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#d8532e] hover:text-white rounded-lg transition-all cursor-pointer" data-value="Delivered">Delivered</div>
                                     </div>
                                 </div>
 
@@ -1087,8 +1087,8 @@
                                     </div>
                                     <!-- Dropdown List Panel -->
                                     <div id="sortDropdownPanel" class="absolute right-0 top-full mt-1.5 w-40 bg-white border border-gray-150 rounded-xl shadow-lg z-30 p-1 space-y-0.5 custom-dropdown-panel">
-                                        <div onclick="selectOrderSortOption('newest', 'Newest First')" class="sort-option px-3.5 py-2 text-xs font-semibold bg-accent text-white rounded-lg transition-all cursor-pointer" data-value="newest">Newest First</div>
-                                        <div onclick="selectOrderSortOption('oldest', 'Oldest First')" class="sort-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#fff1ee] hover:text-[#d8532e] rounded-lg transition-all cursor-pointer" data-value="oldest">Oldest First</div>
+                                        <div onclick="selectOrderSortOption('newest', 'Newest First')" class="sort-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#d8532e] hover:text-white rounded-lg transition-all cursor-pointer" data-value="newest">Newest First</div>
+                                        <div onclick="selectOrderSortOption('oldest', 'Oldest First')" class="sort-option px-3.5 py-2 text-xs font-medium text-primary hover:bg-[#d8532e] hover:text-white rounded-lg transition-all cursor-pointer" data-value="oldest">Oldest First</div>
                                     </div>
                                 </div>
                             </div>
@@ -3485,10 +3485,10 @@
             options.forEach(opt => {
                 if (opt.getAttribute('data-value') === val) {
                     opt.classList.add('bg-accent', 'text-white', 'font-semibold');
-                    opt.classList.remove('text-primary', 'font-medium', 'hover:bg-[#fff1ee]', 'hover:text-[#d8532e]');
+                    opt.classList.remove('text-primary', 'font-medium', 'hover:bg-[#d8532e]', 'hover:text-white');
                 } else {
                     opt.classList.remove('bg-accent', 'text-white', 'font-semibold');
-                    opt.classList.add('text-primary', 'font-medium', 'hover:bg-[#fff1ee]', 'hover:text-[#d8532e]');
+                    opt.classList.add('text-primary', 'font-medium', 'hover:bg-[#d8532e]', 'hover:text-white');
                 }
             });
 
@@ -3512,10 +3512,10 @@
             options.forEach(opt => {
                 if (opt.getAttribute('data-value') === val) {
                     opt.classList.add('bg-accent', 'text-white', 'font-semibold');
-                    opt.classList.remove('text-primary', 'font-medium', 'hover:bg-[#fff1ee]', 'hover:text-[#d8532e]');
+                    opt.classList.remove('text-primary', 'font-medium', 'hover:bg-[#d8532e]', 'hover:text-white');
                 } else {
                     opt.classList.remove('bg-accent', 'text-white', 'font-semibold');
-                    opt.classList.add('text-primary', 'font-medium', 'hover:bg-[#fff1ee]', 'hover:text-[#d8532e]');
+                    opt.classList.add('text-primary', 'font-medium', 'hover:bg-[#d8532e]', 'hover:text-white');
                 }
             });
 
@@ -3526,8 +3526,37 @@
             hideCustomDropdown('sort', true);
         }
 
+        function syncOrdersDropdowns() {
+            // Sync Status Dropdown Option UI
+            const statusVal = document.getElementById('orderStatusDropdown') ? document.getElementById('orderStatusDropdown').value : 'All';
+            const statusOptions = document.querySelectorAll('.status-option');
+            statusOptions.forEach(opt => {
+                if (opt.getAttribute('data-value') === statusVal) {
+                    opt.classList.add('bg-accent', 'text-white', 'font-semibold');
+                    opt.classList.remove('text-primary', 'font-medium', 'hover:bg-[#d8532e]', 'hover:text-white');
+                } else {
+                    opt.classList.remove('bg-accent', 'text-white', 'font-semibold');
+                    opt.classList.add('text-primary', 'font-medium', 'hover:bg-[#d8532e]', 'hover:text-white');
+                }
+            });
+
+            // Sync Sort Dropdown Option UI
+            const sortVal = document.getElementById('orderSortDropdown') ? document.getElementById('orderSortDropdown').value : 'newest';
+            const sortOptions = document.querySelectorAll('.sort-option');
+            sortOptions.forEach(opt => {
+                if (opt.getAttribute('data-value') === sortVal) {
+                    opt.classList.add('bg-accent', 'text-white', 'font-semibold');
+                    opt.classList.remove('text-primary', 'font-medium', 'hover:bg-[#d8532e]', 'hover:text-white');
+                } else {
+                    opt.classList.remove('bg-accent', 'text-white', 'font-semibold');
+                    opt.classList.add('text-primary', 'font-medium', 'hover:bg-[#d8532e]', 'hover:text-white');
+                }
+            });
+        }
+
         function initOrdersTab() {
             recalculateOrderStats();
+            syncOrdersDropdowns();
             renderOrders();
         }
 
