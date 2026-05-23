@@ -427,7 +427,7 @@
                         </svg>
                         Orders
                     </a>
-                    <a href="#" id="nav-settings" onclick="showSectionToast('Settings panel')"
+                    <a href="#" id="nav-settings" onclick="switchTab('settings')"
                         class="flex items-center gap-3 text-gray-400 hover:text-white px-4 py-3.5 rounded-xl font-semibold text-sm transition-all hover:bg-white/5 select-none">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -1167,6 +1167,169 @@
                     </div>
                 </div>
 
+                <!-- ==================== SETTINGS SECTION ==================== -->
+                <div id="sectionSettings" class="hidden space-y-8 animate-fadeIn">
+                    <!-- Page Header -->
+                    <div class="flex flex-col gap-2">
+                        <h2 class="text-3xl font-heading font-extrabold text-primary tracking-tight">System Settings</h2>
+                        <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Configure store information, delivery, and credentials</p>
+                    </div>
+
+                    <!-- 3 Cards Layout -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- Left Column (Store Info & Delivery Settings) -->
+                        <div class="space-y-8">
+                            <!-- 1. Store Information Card -->
+                            <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-6">
+                                <div class="flex items-center gap-3 pb-4 border-b border-gray-50">
+                                    <div class="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-accent">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-heading font-bold text-primary">Store Information</h3>
+                                        <p class="text-xs text-gray-400 font-semibold">General metadata for your e-commerce shop</p>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div class="space-y-1.5">
+                                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingStoreName">Store Name</label>
+                                        <input type="text" id="settingStoreName" placeholder="Otaku Vault" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all" value="Otaku Vault">
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingStoreEmail">Store Email</label>
+                                        <input type="email" id="settingStoreEmail" placeholder="support@otakuvault.com" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all" value="support@otakuvault.com">
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingStoreAddress">Store Address</label>
+                                        <textarea id="settingStoreAddress" placeholder="Banani, Dhaka, Bangladesh" rows="3" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all resize-none">Banani, Dhaka, Bangladesh</textarea>
+                                    </div>
+                                </div>
+
+                                <div class="pt-4 border-t border-gray-50 flex justify-end">
+                                    <button onclick="saveStoreInformation()" class="bg-[#d8532e] hover:bg-[#c53b2b] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all duration-300 flex items-center gap-2 select-none hover:shadow">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                        </svg>
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 2. Delivery Settings Card -->
+                            <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-6">
+                                <div class="flex items-center gap-3 pb-4 border-b border-gray-50">
+                                    <div class="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-accent">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10M21 16V10a1 1 0 00-1-1h-6v8m0 0h2" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-heading font-bold text-primary">Delivery Settings</h3>
+                                        <p class="text-xs text-gray-400 font-semibold">Configure shipping costs and free shipping thresholds</p>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="space-y-1.5">
+                                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingDeliveryDhaka">Dhaka Delivery Fee (BDT)</label>
+                                        <input type="number" id="settingDeliveryDhaka" placeholder="60" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all" value="60">
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingDeliveryOutside">Outside Dhaka Fee (BDT)</label>
+                                        <input type="number" id="settingDeliveryOutside" placeholder="120" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all" value="120">
+                                    </div>
+                                    <div class="space-y-1.5 md:col-span-2">
+                                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingFreeThreshold">Free Delivery Threshold (BDT)</label>
+                                        <input type="number" id="settingFreeThreshold" placeholder="3000" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all" value="3000">
+                                    </div>
+                                </div>
+
+                                <div class="pt-4 border-t border-gray-50 flex justify-end">
+                                    <button onclick="saveDeliverySettings()" class="bg-[#d8532e] hover:bg-[#c53b2b] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all duration-300 flex items-center gap-2 select-none hover:shadow">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                        </svg>
+                                        Save Settings
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right Column (Password Change Card) -->
+                        <div>
+                            <!-- 3. Password Change Card -->
+                            <div class="bg-white border border-gray-100 rounded-3xl p-6 shadow-sm space-y-6">
+                                <div class="flex items-center gap-3 pb-4 border-b border-gray-50">
+                                    <div class="w-10 h-10 rounded-xl bg-orange-50 border border-orange-100 flex items-center justify-center text-accent">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="text-lg font-heading font-bold text-primary">Change Password</h3>
+                                        <p class="text-xs text-gray-400 font-semibold">Update your administrator portal access credentials</p>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div class="space-y-1.5 relative">
+                                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingCurrentPassword">Current Password</label>
+                                        <div class="relative">
+                                            <input type="password" id="settingCurrentPassword" placeholder="••••••••" class="password-input w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all">
+                                            <button type="button" onclick="toggleSettingsPassword('settingCurrentPassword', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-accent transition-all cursor-pointer">
+                                                <!-- Eye icon -->
+                                                <svg class="w-5 h-5 eye-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="space-y-1.5 relative">
+                                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingNewPassword">New Password</label>
+                                        <div class="relative">
+                                            <input type="password" id="settingNewPassword" placeholder="••••••••" class="password-input w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all">
+                                            <button type="button" onclick="toggleSettingsPassword('settingNewPassword', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-accent transition-all cursor-pointer">
+                                                <svg class="w-5 h-5 eye-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div class="space-y-1.5 relative">
+                                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingConfirmPassword">Confirm New Password</label>
+                                        <div class="relative">
+                                            <input type="password" id="settingConfirmPassword" placeholder="••••••••" class="password-input w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all">
+                                            <button type="button" onclick="toggleSettingsPassword('settingConfirmPassword', this)" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-accent transition-all cursor-pointer">
+                                                <svg class="w-5 h-5 eye-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="pt-4 border-t border-gray-50 flex justify-end">
+                                    <button onclick="savePasswordSettings()" class="bg-[#d8532e] hover:bg-[#c53b2b] text-white px-6 py-3 rounded-xl font-bold text-sm shadow-sm transition-all duration-300 flex items-center gap-2 select-none hover:shadow">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
+                                        Update Password
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </main>
     </div>
@@ -1360,6 +1523,9 @@
         // On Page Load: Check session and subscribe to auth state changes
         window.addEventListener('DOMContentLoaded', async () => {
             initCustomDropdowns();
+            if (typeof initSettingsTab === 'function') {
+                initSettingsTab();
+            }
             if (!supabaseClient) return;
 
             // Subscribe to auth state changes (strictly for UI visibility lockouts on logout)
@@ -1614,7 +1780,8 @@
                 customers: document.getElementById('sectionCustomers'),
                 discounts: document.getElementById('sectionDiscounts'),
                 invoices: document.getElementById('sectionInvoices'),
-                orders: document.getElementById('sectionOrders')
+                orders: document.getElementById('sectionOrders'),
+                settings: document.getElementById('sectionSettings')
             };
 
             const navLinks = {
@@ -1623,7 +1790,8 @@
                 customers: document.getElementById('nav-customers'),
                 discounts: document.getElementById('nav-discounts'),
                 invoices: document.getElementById('nav-invoices'),
-                orders: document.getElementById('nav-orders')
+                orders: document.getElementById('nav-orders'),
+                settings: document.getElementById('nav-settings')
             };
 
             // Toggle visibility of sections
@@ -1663,6 +1831,10 @@
                 fetchInvoicesData();
             } else if (tabName === 'orders') {
                 initOrdersTab();
+            } else if (tabName === 'settings') {
+                if (typeof initSettingsTab === 'function') {
+                    initSettingsTab();
+                }
             }
         }
 
@@ -2562,6 +2734,111 @@
                     deleteBtn.textContent = 'Yes, Delete';
                 }
             }
+        }
+
+        // ==================== SETTINGS FUNCTIONS ====================
+        function toggleSettingsPassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            
+            // Toggle eye icon
+            if (isPassword) {
+                btn.innerHTML = `
+                    <svg class="w-5 h-5 eye-icon text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                    </svg>
+                `;
+            } else {
+                btn.innerHTML = `
+                    <svg class="w-5 h-5 eye-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                `;
+            }
+        }
+
+        function initSettingsTab() {
+            const nameEl = document.getElementById('settingStoreName');
+            const emailEl = document.getElementById('settingStoreEmail');
+            const addrEl = document.getElementById('settingStoreAddress');
+            const dhakaEl = document.getElementById('settingDeliveryDhaka');
+            const outsideEl = document.getElementById('settingDeliveryOutside');
+            const thresholdEl = document.getElementById('settingFreeThreshold');
+
+            if (nameEl) nameEl.value = localStorage.getItem('storeSettingsName') || 'Otaku Vault';
+            if (emailEl) emailEl.value = localStorage.getItem('storeSettingsEmail') || 'support@otakuvault.com';
+            if (addrEl) addrEl.value = localStorage.getItem('storeSettingsAddress') || 'Banani, Dhaka, Bangladesh';
+            if (dhakaEl) dhakaEl.value = localStorage.getItem('deliveryDhaka') || '60';
+            if (outsideEl) outsideEl.value = localStorage.getItem('deliveryOutside') || '120';
+            if (thresholdEl) thresholdEl.value = localStorage.getItem('freeDeliveryThreshold') || '3000';
+        }
+
+        function saveStoreInformation() {
+            const name = document.getElementById('settingStoreName').value.trim();
+            const email = document.getElementById('settingStoreEmail').value.trim();
+            const address = document.getElementById('settingStoreAddress').value.trim();
+
+            if (!name || !email || !address) {
+                showNotificationToast('Please fill out all store information fields.', false);
+                return;
+            }
+
+            localStorage.setItem('storeSettingsName', name);
+            localStorage.setItem('storeSettingsEmail', email);
+            localStorage.setItem('storeSettingsAddress', address);
+
+            showNotificationToast('Store information saved successfully!');
+        }
+
+        function saveDeliverySettings() {
+            const dhaka = document.getElementById('settingDeliveryDhaka').value.trim();
+            const outside = document.getElementById('settingDeliveryOutside').value.trim();
+            const threshold = document.getElementById('settingFreeThreshold').value.trim();
+
+            if (dhaka === '' || outside === '' || threshold === '') {
+                showNotificationToast('Please fill out all delivery settings fields.', false);
+                return;
+            }
+
+            if (parseFloat(dhaka) < 0 || parseFloat(outside) < 0 || parseFloat(threshold) < 0) {
+                showNotificationToast('Values cannot be negative.', false);
+                return;
+            }
+
+            localStorage.setItem('deliveryDhaka', dhaka);
+            localStorage.setItem('deliveryOutside', outside);
+            localStorage.setItem('freeDeliveryThreshold', threshold);
+
+            showNotificationToast('Delivery settings saved successfully!');
+        }
+
+        function savePasswordSettings() {
+            const current = document.getElementById('settingCurrentPassword').value;
+            const newPass = document.getElementById('settingNewPassword').value;
+            const confirmPass = document.getElementById('settingConfirmPassword').value;
+
+            if (!current || !newPass || !confirmPass) {
+                showNotificationToast('Please fill out all password fields.', false);
+                return;
+            }
+
+            if (newPass !== confirmPass) {
+                showNotificationToast('New passwords do not match.', false);
+                return;
+            }
+
+            if (newPass.length < 6) {
+                showNotificationToast('New password must be at least 6 characters.', false);
+                return;
+            }
+
+            showNotificationToast('Password updated successfully!');
+            document.getElementById('settingCurrentPassword').value = '';
+            document.getElementById('settingNewPassword').value = '';
+            document.getElementById('settingConfirmPassword').value = '';
         }
 
         // Custom notification toast helper
