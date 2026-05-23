@@ -2555,9 +2555,9 @@
             // Fallback mock records if database is empty or connection fails
             if (allDiscounts.length === 0) {
                 allDiscounts = [
-                    { id: "d1", code: "WELCOME10", percentage: 10, expiry_date: "2026-12-31", active: true },
-                    { id: "d2", code: "OTAKU25", percentage: 25, expiry_date: "2026-06-30", active: false },
-                    { id: "d3", code: "MEGA50", percentage: 50, expiry_date: "2026-05-31", active: true }
+                    { id: "mock-d1", code: "WELCOME10", percentage: 10, expiry_date: "2026-12-31", active: true },
+                    { id: "mock-d2", code: "OTAKU25", percentage: 25, expiry_date: "2026-06-30", active: false },
+                    { id: "mock-d3", code: "MEGA50", percentage: 50, expiry_date: "2026-05-31", active: true }
                 ];
             }
 
@@ -2580,7 +2580,10 @@
             allDiscounts.forEach(d => {
                 const dateObj = new Date(d.expiry_date);
                 const dateStr = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-                const isChecked = d.active ? 'checked' : '';
+                
+                // Support both active and is_active columns
+                const isActive = d.active !== undefined ? d.active : d.is_active;
+                const isChecked = isActive ? 'checked' : '';
 
                 const tr = document.createElement('tr');
                 tr.className = 'hover:bg-gray-50/50 transition-colors duration-200';
@@ -2590,7 +2593,7 @@
                     <td class="py-4 px-4 text-gray-400 font-semibold">${dateStr}</td>
                     <td class="py-4 px-4">
                         <label class="relative inline-flex items-center cursor-pointer select-none">
-                            <input type="checkbox" ${isChecked} onchange="toggleDiscountActive('${d.id}', ${d.active})"
+                            <input type="checkbox" ${isChecked} onchange="toggleDiscountActive('${d.id}', ${isActive})"
                                 class="sr-only peer">
                             <div class="w-9 h-5 bg-gray-200 rounded-full peer peer-focus:ring-2 peer-focus:ring-accent/20 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-accent"></div>
                         </label>
@@ -2617,13 +2620,20 @@
 
             if (supabaseClient) {
                 try {
+                    // Try to save active as is_active if table column is named differently, else active
                     const { error } = await supabaseClient
                         .from('discount_codes')
-                        .insert([{ code, percentage, expiry_date, active }]);
-                    if (error) throw error;
+                        .insert([{ code, percentage, expiry_date, active, is_active: active }]);
+                    if (error) {
+                        // Retry with only active if is_active fails (in case column is only active)
+                        const { error: retryError } = await supabaseClient
+                            .from('discount_codes')
+                            .insert([{ code, percentage, expiry_date, active }]);
+                        if (retryError) throw retryError;
+                    }
                 } catch (e) {
                     console.error("Error creating discount code:", e);
-                    alert("Failed to save discount code: " + e.message);
+                    showNotificationToast("Failed to save discount code: " + e.message, false);
                     submitBtn.disabled = false;
                     submitBtn.textContent = originalText;
                     return;
@@ -2640,25 +2650,51 @@
 
         async function toggleDiscountActive(id, currentStatus) {
             const newStatus = !currentStatus;
+
+            // Immediately update in local state for organic responsiveness
+            const code = allDiscounts.find(item => item.id === id);
+            if (code) {
+                code.active = newStatus;
+                if ('is_active' in code) code.is_active = newStatus;
+            }
+            renderDiscountsTable();
+
             if (supabaseClient && !id.startsWith('mock-')) {
                 try {
+                    // Dynamically detect column name from object
+                    let statusColumn = 'active';
+                    if (code) {
+                        if ('is_active' in code) {
+                            statusColumn = 'is_active';
+                        } else if ('active' in code) {
+                            statusColumn = 'active';
+                        }
+                    }
+
+                    const updatePayload = {};
+                    updatePayload[statusColumn] = newStatus;
+
                     const { error } = await supabaseClient
                         .from('discount_codes')
-                        .update({ active: newStatus })
+                        .update(updatePayload)
                         .eq('id', id);
                     if (error) throw error;
+                    
+                    showNotificationToast("Discount code status updated successfully!");
                 } catch (e) {
                     console.error("Error updating active status:", e);
-                    alert("Failed to update status: " + e.message);
-                    fetchDiscountsData();
-                    return;
+                    showNotificationToast(`Failed to update status: ${e.message}`, false);
+                    
+                    // Revert local state on database error
+                    if (code) {
+                        code.active = currentStatus;
+                        if ('is_active' in code) code.is_active = currentStatus;
+                    }
+                    renderDiscountsTable();
                 }
+            } else {
+                showNotificationToast("Mock discount code status updated locally.");
             }
-
-            // Update in local state
-            const code = allDiscounts.find(item => item.id === id);
-            if (code) code.active = newStatus;
-            renderDiscountsTable();
         }
 
         async function deleteDiscountCode(id) {
