@@ -79,6 +79,59 @@
             border-left: 3px solid #e85d04;
         }
 
+        /* Custom styled dropdown select inputs inside modal */
+        .custom-dropdown-wrapper {
+            position: relative;
+        }
+
+        .custom-select-trigger {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px !important;
+            transition: all 0.3s ease;
+        }
+
+        .custom-dropdown-wrapper:hover .custom-select-trigger {
+            border-color: #e85d04 !important;
+            box-shadow: 0 0 0 3px rgba(232, 93, 4, 0.1);
+        }
+
+        .custom-dropdown-wrapper:hover .custom-select-trigger svg {
+            transform: rotate(180deg);
+        }
+
+        .custom-select-options {
+            opacity: 0;
+            transform: translateY(-8px) scale(0.95);
+            pointer-events: none;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            border-radius: 12px !important;
+            border-color: #f1f3f5;
+        }
+
+        .custom-dropdown-wrapper:hover .custom-select-options {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+
+        .custom-dropdown-wrapper .custom-option {
+            border-radius: 12px !important;
+            border-left: none !important;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .custom-dropdown-wrapper .custom-option:hover {
+            background-color: #e85d04 !important;
+            color: #ffffff !important;
+            border-left: none !important;
+        }
+
+        .custom-dropdown-wrapper .custom-option.selected {
+            background-color: rgba(232, 93, 4, 0.08) !important;
+            color: #e85d04 !important;
+            border-left: none !important;
+        }
+
         /* Product Modal inputs border radius overrides */
         #productModal input,
         #productModal select,
@@ -1031,6 +1084,7 @@
 
         // On Page Load: Check session and subscribe to auth state changes
         window.addEventListener('DOMContentLoaded', async () => {
+            initCustomDropdowns();
             if (!supabaseClient) return;
 
             // Subscribe to auth state changes (strictly for UI visibility lockouts on logout)
@@ -1724,6 +1778,7 @@
                     }
                 }
             }
+            syncCustomDropdowns();
 
             modal.classList.remove('hidden');
             setTimeout(() => {
@@ -1753,6 +1808,69 @@
                     container.classList.add('hidden');
                 }
             }
+        }
+
+        // Initialize Custom Dropdowns inside modal
+        function initCustomDropdowns() {
+            const wrappers = document.querySelectorAll('.custom-dropdown-wrapper');
+            wrappers.forEach(wrapper => {
+                const selectId = wrapper.getAttribute('data-select-id');
+                const nativeSelect = document.getElementById(selectId);
+                if (!nativeSelect) return;
+                
+                const trigger = wrapper.querySelector('.custom-select-trigger');
+                const triggerText = trigger.querySelector('.selected-text');
+                const options = wrapper.querySelectorAll('.custom-option');
+                
+                // Hide native select visually
+                nativeSelect.classList.add('hidden');
+                
+                // Update selected text initial value
+                if (nativeSelect.value) {
+                    const selectedOpt = wrapper.querySelector(`.custom-option[data-value="${nativeSelect.value}"]`);
+                    if (selectedOpt) {
+                        triggerText.textContent = selectedOpt.textContent;
+                        options.forEach(opt => opt.classList.remove('selected'));
+                        selectedOpt.classList.add('selected');
+                    }
+                }
+                
+                // Bind click event handlers
+                options.forEach(option => {
+                    option.addEventListener('click', function() {
+                        const val = this.getAttribute('data-value');
+                        nativeSelect.value = val;
+                        triggerText.textContent = this.textContent;
+                        
+                        options.forEach(opt => opt.classList.remove('selected'));
+                        this.classList.add('selected');
+                        
+                        // Dispatch native select change event so any listeners (like toggleDiscountFields) are fired!
+                        nativeSelect.dispatchEvent(new Event('change'));
+                    });
+                });
+            });
+        }
+
+        // Sync visual custom dropdown selection state with native select state
+        function syncCustomDropdowns() {
+            const wrappers = document.querySelectorAll('.custom-dropdown-wrapper');
+            wrappers.forEach(wrapper => {
+                const selectId = wrapper.getAttribute('data-select-id');
+                const nativeSelect = document.getElementById(selectId);
+                if (!nativeSelect) return;
+                
+                const triggerText = wrapper.querySelector('.selected-text');
+                const options = wrapper.querySelectorAll('.custom-option');
+                
+                const val = nativeSelect.value;
+                const activeOpt = wrapper.querySelector(`.custom-option[data-value="${val}"]`) || options[0];
+                if (activeOpt && triggerText) {
+                    triggerText.textContent = activeOpt.textContent;
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    activeOpt.classList.add('selected');
+                }
+            });
         }
 
         // Upload Product Image to Supabase Storage Bucket
@@ -2760,20 +2878,36 @@
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <!-- Category -->
-                        <div class="space-y-1.5">
+                        <div class="space-y-1.5 custom-dropdown-wrapper" data-select-id="modalCategory">
                             <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Category</label>
-                            <select id="modalCategory" required
-                                class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all bg-white cursor-pointer">
+                            
+                            <!-- Hidden Native Select -->
+                            <select id="modalCategory" required class="hidden">
                                 <option value="Figures">Figures</option>
                                 <option value="Accessories">Accessories</option>
                             </select>
+
+                            <!-- Custom Trigger Button -->
+                            <div class="custom-select-trigger w-full border border-gray-200 rounded-xl px-4 py-3 outline-none hover:border-[#e85d04] focus:border-[#e85d04] text-sm font-semibold transition-all bg-white cursor-pointer flex justify-between items-center select-none">
+                                <span class="selected-text">Figures</span>
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                </svg>
+                            </div>
+                            
+                            <!-- Custom Options Dropdown List Container -->
+                            <div class="custom-select-options absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-150 rounded-xl shadow-xl overflow-hidden opacity-0 pointer-events-none transform -translate-y-2 scale-95 transition-all duration-300 origin-top p-1 space-y-0.5">
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Figures">Figures</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Accessories">Accessories</div>
+                            </div>
                         </div>
 
                         <!-- Series -->
-                        <div class="space-y-1.5">
+                        <div class="space-y-1.5 custom-dropdown-wrapper" data-select-id="modalSeries">
                             <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Series</label>
-                            <select id="modalSeries" required
-                                class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all bg-white cursor-pointer">
+
+                            <!-- Hidden Native Select -->
+                            <select id="modalSeries" required class="hidden">
                                 <option value="One Piece">One Piece</option>
                                 <option value="Naruto">Naruto</option>
                                 <option value="Demon Slayer">Demon Slayer</option>
@@ -2783,6 +2917,26 @@
                                 <option value="My Hero Academia">My Hero Academia</option>
                                 <option value="Black Clover">Black Clover</option>
                             </select>
+
+                            <!-- Custom Trigger Button -->
+                            <div class="custom-select-trigger w-full border border-gray-200 rounded-xl px-4 py-3 outline-none hover:border-[#e85d04] focus:border-[#e85d04] text-sm font-semibold transition-all bg-white cursor-pointer flex justify-between items-center select-none">
+                                <span class="selected-text">One Piece</span>
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                </svg>
+                            </div>
+
+                            <!-- Custom Options Dropdown List Container -->
+                            <div class="custom-select-options absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-150 rounded-xl shadow-xl overflow-hidden opacity-0 pointer-events-none transform -translate-y-2 scale-95 transition-all duration-300 origin-top p-1 space-y-0.5">
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="One Piece">One Piece</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Naruto">Naruto</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Demon Slayer">Demon Slayer</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Dragon Ball Z">Dragon Ball Z</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Jujutsu Kaisen">Jujutsu Kaisen</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Attack on Titan">Attack on Titan</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="My Hero Academia">My Hero Academia</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Black Clover">Black Clover</div>
+                            </div>
                         </div>
                     </div>
 
@@ -2795,26 +2949,59 @@
                         </div>
 
                         <!-- Status (In Stock vs Pre-order) -->
-                        <div class="space-y-1.5">
+                        <div class="space-y-1.5 custom-dropdown-wrapper" data-select-id="modalStatus">
                             <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Status</label>
-                            <select id="modalStatus" required
-                                class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all bg-white cursor-pointer">
+                            
+                            <!-- Hidden Native Select -->
+                            <select id="modalStatus" required class="hidden">
                                 <option value="In Stock">In Stock</option>
                                 <option value="Pre-order">Pre-order</option>
                             </select>
+
+                            <!-- Custom Trigger Button -->
+                            <div class="custom-select-trigger w-full border border-gray-200 rounded-xl px-4 py-3 outline-none hover:border-[#e85d04] focus:border-[#e85d04] text-sm font-semibold transition-all bg-white cursor-pointer flex justify-between items-center select-none">
+                                <span class="selected-text">In Stock</span>
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                </svg>
+                            </div>
+
+                            <!-- Custom Options Dropdown List Container -->
+                            <div class="custom-select-options absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-150 rounded-xl shadow-xl overflow-hidden opacity-0 pointer-events-none transform -translate-y-2 scale-95 transition-all duration-300 origin-top p-1 space-y-0.5">
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="In Stock">In Stock</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="Pre-order">Pre-order</div>
+                            </div>
                         </div>
 
                         <!-- Badge -->
-                        <div class="space-y-1.5">
+                        <div class="space-y-1.5 custom-dropdown-wrapper" data-select-id="modalBadge">
                             <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Badge</label>
-                            <select id="modalBadge" required onchange="toggleDiscountFields(this.value)"
-                                class="w-full border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-accent text-sm font-semibold transition-all bg-white cursor-pointer">
+                            
+                            <!-- Hidden Native Select -->
+                            <select id="modalBadge" required onchange="toggleDiscountFields(this.value)" class="hidden">
                                 <option value="None">None</option>
                                 <option value="NEW">NEW</option>
                                 <option value="HOT">HOT</option>
                                 <option value="UPCOMING">UPCOMING</option>
                                 <option value="DISCOUNT">DISCOUNT</option>
                             </select>
+
+                            <!-- Custom Trigger Button -->
+                            <div class="custom-select-trigger w-full border border-gray-200 rounded-xl px-4 py-3 outline-none hover:border-[#e85d04] focus:border-[#e85d04] text-sm font-semibold transition-all bg-white cursor-pointer flex justify-between items-center select-none">
+                                <span class="selected-text">None</span>
+                                <svg class="w-4 h-4 text-gray-400 transition-transform duration-300 pointer-events-none" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+                                </svg>
+                            </div>
+
+                            <!-- Custom Options Dropdown List Container -->
+                            <div class="custom-select-options absolute z-50 left-0 right-0 mt-1 bg-white border border-gray-150 rounded-xl shadow-xl overflow-hidden opacity-0 pointer-events-none transform -translate-y-2 scale-95 transition-all duration-300 origin-top p-1 space-y-0.5">
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="None">None</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="NEW">NEW</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="HOT">HOT</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="UPCOMING">UPCOMING</div>
+                                <div class="custom-option px-4 py-2.5 rounded-lg text-sm font-semibold text-gray-700 hover:bg-[#e85d04] hover:text-white transition-all duration-300 cursor-pointer select-none" data-value="DISCOUNT">DISCOUNT</div>
+                            </div>
                         </div>
                     </div>
 
