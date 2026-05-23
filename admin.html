@@ -35,6 +35,53 @@
         }
     </script>
     <style>
+        /* Liquid Status Toggle Switch */
+        .liquid-switch {
+            position: relative;
+            width: 56px;
+            height: 28px;
+            background-color: #9ca3af; /* Default grey */
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: visible;
+        }
+
+        .liquid-switch.active {
+            background-color: #10b981; /* Green */
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+        }
+
+        .liquid-switch-knob {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 20px;
+            height: 20px;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1.2), 
+                        width 0.4s cubic-bezier(0.4, 0, 0.2, 1.2), 
+                        border-radius 0.4s cubic-bezier(0.4, 0, 0.2, 1.2);
+        }
+
+        /* Active Switch position */
+        .liquid-switch.active .liquid-switch-knob {
+            left: 32px;
+        }
+
+        /* Morphing transitions on click (knob stretches like a liquid droplet) */
+        .liquid-switch.transitioning .liquid-switch-knob {
+            width: 28px;
+            border-radius: 40% 60% 60% 40% / 50%; /* Stretches left-to-right */
+        }
+
+        .liquid-switch.transitioning.active .liquid-switch-knob {
+            width: 28px;
+            border-radius: 60% 40% 40% 60% / 50%; /* Stretches right-to-left */
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -1556,18 +1603,13 @@
                             </span>
                         </td>
                         <td class="py-6 px-4">
-                            <div onclick="cycleProductStatus(${product.id}, '${status}')" class="inline-flex items-center cursor-pointer select-none">
-                                ${status === 'stock_out' ? `
-                                    <div class="w-14 h-7 bg-gray-300 rounded-full relative transition-all duration-300">
-                                        <div class="absolute top-[4px] left-[4px] bg-white rounded-full h-5 w-5 transition-all"></div>
-                                    </div>
-                                    <span class="ml-3 text-xs font-extrabold text-gray-400">Stock Out</span>
-                                ` : `
-                                    <div class="w-14 h-7 bg-emerald-500 rounded-full relative transition-all duration-300">
-                                        <div class="absolute top-[4px] left-[28px] bg-white rounded-full h-5 w-5 transition-all"></div>
-                                    </div>
-                                    <span class="ml-3 text-xs font-extrabold text-emerald-500">In Stock</span>
-                                `}
+                            <div class="flex items-center gap-3">
+                                <div onclick="toggleStatusInteractive(this, ${product.id})" class="liquid-switch ${status === 'stock_out' ? '' : 'active'} inline-block select-none">
+                                    <div class="liquid-switch-knob"></div>
+                                </div>
+                                <span class="status-label text-xs font-extrabold ${status === 'stock_out' ? 'text-gray-400' : 'text-emerald-500'}">
+                                    ${status === 'stock_out' ? 'Stock Out' : 'In Stock'}
+                                </span>
                             </div>
                         </td>
                         <td class="py-6 px-4 text-right">
@@ -1638,6 +1680,61 @@
             const checkedCount = Array.from(checkboxes).filter(chk => chk.checked).length;
             master.checked = checkedCount === checkboxes.length;
             master.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+        }
+
+        // Interactive visual liquid transition handler before calling DB sync
+        async function toggleStatusInteractive(element, id) {
+            if (element.classList.contains('processing')) return;
+            element.classList.add('processing', 'transitioning');
+
+            const isActive = element.classList.contains('active');
+            const currentStatus = isActive ? 'in_stock' : 'stock_out';
+            const nextStatus = isActive ? 'stock_out' : 'in_stock';
+
+            // Toggle active state immediately for visual fluid responsiveness
+            element.classList.toggle('active');
+
+            // Update label text and color dynamically
+            const label = element.nextElementSibling;
+            if (label && label.classList.contains('status-label')) {
+                label.textContent = nextStatus === 'in_stock' ? 'In Stock' : 'Stock Out';
+                if (nextStatus === 'in_stock') {
+                    label.classList.remove('text-gray-400');
+                    label.classList.add('text-emerald-500');
+                } else {
+                    label.classList.remove('text-emerald-500');
+                    label.classList.add('text-gray-400');
+                }
+            }
+
+            // Remove transitioning class after the stretch animation duration to snap knob back to shape
+            setTimeout(() => {
+                element.classList.remove('transitioning');
+            }, 400);
+
+            try {
+                // Call status toggle DB function which handles PATCH and verification
+                await cycleProductStatus(id, currentStatus);
+            } catch (err) {
+                // If it failed, cycleProductStatus will trigger rollback, but let's visually revert here immediately for perfect consistency
+                element.classList.add('transitioning');
+                element.classList.toggle('active');
+                if (label && label.classList.contains('status-label')) {
+                    label.textContent = currentStatus === 'in_stock' ? 'In Stock' : 'Stock Out';
+                    if (currentStatus === 'in_stock') {
+                        label.classList.remove('text-gray-400');
+                        label.classList.add('text-emerald-500');
+                    } else {
+                        label.classList.remove('text-emerald-500');
+                        label.classList.add('text-gray-400');
+                    }
+                }
+                setTimeout(() => {
+                    element.classList.remove('transitioning');
+                }, 400);
+            } finally {
+                element.classList.remove('processing');
+            }
         }
 
         // Quick toggle product status (cycling between in_stock <-> stock_out)
