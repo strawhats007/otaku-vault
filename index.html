@@ -172,18 +172,19 @@
                 </div>
 
                 <!-- Account Icon -->
-                <button class="text-primary/80 hover:text-accent transition-colors p-2 cursor-pointer" title="Account">
+                <a href="account.html" class="text-primary/80 hover:text-accent transition-colors p-2 cursor-pointer inline-block" title="Account">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
-                </button>
+                </a>
 
                 <!-- Wishlist Icon -->
-                <button class="text-primary/80 hover:text-accent transition-colors p-2 cursor-pointer" title="Wishlist">
+                <a href="wishlist.html" class="text-primary/80 hover:text-accent transition-colors p-2 cursor-pointer relative inline-block" title="Wishlist">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                     </svg>
-                </button>
+                    <span id="wishlistBadge" class="absolute top-0 right-0 bg-accent text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none hidden">0</span>
+                </a>
 
                 <!-- Cart Button -->
                 <a href="cart.html" class="flex items-center gap-2 bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-full font-semibold transition-all hover:scale-105 cursor-pointer">
@@ -946,6 +947,11 @@
                 const defaultImg = getProductImageUrl(product.image);
                 const hoverImg = getProductImageUrl(product.hover_image_url || product.second_image || product.image);
 
+                const wishlist = JSON.parse(localStorage.getItem('animeWishlist')) || [];
+                const isInWishlist = wishlist.some(p => String(p.id) === String(product.id));
+                const outlineClass = isInWishlist ? 'hidden' : '';
+                const solidClass = isInWishlist ? '' : 'hidden';
+
                 let actionHtml = '';
                 if (status === 'stock_out') {
                     actionHtml = `
@@ -970,11 +976,11 @@
                             ${badgeHtml}
                             
                             <div class="absolute top-3 right-3 z-30 flex flex-col gap-2">
-                                <button class="bg-white/80 hover:bg-white text-accent p-2 rounded-full shadow-md transition-all hover:scale-110 cursor-pointer" onclick="toggleWishlist(this, event)" title="Wishlist">
-                                    <svg class="w-5 h-5 heart-outline" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <button class="bg-white/80 hover:bg-white text-accent p-2 rounded-full shadow-md transition-all hover:scale-110 cursor-pointer" onclick="toggleWishlist(this, ${product.id}, event)" title="Wishlist">
+                                    <svg class="w-5 h-5 heart-outline ${outlineClass}" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                                     </svg>
-                                    <svg class="w-5 h-5 heart-solid hidden" fill="currentColor" viewBox="0 0 24 24">
+                                    <svg class="w-5 h-5 heart-solid ${solidClass}" fill="currentColor" viewBox="0 0 24 24">
                                         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                                     </svg>
                                 </button>
@@ -1106,7 +1112,7 @@
             }
 
             // 2. Series Filter
-            if (window.activeSeries && window.activeSeries !== 'all' && window.activeSeries !== 'all series') {
+            if (window.activeSeries && window.activeSeries.toLowerCase() !== 'all' && window.activeSeries.toLowerCase() !== 'all series') {
                 const seriesLower = window.activeSeries.toLowerCase();
                 filtered = filtered.filter(p => (p.series || '').toLowerCase() === seriesLower);
                 if (heading) heading.textContent = window.activeSeries;
@@ -1144,9 +1150,11 @@
             }
 
             // If no active filter heading, default to 'All Products'
-            if ((!window.activeCategory || window.activeCategory === 'all' || window.activeCategory === 'all figures') && 
-                (!window.activeSeries || window.activeSeries === 'all' || window.activeSeries === 'all series') && 
-                window.activeBadge === 'all' && 
+            const activeCatLower = (window.activeCategory || '').toLowerCase();
+            const activeSeriesLower = (window.activeSeries || '').toLowerCase();
+            if ((!activeCatLower || activeCatLower === 'all' || activeCatLower === 'all figures') && 
+                (!activeSeriesLower || activeSeriesLower === 'all' || activeSeriesLower === 'all series') && 
+                (!window.activeBadge || window.activeBadge === 'all') && 
                 !window.currentSearchQuery) {
                 if (heading) heading.textContent = 'All Products';
             }
@@ -1291,6 +1299,9 @@
 
         document.addEventListener('DOMContentLoaded', function() {
             fetchAndRenderProducts();
+            if (typeof updateWishlistBadge === 'function') {
+                updateWishlistBadge();
+            }
 
             // Handle URL Query parameters for filter routing from other pages
             setTimeout(() => {
@@ -1333,20 +1344,55 @@
                 lastScrollY = currentScrollY;
             });
 
-            // Wishlist Toggle Functionality
-            function toggleWishlist(btn, event) {
-                event.preventDefault();
-                event.stopPropagation();
-                const outline = btn.querySelector('.heart-outline');
-                const solid = btn.querySelector('.heart-solid');
-                if (outline.classList.contains('hidden')) {
-                    outline.classList.remove('hidden');
-                    solid.classList.add('hidden');
-                } else {
-                    outline.classList.add('hidden');
-                    solid.classList.remove('hidden');
+            // Wishlist Badge update
+            function updateWishlistBadge() {
+                const wishlist = JSON.parse(localStorage.getItem('animeWishlist')) || [];
+                const badge = document.getElementById('wishlistBadge');
+                if (badge) {
+                    badge.textContent = wishlist.length;
+                    if (wishlist.length > 0) {
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
                 }
             }
+            window.updateWishlistBadge = updateWishlistBadge;
+
+            // Wishlist Toggle Functionality (localStorage persisted)
+            function toggleWishlist(btn, productId, event) {
+                if (event) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                const outline = btn.querySelector('.heart-outline');
+                const solid = btn.querySelector('.heart-solid');
+                
+                let wishlist = JSON.parse(localStorage.getItem('animeWishlist')) || [];
+                const productsList = window.allProducts || fallbackProducts;
+                const product = productsList.find(p => String(p.id) === String(productId));
+                if (!product) return;
+
+                const index = wishlist.findIndex(p => String(p.id) === String(productId));
+
+                if (index > -1) {
+                    // Remove
+                    wishlist.splice(index, 1);
+                    if (outline) outline.classList.remove('hidden');
+                    if (solid) solid.classList.add('hidden');
+                    if (typeof showToast === 'function') showToast('Removed from Wishlist!', 'success');
+                } else {
+                    // Add
+                    wishlist.push(product);
+                    if (outline) outline.classList.add('hidden');
+                    if (solid) solid.classList.remove('hidden');
+                    if (typeof showToast === 'function') showToast('Added to Wishlist!', 'success');
+                }
+
+                localStorage.setItem('animeWishlist', JSON.stringify(wishlist));
+                updateWishlistBadge();
+            }
+            window.toggleWishlist = toggleWishlist;
 
             // Mobile menu toggle
             const menuBtn = document.getElementById('menuBtn');
