@@ -75,7 +75,7 @@
         /* Liquid Underline Indicator styling */
         .nav-underline-indicator {
             position: absolute;
-            bottom: 0px;
+            bottom: 4px;
             height: 3px;
             background-color: #d8532e;
             border-radius: 9999px;
@@ -97,10 +97,10 @@
             </a>
 
             <!-- Center: Navigation Links -->
-            <div id="navLinksContainer" class="hidden lg:flex items-center gap-8 justify-center absolute left-1/2 transform -translate-x-1/2 h-full">
-                <a href="index.html" class="nav-item-link text-primary hover:text-accent transition-colors font-medium">Home</a>
+            <div id="navLinksContainer" class="hidden lg:flex items-center gap-8 justify-center absolute left-1/2 transform -translate-x-1/2">
+                <a href="index.html" class="nav-item-link text-primary hover:text-accent transition-colors font-medium py-2">Home</a>
                 <!-- Shop Dropdown Menu -->
-                <div class="nav-item-link relative py-2 h-full flex items-center" id="shopDropdownWrapper">
+                <div class="nav-item-link relative py-2" id="shopDropdownWrapper">
                     <button class="flex items-center gap-1.5 text-primary hover:text-accent transition-colors font-medium cursor-pointer" id="shopBtn">
                         <span>Shop</span>
                         <svg id="shopDropdownArrow" class="w-2.5 h-1.5 transition-transform duration-300 transform" width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -116,9 +116,9 @@
                         <button class="shop-category-option w-full text-left px-4 py-2 text-sm font-semibold text-primary hover:bg-accent/10 hover:text-accent transition-all cursor-pointer" data-category="Statues/PVC">Statues/PVC</button>
                     </div>
                 </div>
-                <a href="#" class="nav-item-link text-primary hover:text-accent transition-colors font-medium">Series</a>
-                <a href="#" class="nav-item-link text-primary hover:text-accent transition-colors font-medium">New Arrivals</a>
-                <a href="#" class="nav-item-link text-primary hover:text-accent transition-colors font-medium">About</a>
+                <a href="#" class="nav-item-link text-primary hover:text-accent transition-colors font-medium py-2">Series</a>
+                <a href="#" class="nav-item-link text-primary hover:text-accent transition-colors font-medium py-2">New Arrivals</a>
+                <a href="#" class="nav-item-link text-primary hover:text-accent transition-colors font-medium py-2">About</a>
                 
                 <!-- Fluid Underline Indicator -->
                 <div class="nav-underline-indicator" id="navIndicator"></div>
