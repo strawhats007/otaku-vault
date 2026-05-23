@@ -1172,15 +1172,22 @@
                     <!-- Page Header -->
                     <div class="flex flex-col gap-2">
                         <h2 class="text-3xl font-heading font-extrabold text-primary tracking-tight">System Settings</h2>
-                        <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Configure store information, delivery, and credentials</p>
+                        <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Configure your profile, store details, shipping, and security</p>
                     </div>
 
                     <!-- Two-Column Dashboard Layout -->
                     <div class="bg-white border border-gray-100 rounded-3xl p-4 md:p-6 shadow-sm flex flex-col md:flex-row gap-8 min-h-[500px]">
                         <!-- Left Column: Vertical Sub-Navigation Tabs (~220px) -->
                         <div class="w-full md:w-[220px] flex-shrink-0 border-b md:border-b-0 md:border-r border-gray-100 pb-4 md:pb-0 md:pr-6 space-y-1 flex flex-row md:flex-col overflow-x-auto md:overflow-x-visible">
+                            <!-- Profile Tab -->
+                            <button onclick="switchSettingsSubTab('profile')" id="settingsSubTab-profile" class="settings-sub-tab flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all select-none w-full text-left border-l-4 border-accent text-accent bg-orange-50/50">
+                                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                                <span>Profile</span>
+                            </button>
                             <!-- Store Info Tab -->
-                            <button onclick="switchSettingsSubTab('store-info')" id="settingsSubTab-store-info" class="settings-sub-tab flex items-center gap-3 px-4 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition-all select-none w-full text-left border-l-4 border-accent text-accent bg-orange-50/50">
+                            <button onclick="switchSettingsSubTab('store-info')" id="settingsSubTab-store-info" class="settings-sub-tab flex items-center gap-3 px-4 py-3.5 rounded-xl font-semibold text-xs uppercase tracking-wider text-gray-400 hover:text-primary hover:bg-gray-50 transition-all select-none w-full text-left border-l-4 border-transparent">
                                 <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                                 </svg>
@@ -1205,8 +1212,62 @@
 
                         <!-- Right Column: Content Area -->
                         <div class="flex-grow">
-                            <!-- 1. Store Information Pane -->
-                            <div id="settingsPane-store-info" class="settings-pane space-y-6 animate-fadeIn">
+                            <!-- 1. Profile Pane -->
+                            <div id="settingsPane-profile" class="settings-pane space-y-6 animate-fadeIn bg-white border border-gray-100 rounded-3xl p-6 shadow-xs">
+                                <div class="pb-4 border-b border-gray-50">
+                                    <h3 class="text-xl font-heading font-extrabold text-primary">Admin Profile</h3>
+                                    <p class="text-xs text-gray-400 font-semibold mt-1">Manage your administrative personal profile details and avatar</p>
+                                </div>
+
+                                <div class="flex flex-col sm:flex-row items-center gap-6 pb-2">
+                                    <!-- Avatar container -->
+                                    <div class="relative group">
+                                        <div id="profileAvatarContainer" class="w-24 h-24 rounded-full bg-orange-100 border-2 border-accent/20 flex items-center justify-center text-accent text-3xl font-heading font-extrabold shadow-sm overflow-hidden select-none">
+                                            <span id="profileAvatarInitials">A</span>
+                                            <img id="profileAvatarImage" class="w-full h-full object-cover hidden" alt="Avatar">
+                                        </div>
+                                        <label for="profileAvatarUpload" class="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-accent hover:bg-accent-dark text-white flex items-center justify-center cursor-pointer shadow-md transition-all">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                        </label>
+                                        <input type="file" id="profileAvatarUpload" accept="image/*" class="hidden" onchange="handleProfileAvatarUpload(this)">
+                                    </div>
+                                    <div class="space-y-1 text-center sm:text-left">
+                                        <h4 class="text-base font-bold text-primary" id="profileHeadingName">Administrator</h4>
+                                        <p class="text-xs text-gray-400 font-semibold" id="profileHeadingRole">Portal Super Admin</p>
+                                        <button onclick="document.getElementById('profileAvatarUpload').click()" class="text-xs font-extrabold text-accent hover:text-accent-dark transition-all cursor-pointer">Upload Photo</button>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div class="space-y-1.5">
+                                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingAdminName">Admin Name</label>
+                                        <input type="text" id="settingAdminName" placeholder="Administrator" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all" value="Administrator">
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingAdminEmail">Email Address</label>
+                                        <input type="email" id="settingAdminEmail" placeholder="admin@otakuvault.com" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all" value="admin@otakuvault.com">
+                                    </div>
+                                    <div class="space-y-1.5 md:col-span-2">
+                                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider" for="settingAdminPhone">Phone Number</label>
+                                        <input type="text" id="settingAdminPhone" placeholder="+880 1712-345678" class="w-full px-4 py-3 bg-[#f8f9fa] border border-[#f1f3f5] rounded-xl text-sm font-semibold text-primary focus:outline-none focus:border-[#d8532e] focus:bg-white transition-all" value="+880 1712-345678">
+                                    </div>
+                                </div>
+
+                                <div class="pt-4 border-t border-gray-50 flex justify-end">
+                                    <button onclick="saveAdminProfile()" class="bg-[#d8532e] hover:bg-[#c53b2b] text-white px-6 py-3.5 rounded-xl font-bold text-sm shadow-sm transition-all duration-300 flex items-center gap-2 select-none hover:shadow">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                        </svg>
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- 2. Store Information Pane -->
+                            <div id="settingsPane-store-info" class="settings-pane hidden space-y-6 animate-fadeIn bg-white border border-gray-100 rounded-3xl p-6 shadow-xs">
                                 <div class="pb-4 border-b border-gray-50">
                                     <h3 class="text-xl font-heading font-extrabold text-primary">Store Information</h3>
                                     <p class="text-xs text-gray-400 font-semibold mt-1">General metadata and contact information for your online shop</p>
@@ -1237,8 +1298,8 @@
                                 </div>
                             </div>
 
-                            <!-- 2. Delivery Pane -->
-                            <div id="settingsPane-delivery" class="settings-pane hidden space-y-6 animate-fadeIn">
+                            <!-- 3. Delivery Pane -->
+                            <div id="settingsPane-delivery" class="settings-pane hidden space-y-6 animate-fadeIn bg-white border border-gray-100 rounded-3xl p-6 shadow-xs">
                                 <div class="pb-4 border-b border-gray-50">
                                     <h3 class="text-xl font-heading font-extrabold text-primary">Delivery Settings</h3>
                                     <p class="text-xs text-gray-400 font-semibold mt-1">Configure shipping costs and free delivery thresholds</p>
@@ -1269,8 +1330,8 @@
                                 </div>
                             </div>
 
-                            <!-- 3. Security Pane -->
-                            <div id="settingsPane-security" class="settings-pane hidden space-y-6 animate-fadeIn">
+                            <!-- 4. Security Pane -->
+                            <div id="settingsPane-security" class="settings-pane hidden space-y-6 animate-fadeIn bg-white border border-gray-100 rounded-3xl p-6 shadow-xs">
                                 <div class="pb-4 border-b border-gray-50">
                                     <h3 class="text-xl font-heading font-extrabold text-primary">Security Settings</h3>
                                     <p class="text-xs text-gray-400 font-semibold mt-1">Manage portal password and authentication credentials</p>
@@ -1328,7 +1389,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
 
             </div>
         </main>
@@ -2783,6 +2843,44 @@
         }
 
         function initSettingsTab() {
+            // Profile init
+            const adminNameEl = document.getElementById('settingAdminName');
+            const adminEmailEl = document.getElementById('settingAdminEmail');
+            const adminPhoneEl = document.getElementById('settingAdminPhone');
+            const initialsEl = document.getElementById('profileAvatarInitials');
+            const avatarImgEl = document.getElementById('profileAvatarImage');
+            const headingNameEl = document.getElementById('profileHeadingName');
+
+            const savedName = localStorage.getItem('adminProfileName') || 'Administrator';
+            const savedEmail = localStorage.getItem('adminProfileEmail') || 'admin@otakuvault.com';
+            const savedPhone = localStorage.getItem('adminProfilePhone') || '+880 1712-345678';
+            const savedAvatar = localStorage.getItem('adminProfileAvatar');
+
+            if (adminNameEl) adminNameEl.value = savedName;
+            if (adminEmailEl) adminEmailEl.value = savedEmail;
+            if (adminPhoneEl) adminPhoneEl.value = savedPhone;
+            if (headingNameEl) headingNameEl.textContent = savedName;
+
+            // Set initials
+            if (initialsEl) {
+                const initials = savedName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'A';
+                initialsEl.textContent = initials;
+            }
+
+            // Set avatar image
+            if (avatarImgEl) {
+                if (savedAvatar) {
+                    avatarImgEl.src = savedAvatar;
+                    avatarImgEl.classList.remove('hidden');
+                    if (initialsEl) initialsEl.classList.add('hidden');
+                } else {
+                    avatarImgEl.src = '';
+                    avatarImgEl.classList.add('hidden');
+                    if (initialsEl) initialsEl.classList.remove('hidden');
+                }
+            }
+
+            // Store Info init
             const nameEl = document.getElementById('settingStoreName');
             const emailEl = document.getElementById('settingStoreEmail');
             const addrEl = document.getElementById('settingStoreAddress');
@@ -2796,6 +2894,65 @@
             if (dhakaEl) dhakaEl.value = localStorage.getItem('deliveryDhaka') || '60';
             if (outsideEl) outsideEl.value = localStorage.getItem('deliveryOutside') || '120';
             if (thresholdEl) thresholdEl.value = localStorage.getItem('freeDeliveryThreshold') || '3000';
+        }
+
+        function saveAdminProfile() {
+            const name = document.getElementById('settingAdminName').value.trim();
+            const email = document.getElementById('settingAdminEmail').value.trim();
+            const phone = document.getElementById('settingAdminPhone').value.trim();
+
+            if (!name || !email || !phone) {
+                showNotificationToast('Please fill out all profile fields.', false);
+                return;
+            }
+
+            localStorage.setItem('adminProfileName', name);
+            localStorage.setItem('adminProfileEmail', email);
+            localStorage.setItem('adminProfilePhone', phone);
+
+            // Update UI elements
+            const headingNameEl = document.getElementById('profileHeadingName');
+            if (headingNameEl) headingNameEl.textContent = name;
+
+            const initialsEl = document.getElementById('profileAvatarInitials');
+            if (initialsEl && !localStorage.getItem('adminProfileAvatar')) {
+                const initials = name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() || 'A';
+                initialsEl.textContent = initials;
+            }
+
+            showNotificationToast('Profile information saved successfully!');
+        }
+
+        function handleProfileAvatarUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Validate file size and type
+            if (!file.type.startsWith('image/')) {
+                showNotificationToast('Please select a valid image file.', false);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Data = e.target.result;
+                localStorage.setItem('adminProfileAvatar', base64Data);
+
+                // Update UI elements
+                const avatarImgEl = document.getElementById('profileAvatarImage');
+                const initialsEl = document.getElementById('profileAvatarInitials');
+
+                if (avatarImgEl) {
+                    avatarImgEl.src = base64Data;
+                    avatarImgEl.classList.remove('hidden');
+                }
+                if (initialsEl) {
+                    initialsEl.classList.add('hidden');
+                }
+
+                showNotificationToast('Profile photo updated successfully!');
+            };
+            reader.readAsDataURL(file);
         }
 
         function saveStoreInformation() {
