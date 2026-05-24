@@ -1280,7 +1280,7 @@
                     );
 
                     const { data, error } = await Promise.race([
-                        supabaseClient.from('products').select('*, discount_percent, discount_expiry, badge').order('id', { ascending: true }),
+                        supabaseClient.from('products').select('*').order('id', { ascending: true }),
                         timeoutPromise
                     ]);
 
