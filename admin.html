@@ -197,9 +197,15 @@
         #productModal select,
         #productModal textarea,
         #productModal label[for="imageUploadInput"],
-        #productModal label[for="hoverImageUploadInput"],
+        #productModal label[for="opt2ImageUploadInput"],
+        #productModal label[for="opt3ImageUploadInput"],
+        #productModal label[for="opt4ImageUploadInput"],
+        #productModal label[for="opt5ImageUploadInput"],
         #productModal #imagePreviewThumbnail,
-        #productModal #hoverImagePreviewThumbnail,
+        #productModal #opt2ImagePreviewThumbnail,
+        #productModal #opt3ImagePreviewThumbnail,
+        #productModal #opt4ImagePreviewThumbnail,
+        #productModal #opt5ImagePreviewThumbnail,
         #productModal .w-20.h-20,
         #productModal button {
             border-radius: 12px !important;
@@ -1583,6 +1589,11 @@
         // On Page Load: Check session and subscribe to auth state changes
         window.addEventListener('DOMContentLoaded', async () => {
             initCustomDropdowns();
+            setupDragAndDrop('mainImageUploadLabel', 'imageUploadInput', 'main');
+            setupDragAndDrop('opt2ImageUploadLabel', 'opt2ImageUploadInput', 'opt2');
+            setupDragAndDrop('opt3ImageUploadLabel', 'opt3ImageUploadInput', 'opt3');
+            setupDragAndDrop('opt4ImageUploadLabel', 'opt4ImageUploadInput', 'opt4');
+            setupDragAndDrop('opt5ImageUploadLabel', 'opt5ImageUploadInput', 'opt5');
             if (typeof initSettingsTab === 'function') {
                 initSettingsTab();
             }
@@ -1830,6 +1841,8 @@
         let allProducts = [];
         let hasDiscountPercentCol = true;
         let hasDiscountExpiryCol = true;
+        let hasImage4Col = true;
+        let hasImage5Col = true;
 
         // Tab Switching logic
         function switchTab(tabName) {
@@ -1917,6 +1930,27 @@
             try {
                 if (!supabaseClient) {
                     throw new Error("Supabase client is not initialized.");
+                }
+
+                // Check dynamically if products table contains the image_4 and image_5 columns
+                try {
+                    const { error: testImgColErr } = await supabaseClient
+                        .from('products')
+                        .select('image_4, image_5')
+                        .limit(1);
+                    if (!testImgColErr) {
+                        hasImage4Col = true;
+                        hasImage5Col = true;
+                        console.log("[fetchProductsData] image_4 and image_5 columns detected in Supabase.");
+                    } else {
+                        hasImage4Col = false;
+                        hasImage5Col = false;
+                        console.warn("[fetchProductsData] image_4 and image_5 columns not found, using compatibility fallback.");
+                    }
+                } catch (imgColCheckErr) {
+                    console.warn("[fetchProductsData] Failed to check for image columns presence:", imgColCheckErr);
+                    hasImage4Col = false;
+                    hasImage5Col = false;
                 }
 
                 // Check dynamically if products table contains the discount_percent and discount_expiry columns
@@ -2291,7 +2325,42 @@
             document.getElementById('modalStatus').value = 'in_stock';
             document.getElementById('modalBadge').value = 'None';
             document.getElementById('modalImageUrl').value = '';
-            document.getElementById('modalHoverImageUrl').value = '';
+            
+            // Reset main image preview elements
+            const mainPreview = document.getElementById('imagePreviewThumbnail');
+            const mainNoPreview = document.getElementById('noPreviewText');
+            const mainLabel = document.getElementById('uploadLabelText');
+            if (mainPreview) {
+                mainPreview.src = '';
+                mainPreview.classList.add('hidden');
+            }
+            if (mainNoPreview) mainNoPreview.classList.remove('hidden');
+            if (mainLabel) mainLabel.textContent = "Click or Drag Image to Upload";
+
+            // Reset optional slot hidden inputs
+            if (document.getElementById('modalOpt2ImageUrl')) document.getElementById('modalOpt2ImageUrl').value = '';
+            if (document.getElementById('modalOpt3ImageUrl')) document.getElementById('modalOpt3ImageUrl').value = '';
+            if (document.getElementById('modalOpt4ImageUrl')) document.getElementById('modalOpt4ImageUrl').value = '';
+            if (document.getElementById('modalOpt5ImageUrl')) document.getElementById('modalOpt5ImageUrl').value = '';
+
+            const optSlots = [2, 3, 4, 5];
+            optSlots.forEach(slot => {
+                const preview = document.getElementById(`opt${slot}ImagePreviewThumbnail`);
+                const noPreview = document.getElementById(`noOpt${slot}PreviewText`);
+                const label = document.getElementById(`opt${slot}UploadLabelText`);
+                const removeBtn = document.getElementById(`removeOpt${slot}Btn`);
+
+                if (preview) {
+                    preview.src = '';
+                    preview.classList.add('hidden');
+                }
+                if (noPreview) noPreview.classList.remove('hidden');
+                if (label) label.textContent = `Click or Drag Optional Image ${slot} to Upload`;
+                if (removeBtn) {
+                    removeBtn.classList.add('hidden');
+                    removeBtn.classList.remove('flex');
+                }
+            });
             document.getElementById('modalDescription').value = '';
             document.getElementById('modalDiscountPercent').value = '';
             document.getElementById('modalDiscountExpiry').value = '';
@@ -2363,9 +2432,91 @@
                     if (loadedStatus === 'Stock Out') loadedStatus = 'stock_out';
                     document.getElementById('modalStatus').value = loadedStatus;
                     document.getElementById('modalImageUrl').value = product.image || '';
+                    if (product.image && mainPreview && mainNoPreview) {
+                        mainPreview.src = product.image;
+                        mainPreview.classList.remove('hidden');
+                        mainNoPreview.classList.add('hidden');
+                        if (mainLabel) mainLabel.textContent = "Change Image";
+                    }
 
-                    const hoverImgUrl = product.hover_image_url || product.second_image || '';
-                    document.getElementById('modalHoverImageUrl').value = hoverImgUrl;
+                    // Load Optional Images
+                    let opt2 = '';
+                    let opt3 = '';
+                    let opt4 = '';
+                    let opt5 = '';
+
+                    // Check if second_image is a JSON array
+                    let parsedSecondImages = [];
+                    if (product.second_image && product.second_image.trim().startsWith('[')) {
+                        try {
+                            const parsed = JSON.parse(product.second_image);
+                            if (Array.isArray(parsed)) {
+                                parsedSecondImages = parsed;
+                            }
+                        } catch (e) {
+                            console.warn("Failed to parse second_image JSON:", e);
+                        }
+                    }
+
+                    if (parsedSecondImages.length > 0) {
+                        opt2 = parsedSecondImages[0] || '';
+                        opt3 = parsedSecondImages[1] || '';
+                        opt4 = parsedSecondImages[2] || '';
+                        opt5 = parsedSecondImages[3] || '';
+                    } else {
+                        opt2 = product.second_image || '';
+                        opt3 = product.hover_image_url || '';
+                        opt4 = product.image_4 || '';
+                        opt5 = product.image_5 || '';
+                    }
+
+                    // Always prioritize dedicated columns if they are not empty (merging options)
+                    if (product.image_4) opt4 = product.image_4;
+                    if (product.image_5) opt5 = product.image_5;
+
+                    // Set field values
+                    if (document.getElementById('modalOpt2ImageUrl')) document.getElementById('modalOpt2ImageUrl').value = opt2;
+                    if (document.getElementById('modalOpt3ImageUrl')) document.getElementById('modalOpt3ImageUrl').value = opt3;
+                    if (document.getElementById('modalOpt4ImageUrl')) document.getElementById('modalOpt4ImageUrl').value = opt4;
+                    if (document.getElementById('modalOpt5ImageUrl')) document.getElementById('modalOpt5ImageUrl').value = opt5;
+
+                    // Render Previews for Optional Slots
+                    const optSlotsToLoad = [
+                        { num: 2, url: opt2 },
+                        { num: 3, url: opt3 },
+                        { num: 4, url: opt4 },
+                        { num: 5, url: opt5 }
+                    ];
+
+                    optSlotsToLoad.forEach(slot => {
+                        const preview = document.getElementById(`opt${slot.num}ImagePreviewThumbnail`);
+                        const noPreview = document.getElementById(`noOpt${slot.num}PreviewText`);
+                        const label = document.getElementById(`opt${slot.num}UploadLabelText`);
+                        const removeBtn = document.getElementById(`removeOpt${slot.num}Btn`);
+
+                        if (slot.url && preview && noPreview) {
+                            preview.src = slot.url;
+                            preview.classList.remove('hidden');
+                            noPreview.classList.add('hidden');
+                            if (label) label.textContent = "Change Image";
+                            if (removeBtn) {
+                                removeBtn.classList.remove('hidden');
+                                removeBtn.classList.add('flex');
+                            }
+                        } else {
+                            if (preview) {
+                                preview.src = '';
+                                preview.classList.add('hidden');
+                            }
+                            if (noPreview) noPreview.classList.remove('hidden');
+                            if (label) label.textContent = `Click or Drag Optional Image ${slot.num} to Upload`;
+                            if (removeBtn) {
+                                removeBtn.classList.add('hidden');
+                                removeBtn.classList.remove('flex');
+                            }
+                        }
+                    });
+
                     document.getElementById('modalDescription').value = '';
 
                     let initialBadge = product.badge || 'None';
@@ -2381,20 +2532,6 @@
 
                     document.getElementById('modalDiscountPercent').value = product.discount_percent !== undefined && product.discount_percent !== null ? product.discount_percent : '';
                     document.getElementById('modalDiscountExpiry').value = product.discount_expiry !== undefined && product.discount_expiry !== null ? product.discount_expiry : '';
-
-                    if (product.image && previewImg && noPreview) {
-                        previewImg.src = product.image;
-                        previewImg.classList.remove('hidden');
-                        noPreview.classList.add('hidden');
-                        uploadLabelText.textContent = "Change Product Image";
-                    }
-
-                    if (hoverImgUrl && hoverPreviewImg && noHoverPreview) {
-                        hoverPreviewImg.src = hoverImgUrl;
-                        hoverPreviewImg.classList.remove('hidden');
-                        noHoverPreview.classList.add('hidden');
-                        hoverUploadLabelText.textContent = "Change Hover Image";
-                    }
                 }
             }
             syncCustomDropdowns();
@@ -2514,18 +2651,27 @@
             const file = event.target.files[0];
             if (!file) return;
 
-            let uploadLabelText, previewImg, noPreview, hiddenInputId;
+            let uploadLabelText, previewImg, noPreview, hiddenInputId, removeBtn;
 
             if (type === 'main') {
                 uploadLabelText = document.getElementById('uploadLabelText');
                 previewImg = document.getElementById('imagePreviewThumbnail');
                 noPreview = document.getElementById('noPreviewText');
                 hiddenInputId = 'modalImageUrl';
+            } else if (type.startsWith('opt')) {
+                const slot = type.replace('opt', '');
+                uploadLabelText = document.getElementById(`opt${slot}UploadLabelText`);
+                previewImg = document.getElementById(`opt${slot}ImagePreviewThumbnail`);
+                noPreview = document.getElementById(`noOpt${slot}PreviewText`);
+                hiddenInputId = `modalOpt${slot}ImageUrl`;
+                removeBtn = document.getElementById(`removeOpt${slot}Btn`);
             } else {
-                uploadLabelText = document.getElementById('hoverUploadLabelText');
-                previewImg = document.getElementById('hoverImagePreviewThumbnail');
-                noPreview = document.getElementById('noHoverPreviewText');
-                hiddenInputId = 'modalHoverImageUrl';
+                // Compatibility for legacy 'hover' type
+                uploadLabelText = document.getElementById('opt3UploadLabelText') || document.getElementById('hoverUploadLabelText');
+                previewImg = document.getElementById('opt3ImagePreviewThumbnail') || document.getElementById('hoverImagePreviewThumbnail');
+                noPreview = document.getElementById('noOpt3PreviewText') || document.getElementById('noHoverPreviewText');
+                hiddenInputId = 'modalOpt3ImageUrl';
+                removeBtn = document.getElementById('removeOpt3Btn');
             }
 
             if (uploadLabelText) uploadLabelText.textContent = "Uploading image...";
@@ -2558,13 +2704,13 @@
                 const publicUrl = publicUrlData.publicUrl;
 
                 console.log(`[Upload success] Uploaded ${type} image.`);
-                console.log(`- Received Public URL: ${publicUrl}`);
-                console.log(`- Setting hidden input: #${hiddenInputId}`);
+                console.log(`- Setting hidden input: #${hiddenInputId} to ${publicUrl}`);
 
                 // Set value in hidden input and show preview
-                document.getElementById(hiddenInputId).value = publicUrl;
-
-                console.log(`- Verified hidden input value:`, document.getElementById(hiddenInputId).value);
+                const targetInput = document.getElementById(hiddenInputId);
+                if (targetInput) {
+                    targetInput.value = publicUrl;
+                }
 
                 if (previewImg && noPreview) {
                     previewImg.src = publicUrl;
@@ -2572,22 +2718,82 @@
                     noPreview.classList.add('hidden');
                 }
 
-                if (uploadLabelText) uploadLabelText.textContent = "Image uploaded successfully!";
+                if (removeBtn) {
+                    removeBtn.classList.remove('hidden');
+                    removeBtn.classList.add('flex');
+                }
+
+                if (uploadLabelText) {
+                    uploadLabelText.textContent = "Change Image";
+                }
                 showNotificationToast("Image uploaded successfully!");
             } catch (err) {
                 console.error("Image upload failed:", err);
                 if (uploadLabelText) {
-                    uploadLabelText.textContent = type === 'main' ? "Upload failed. Click to retry." : "Upload failed. Click to retry.";
+                    uploadLabelText.textContent = "Upload failed. Click to retry.";
                 }
                 showNotificationToast(`Upload failed: ${err.message || err}`, false);
             }
         }
 
+        // Remove optional uploaded image
+        function removeOptionalImage(slotNum) {
+            const hiddenInput = document.getElementById(`modalOpt${slotNum}ImageUrl`);
+            const previewImg = document.getElementById(`opt${slotNum}ImagePreviewThumbnail`);
+            const noPreview = document.getElementById(`noOpt${slotNum}PreviewText`);
+            const labelText = document.getElementById(`opt${slotNum}UploadLabelText`);
+            const removeBtn = document.getElementById(`removeOpt${slotNum}Btn`);
+            const fileInput = document.getElementById(`opt${slotNum}ImageUploadInput`);
+
+            if (hiddenInput) hiddenInput.value = '';
+            if (previewImg) {
+                previewImg.src = '';
+                previewImg.classList.add('hidden');
+            }
+            if (noPreview) noPreview.classList.remove('hidden');
+            if (labelText) {
+                labelText.textContent = `Click or Drag Optional Image ${slotNum} to Upload`;
+            }
+            if (removeBtn) {
+                removeBtn.classList.add('hidden');
+                removeBtn.classList.remove('flex');
+            }
+            if (fileInput) fileInput.value = ''; // Reset file input
+            showNotificationToast(`Optional Image ${slotNum} removed.`);
+        }
+
+        // Setup Drag and Drop Event Listeners
+        function setupDragAndDrop(labelId, inputId, type) {
+            const label = document.getElementById(labelId);
+            if (!label) return;
+
+            label.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                label.classList.remove('bg-gray-50/50');
+                label.classList.add('border-accent', 'bg-accent/5');
+            });
+
+            label.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                label.classList.add('bg-gray-50/50');
+                label.classList.remove('border-accent', 'bg-accent/5');
+            });
+
+            label.addEventListener('drop', (e) => {
+                e.preventDefault();
+                label.classList.add('bg-gray-50/50');
+                label.classList.remove('border-accent', 'bg-accent/5');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const mockEvent = { target: { files: files } };
+                    handleImageUpload(mockEvent, type);
+                }
+            });
+        }
+
         // Save (Insert / Update) Product Form handler
         async function saveProduct(event) {
             event.preventDefault();
-
-
 
             const saveBtn = document.getElementById('saveProductBtn');
             if (saveBtn) {
@@ -2603,15 +2809,20 @@
             const stock = Number(document.getElementById('modalStock').value);
             const status = document.getElementById('modalStatus').value;
             const image_url = document.getElementById('modalImageUrl').value;
-            const hover_image_url = document.getElementById('modalHoverImageUrl').value;
+            
+            const opt2_url = document.getElementById('modalOpt2ImageUrl') ? document.getElementById('modalOpt2ImageUrl').value : null;
+            const opt3_url = document.getElementById('modalOpt3ImageUrl') ? document.getElementById('modalOpt3ImageUrl').value : null;
+            const opt4_url = document.getElementById('modalOpt4ImageUrl') ? document.getElementById('modalOpt4ImageUrl').value : null;
+            const opt5_url = document.getElementById('modalOpt5ImageUrl') ? document.getElementById('modalOpt5ImageUrl').value : null;
+
             const discount_percent = Number(document.getElementById('modalDiscountPercent').value) || 0;
             const discount_expiry = document.getElementById('modalDiscountExpiry').value || null;
-
+ 
             const badge = document.getElementById('modalBadge').value;
             const isDiscountBadge = badge === 'DISCOUNT';
             const final_discount_percent = isDiscountBadge ? discount_percent : 0;
             const final_discount_expiry = isDiscountBadge ? discount_expiry : null;
-
+ 
             const payload = {
                 name: name,
                 price: price,
@@ -2620,10 +2831,23 @@
                 series: series,
                 image: image_url,
                 status: status,
-                second_image: hover_image_url || image_url,
-                hover_image_url: hover_image_url || null,
                 badge: badge === 'None' ? 'None' : badge
             };
+
+            if (hasImage4Col && hasImage5Col) {
+                payload.second_image = opt2_url || image_url;
+                payload.hover_image_url = opt3_url || null;
+                payload.image_4 = opt4_url || null;
+                payload.image_5 = opt5_url || null;
+            } else {
+                const optImages = [opt2_url, opt3_url, opt4_url, opt5_url].filter(Boolean);
+                if (optImages.length > 1) {
+                    payload.second_image = JSON.stringify(optImages);
+                } else {
+                    payload.second_image = opt2_url || image_url;
+                }
+                payload.hover_image_url = opt3_url || opt2_url || null;
+            }
 
             if (hasDiscountPercentCol) {
                 payload.discount_percent = final_discount_percent;
@@ -2641,7 +2865,7 @@
             console.log("- ID:", id || "(new product)");
             console.log("- Name:", name);
             console.log("- Main Image Input:", image_url);
-            console.log("- Hover Image Input:", hover_image_url);
+            console.log("- Hover Image Input:", payload.hover_image_url);
             console.log("- Full Payload Object:", JSON.stringify(payload, null, 2));
 
             try {
@@ -4462,10 +4686,10 @@
 
                     <!-- Product Image Upload / Public URL Flow -->
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Product Image</label>
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Product Image (Required)</label>
                         <div class="flex gap-4 items-center">
                             <div class="flex-grow">
-                                <label for="imageUploadInput"
+                                <label for="imageUploadInput" id="mainImageUploadLabel"
                                     class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer hover:border-accent transition-all bg-gray-50/50">
                                     <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
@@ -4489,34 +4713,124 @@
                         <input type="hidden" id="modalImageUrl" required>
                     </div>
 
-                    <!-- Product Hover Image Upload -->
+                    <!-- Optional Image 2 -->
                     <div class="space-y-1.5">
-                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Hover Image
-                            (Optional)</label>
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Optional Image 2</label>
                         <div class="flex gap-4 items-center">
                             <div class="flex-grow">
-                                <label for="hoverImageUploadInput"
+                                <label for="opt2ImageUploadInput" id="opt2ImageUploadLabel"
                                     class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer hover:border-accent transition-all bg-gray-50/50">
                                     <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor"
                                         viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                     </svg>
-                                    <span class="text-xs font-semibold text-gray-500 mt-1" id="hoverUploadLabelText">Click
-                                        or Drag Hover Image to Upload</span>
-                                    <input type="file" id="hoverImageUploadInput" accept="image/*" class="hidden"
-                                        onchange="handleImageUpload(event, 'hover')">
+                                    <span class="text-xs font-semibold text-gray-500 mt-1" id="opt2UploadLabelText">Click or Drag Optional Image 2 to Upload</span>
+                                    <input type="file" id="opt2ImageUploadInput" accept="image/*" class="hidden"
+                                        onchange="handleImageUpload(event, 'opt2')">
                                 </label>
                             </div>
                             <!-- Preview Thumbnail -->
-                            <div
-                                class="w-20 h-20 rounded-xl border border-gray-150 overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center">
-                                <img id="hoverImagePreviewThumbnail" src="" class="w-full h-full object-cover hidden">
-                                <span id="noHoverPreviewText" class="text-[10px] text-gray-400 font-bold text-center p-1">No
-                                    Image</span>
+                            <div class="relative w-20 h-20 rounded-xl border border-gray-150 overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center group/preview">
+                                <img id="opt2ImagePreviewThumbnail" src="" class="w-full h-full object-cover hidden">
+                                <span id="noOpt2PreviewText" class="text-[10px] text-gray-400 font-bold text-center p-1">No Image</span>
+                                <button type="button" onclick="removeOptionalImage(2)" id="removeOpt2Btn"
+                                    class="hidden absolute inset-0 bg-black/60 items-center justify-center transition-all opacity-0 group-hover/preview:opacity-100 flex text-white hover:text-red-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
                             </div>
                         </div>
-                        <input type="hidden" id="modalHoverImageUrl">
+                        <input type="hidden" id="modalOpt2ImageUrl">
+                    </div>
+
+                    <!-- Optional Image 3 -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Optional Image 3</label>
+                        <div class="flex gap-4 items-center">
+                            <div class="flex-grow">
+                                <label for="opt3ImageUploadInput" id="opt3ImageUploadLabel"
+                                    class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer hover:border-accent transition-all bg-gray-50/50">
+                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="text-xs font-semibold text-gray-500 mt-1" id="opt3UploadLabelText">Click or Drag Optional Image 3 to Upload</span>
+                                    <input type="file" id="opt3ImageUploadInput" accept="image/*" class="hidden"
+                                        onchange="handleImageUpload(event, 'opt3')">
+                                </label>
+                            </div>
+                            <!-- Preview Thumbnail -->
+                            <div class="relative w-20 h-20 rounded-xl border border-gray-150 overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center group/preview">
+                                <img id="opt3ImagePreviewThumbnail" src="" class="w-full h-full object-cover hidden">
+                                <span id="noOpt3PreviewText" class="text-[10px] text-gray-400 font-bold text-center p-1">No Image</span>
+                                <button type="button" onclick="removeOptionalImage(3)" id="removeOpt3Btn"
+                                    class="hidden absolute inset-0 bg-black/60 items-center justify-center transition-all opacity-0 group-hover/preview:opacity-100 flex text-white hover:text-red-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="modalOpt3ImageUrl">
+                    </div>
+
+                    <!-- Optional Image 4 -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Optional Image 4</label>
+                        <div class="flex gap-4 items-center">
+                            <div class="flex-grow">
+                                <label for="opt4ImageUploadInput" id="opt4ImageUploadLabel"
+                                    class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer hover:border-accent transition-all bg-gray-50/50">
+                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="text-xs font-semibold text-gray-500 mt-1" id="opt4UploadLabelText">Click or Drag Optional Image 4 to Upload</span>
+                                    <input type="file" id="opt4ImageUploadInput" accept="image/*" class="hidden"
+                                        onchange="handleImageUpload(event, 'opt4')">
+                                </label>
+                            </div>
+                            <!-- Preview Thumbnail -->
+                            <div class="relative w-20 h-20 rounded-xl border border-gray-150 overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center group/preview">
+                                <img id="opt4ImagePreviewThumbnail" src="" class="w-full h-full object-cover hidden">
+                                <span id="noOpt4PreviewText" class="text-[10px] text-gray-400 font-bold text-center p-1">No Image</span>
+                                <button type="button" onclick="removeOptionalImage(4)" id="removeOpt4Btn"
+                                    class="hidden absolute inset-0 bg-black/60 items-center justify-center transition-all opacity-0 group-hover/preview:opacity-100 flex text-white hover:text-red-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="modalOpt4ImageUrl">
+                    </div>
+
+                    <!-- Optional Image 5 -->
+                    <div class="space-y-1.5">
+                        <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Optional Image 5</label>
+                        <div class="flex gap-4 items-center">
+                            <div class="flex-grow">
+                                <label for="opt5ImageUploadInput" id="opt5ImageUploadLabel"
+                                    class="flex flex-col items-center justify-center border-2 border-dashed border-gray-200 rounded-xl p-4 cursor-pointer hover:border-accent transition-all bg-gray-50/50">
+                                    <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor"
+                                        viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                    <span class="text-xs font-semibold text-gray-500 mt-1" id="opt5UploadLabelText">Click or Drag Optional Image 5 to Upload</span>
+                                    <input type="file" id="opt5ImageUploadInput" accept="image/*" class="hidden"
+                                        onchange="handleImageUpload(event, 'opt5')">
+                                </label>
+                            </div>
+                            <!-- Preview Thumbnail -->
+                            <div class="relative w-20 h-20 rounded-xl border border-gray-150 overflow-hidden flex-shrink-0 bg-gray-50 flex items-center justify-center group/preview">
+                                <img id="opt5ImagePreviewThumbnail" src="" class="w-full h-full object-cover hidden">
+                                <span id="noOpt5PreviewText" class="text-[10px] text-gray-400 font-bold text-center p-1">No Image</span>
+                                <button type="button" onclick="removeOptionalImage(5)" id="removeOpt5Btn"
+                                    class="hidden absolute inset-0 bg-black/60 items-center justify-center transition-all opacity-0 group-hover/preview:opacity-100 flex text-white hover:text-red-400">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <input type="hidden" id="modalOpt5ImageUrl">
                     </div>
 
                     <!-- Description -->

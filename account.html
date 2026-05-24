@@ -178,11 +178,12 @@
                 </a>
 
                 <!-- Wishlist Icon -->
-                <button class="text-primary/80 hover:text-accent transition-colors p-2 cursor-pointer" title="Wishlist">
+                <a href="wishlist.html" class="text-primary/80 hover:text-accent transition-colors p-2 cursor-pointer relative inline-block" title="Wishlist">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
                     </svg>
-                </button>
+                    <span id="accountWishlistBadge" class="absolute top-0 right-0 bg-accent text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none hidden">0</span>
+                </a>
 
                 <!-- Cart Button -->
                 <a href="cart.html" class="flex items-center gap-2 bg-accent hover:bg-accent-dark text-white px-4 py-2 rounded-full font-semibold transition-all hover:scale-105 cursor-pointer">
@@ -536,6 +537,21 @@
                 }
             }
             loadCartBadge();
+
+            // Load and Sync Wishlist Counter on startup
+            function loadWishlistBadge() {
+                const wishlist = JSON.parse(localStorage.getItem('animeWishlist')) || [];
+                const badge = document.getElementById('accountWishlistBadge');
+                if (badge) {
+                    badge.textContent = wishlist.length;
+                    if (wishlist.length > 0) {
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                }
+            }
+            loadWishlistBadge();
 
             // Mobile Menu Toggle
             const menuBtn = document.getElementById('menuBtn');
